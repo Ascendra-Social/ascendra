@@ -1,0 +1,209 @@
+import React, { useState } from 'react';
+import { base44 } from '@/api/base44Client';
+import { 
+  Image, Video, X, Loader2, Sparkles
+} from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+export default function CreatePostModal({ isOpen, onClose, user, communities = [], onPostCreated }) {
+  const [content, setContent] = useState('');
+  const [mediaFile, setMediaFile] = useState(null);
+  const [mediaPreview, setMediaPreview] = useState(null);
+  const [mediaType, setMediaType] = useState('none');
+  const [communityId, setCommunityId] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleMediaSelect = (e, type) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setMediaFile(file);
+      setMediaType(type);
+      setMediaPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!content.trim() && !mediaFile) return;
+    
+    setIsSubmitting(true);
+    try {
+      let mediaUrl = '';
+      if (mediaFile) {
+        const { file_url } = await base44.integrations.Core.UploadFile({ file: mediaFile });
+        mediaUrl = file_url;
+      }
+
+      // Analyze content positivity using AI
+      let positivityScore = 0.5;
+      try {
+        const analysis = await base44.integrations.Core.InvokeLLM({
+          prompt: `Analyze the following social media post and rate its positivity on a scale of 0 to 1, where 0 is very negative/fear-based and 1 is very positive/uplifting. Only return a number.
+
+Post: "${content}"`,
+          response_json_schema: {
+            type: "object",
+            properties: {
+              score: { type: "number" }
+            }
+          }
+        });
+        positivityScore = analysis.score || 0.5;
+      } catch (e) {
+        console.log('Positivity analysis failed, using default');
+      }
+
+      const post = await base44.entities.Post.create({
+        author_id: user.id,
+        author_name: user.full_name,
+        author_avatar: user.avatar,
+        content,
+        media_url: mediaUrl,
+        media_type: mediaType,
+        community_id: communityId || null,
+        positivity_score: positivityScore,
+      });
+
+      setContent('');
+      setMediaFile(null);
+      setMediaPreview(null);
+      setMediaType('none');
+      setCommunityId('');
+      if (onPostCreated) onPostCreated(post);
+      onClose();
+    } catch (error) {
+      console.error('Error creating post:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-lg rounded-3xl p-0 overflow-hidden">
+        <DialogHeader className="p-6 pb-4 border-b border-slate-100">
+          <DialogTitle className="text-xl font-semibold flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-violet-500" />
+            Create Post
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="p-6 space-y-4">
+          <div className="flex gap-3">
+            <Avatar className="w-12 h-12 ring-2 ring-violet-100">
+              <AvatarImage src={user?.avatar} />
+              <AvatarFallback className="bg-gradient-to-br from-violet-400 to-pink-400 text-white">
+                {user?.full_name?.[0] || 'U'}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <p className="font-semibold text-slate-800">{user?.full_name}</p>
+              <Select value={communityId} onValueChange={setCommunityId}>
+                <SelectTrigger className="w-fit h-7 text-xs border-0 bg-slate-100 rounded-full px-3 mt-1">
+                  <SelectValue placeholder="Post to Feed" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={null}>Your Feed</SelectItem>
+                  {communities.map(c => (
+                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <Textarea
+            placeholder="What's on your mind?"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="min-h-[120px] resize-none border-0 focus-visible:ring-0 text-lg placeholder:text-slate-300"
+          />
+
+          {mediaPreview && (
+            <div className="relative rounded-2xl overflow-hidden">
+              {mediaType === 'video' ? (
+                <video src={mediaPreview} className="w-full rounded-2xl" controls />
+              ) : (
+                <img src={mediaPreview} alt="" className="w-full rounded-2xl" />
+              )}
+              <Button
+                size="icon"
+                variant="secondary"
+                className="absolute top-2 right-2 rounded-full bg-black/50 hover:bg-black/70"
+                onClick={() => {
+                  setMediaFile(null);
+                  setMediaPreview(null);
+                  setMediaType('none');
+                }}
+              >
+                <X className="w-4 h-4 text-white" />
+              </Button>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+            <div className="flex gap-2">
+              <input
+                type="file"
+                id="image-upload"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleMediaSelect(e, 'image')}
+              />
+              <label htmlFor="image-upload">
+                <Button variant="ghost" size="sm" className="rounded-full gap-2" asChild>
+                  <span>
+                    <Image className="w-5 h-5 text-violet-500" />
+                    Photo
+                  </span>
+                </Button>
+              </label>
+              
+              <input
+                type="file"
+                id="video-upload"
+                accept="video/*"
+                className="hidden"
+                onChange={(e) => handleMediaSelect(e, 'video')}
+              />
+              <label htmlFor="video-upload">
+                <Button variant="ghost" size="sm" className="rounded-full gap-2" asChild>
+                  <span>
+                    <Video className="w-5 h-5 text-pink-500" />
+                    Video
+                  </span>
+                </Button>
+              </label>
+            </div>
+
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting || (!content.trim() && !mediaFile)}
+              className="bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-full px-6"
+            >
+              {isSubmitting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                'Post'
+              )}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
