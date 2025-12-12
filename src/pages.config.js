@@ -8,6 +8,7 @@ import Wallet from './pages/Wallet';
 import Profile from './pages/Profile';
 import CommunityDetail from './pages/CommunityDetail';
 import CreatePost from './pages/CreatePost';
+import ListingDetail from './pages/ListingDetail';
 import __Layout from './Layout.jsx';
 
 
@@ -22,6 +23,7 @@ export const PAGES = {
     "Profile": Profile,
     "CommunityDetail": CommunityDetail,
     "CreatePost": CreatePost,
+    "ListingDetail": ListingDetail,
 }
 
 export const pagesConfig = {
