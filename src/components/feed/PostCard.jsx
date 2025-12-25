@@ -161,6 +161,16 @@ export default function PostCard({ post, currentUserId, onLike, onComment }) {
           <Bookmark className="w-5 h-5" />
         </Button>
       </div>
+
+      {/* AI Repost Modal */}
+      <AIAssistantModal
+        isOpen={showAIRepost}
+        onClose={() => setShowAIRepost(false)}
+        mode="repost"
+        imageUrl={post.media_url}
+        existingContent={post.content}
+        onApply={handleAIRepost}
+      />
     </motion.div>
   );
 }

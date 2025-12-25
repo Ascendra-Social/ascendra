@@ -6,6 +6,7 @@ import {
   Home, Search, PlusSquare, ShoppingBag, MessageCircle, 
   User, Compass, Play, Wallet, Bell, Menu, X, Users
 } from 'lucide-react';
+import AIFloatingButton from '@/components/ai/AIFloatingButton';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -196,6 +197,9 @@ export default function Layout({ children, currentPageName }) {
       <main className="lg:ml-72 pt-16 lg:pt-0 pb-24 lg:pb-8 min-h-screen">
         {children}
       </main>
+
+      {/* AI Floating Button */}
+      <AIFloatingButton />
     </div>
   );
 }
