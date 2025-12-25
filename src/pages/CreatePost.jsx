@@ -19,6 +19,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { motion } from 'framer-motion';
+import { moderateContent } from '@/components/moderation/ContentModerationCheck';
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Shield } from 'lucide-react';
 
 export default function CreatePost() {
   const [user, setUser] = useState(null);
@@ -29,6 +32,7 @@ export default function CreatePost() {
   const [communityId, setCommunityId] = useState('');
   const [isReel, setIsReel] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [moderationResult, setModerationResult] = useState(null);
   const navigate = useNavigate();
 
   // Check for repost draft
@@ -85,15 +89,42 @@ export default function CreatePost() {
     if (!content.trim() && !mediaFile) return;
     
     setIsSubmitting(true);
+    setModerationResult(null);
+    
     try {
+      // Content Moderation
+      const moderation = await moderateContent(
+        content,
+        mediaPreview,
+        'post',
+        user.id
+      );
+
+      if (!moderation.approved) {
+        setModerationResult({
+          blocked: true,
+          reason: moderation.explanation,
+          violation: moderation.violation_type
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (moderation.flagged) {
+        setModerationResult({
+          blocked: false,
+          flagged: true,
+          reason: moderation.explanation
+        });
+      }
+
       let mediaUrl = '';
       if (mediaFile) {
         const { file_url } = await base44.integrations.Core.UploadFile({ file: mediaFile });
         mediaUrl = file_url;
       }
 
-      // Analyze content positivity
-      let positivityScore = 0.5;
+      let positivityScore = moderation.safety_score || 0.5;
       if (content.trim()) {
         try {
           const analysis = await base44.integrations.Core.InvokeLLM({
@@ -174,6 +205,28 @@ Post: "${content}"`,
 
         {/* Content */}
         <div className="p-4 space-y-4">
+          {/* Moderation Alert */}
+          {moderationResult && (
+            <Alert variant={moderationResult.blocked ? "destructive" : "default"} className="rounded-xl">
+              {moderationResult.blocked ? (
+                <AlertCircle className="h-4 w-4" />
+              ) : (
+                <Shield className="h-4 w-4" />
+              )}
+              <AlertDescription>
+                <strong>
+                  {moderationResult.blocked ? 'Content Blocked' : 'Content Flagged for Review'}
+                </strong>
+                <p className="text-sm mt-1">{moderationResult.reason}</p>
+                {moderationResult.blocked && (
+                  <p className="text-xs mt-2 opacity-80">
+                    This content violates our community guidelines. Please revise to be more positive and respectful.
+                  </p>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="flex gap-3">
             <Avatar className="w-12 h-12 ring-2 ring-violet-100">
               <AvatarImage src={user.avatar} />

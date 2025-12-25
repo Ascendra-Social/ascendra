@@ -9,6 +9,7 @@ import Messages from './pages/Messages';
 import Profile from './pages/Profile';
 import Reels from './pages/Reels';
 import Wallet from './pages/Wallet';
+import Moderation from './pages/Moderation';
 import __Layout from './Layout.jsx';
 
 
@@ -24,6 +25,7 @@ export const PAGES = {
     "Profile": Profile,
     "Reels": Reels,
     "Wallet": Wallet,
+    "Moderation": Moderation,
 }
 
 export const pagesConfig = {

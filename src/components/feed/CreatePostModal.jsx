@@ -5,6 +5,9 @@ import {
 } from 'lucide-react';
 import AIAssistantModal from '@/components/ai/AIAssistantModal';
 import AIImageGenerator from '@/components/ai/AIImageGenerator';
+import { moderateContent } from '@/components/moderation/ContentModerationCheck';
+import { AlertCircle, Shield } from 'lucide-react';
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -32,6 +35,7 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
   const [showAIModal, setShowAIModal] = useState(false);
   const [aiMode, setAIMode] = useState('caption');
   const [showImageGenerator, setShowImageGenerator] = useState(false);
+  const [moderationResult, setModerationResult] = useState(null);
 
   const handleMediaSelect = (e, type) => {
     const file = e.target.files?.[0];
@@ -60,15 +64,45 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
     if (!content.trim() && !mediaFile) return;
     
     setIsSubmitting(true);
+    setModerationResult(null);
+    
     try {
+      // Step 1: Content Moderation Check
+      const moderation = await moderateContent(
+        content,
+        mediaPreview,
+        'post',
+        user.id
+      );
+
+      // Block harmful content
+      if (!moderation.approved) {
+        setModerationResult({
+          blocked: true,
+          reason: moderation.explanation,
+          violation: moderation.violation_type
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Warn if flagged but not blocked
+      if (moderation.flagged) {
+        setModerationResult({
+          blocked: false,
+          flagged: true,
+          reason: moderation.explanation
+        });
+      }
+
       let mediaUrl = '';
       if (mediaFile) {
         const { file_url } = await base44.integrations.Core.UploadFile({ file: mediaFile });
         mediaUrl = file_url;
       }
 
-      // Analyze content positivity using AI
-      let positivityScore = 0.5;
+      // Step 2: Analyze content positivity
+      let positivityScore = moderation.safety_score || 0.5;
       try {
         const analysis = await base44.integrations.Core.InvokeLLM({
           prompt: `Analyze the following social media post and rate its positivity on a scale of 0 to 1, where 0 is very negative/fear-based and 1 is very positive/uplifting. Only return a number.
@@ -102,6 +136,7 @@ Post: "${content}"`,
       setMediaPreview(null);
       setMediaType('none');
       setCommunityId('');
+      setModerationResult(null);
       if (onPostCreated) onPostCreated(post);
       onClose();
     } catch (error) {
@@ -122,6 +157,28 @@ Post: "${content}"`,
         </DialogHeader>
 
         <div className="p-6 space-y-4">
+          {/* Moderation Alert */}
+          {moderationResult && (
+            <Alert variant={moderationResult.blocked ? "destructive" : "default"} className="rounded-xl">
+              {moderationResult.blocked ? (
+                <AlertCircle className="h-4 w-4" />
+              ) : (
+                <Shield className="h-4 w-4" />
+              )}
+              <AlertDescription>
+                <strong>
+                  {moderationResult.blocked ? 'Content Blocked' : 'Content Flagged for Review'}
+                </strong>
+                <p className="text-sm mt-1">{moderationResult.reason}</p>
+                {moderationResult.blocked && (
+                  <p className="text-xs mt-2 opacity-80">
+                    This content violates our community guidelines. Please revise your post to be more positive and respectful.
+                  </p>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="flex gap-3">
             <Avatar className="w-12 h-12 ring-2 ring-violet-100">
               <AvatarImage src={user?.avatar} />
