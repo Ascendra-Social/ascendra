@@ -31,6 +31,20 @@ export default function CreatePost() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
+  // Check for repost draft
+  useEffect(() => {
+    const draft = localStorage.getItem('repost_draft');
+    if (draft) {
+      const data = JSON.parse(draft);
+      setContent(data.content);
+      if (data.media_url) {
+        setMediaPreview(data.media_url);
+        setMediaType(data.media_type);
+      }
+      localStorage.removeItem('repost_draft');
+    }
+  }, []);
+
   useEffect(() => {
     const loadUser = async () => {
       try {

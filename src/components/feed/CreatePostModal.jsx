@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { 
-  Image, Video, X, Loader2, Sparkles
+  Image, Video, X, Loader2, Sparkles, Wand2
 } from 'lucide-react';
+import AIAssistantModal from '@/components/ai/AIAssistantModal';
+import AIImageGenerator from '@/components/ai/AIImageGenerator';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -27,6 +29,9 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
   const [mediaType, setMediaType] = useState('none');
   const [communityId, setCommunityId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAIModal, setShowAIModal] = useState(false);
+  const [aiMode, setAIMode] = useState('caption');
+  const [showImageGenerator, setShowImageGenerator] = useState(false);
 
   const handleMediaSelect = (e, type) => {
     const file = e.target.files?.[0];
@@ -35,6 +40,20 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
       setMediaType(type);
       setMediaPreview(URL.createObjectURL(file));
     }
+  };
+
+  const handleAIApply = (result) => {
+    if (result.type === 'text') {
+      setContent(result.content);
+    } else if (result.type === 'image') {
+      setMediaPreview(result.url);
+      setMediaType('image');
+    }
+  };
+
+  const handleGeneratedImage = (url) => {
+    setMediaPreview(url);
+    setMediaType('image');
   };
 
   const handleSubmit = async () => {
@@ -132,6 +151,20 @@ Post: "${content}"`,
             onChange={(e) => setContent(e.target.value)}
             className="min-h-[120px] resize-none border-0 focus-visible:ring-0 text-lg placeholder:text-slate-300"
           />
+          
+          {/* AI Helper */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute bottom-2 right-2 rounded-full gap-2 text-violet-500 hover:text-violet-600 hover:bg-violet-50"
+            onClick={() => {
+              setAIMode(mediaPreview ? 'caption' : 'caption');
+              setShowAIModal(true);
+            }}
+          >
+            <Wand2 className="w-4 h-4" />
+            AI Help
+          </Button>
 
           {mediaPreview && (
             <div className="relative rounded-2xl overflow-hidden">
@@ -152,26 +185,50 @@ Post: "${content}"`,
               >
                 <X className="w-4 h-4 text-white" />
               </Button>
+            {mediaPreview && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute top-14 right-2 rounded-full gap-2 bg-white/90 backdrop-blur hover:bg-white"
+                onClick={() => {
+                  setAIMode('enhance');
+                  setShowAIModal(true);
+                }}
+              >
+                <Wand2 className="w-4 h-4 text-violet-500" />
+                Enhance
+              </Button>
+            )}
             </div>
-          )}
+            )}
 
-          <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-            <div className="flex gap-2">
-              <input
-                type="file"
-                id="image-upload"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => handleMediaSelect(e, 'image')}
-              />
-              <label htmlFor="image-upload">
-                <Button variant="ghost" size="sm" className="rounded-full gap-2" asChild>
-                  <span>
-                    <Image className="w-5 h-5 text-violet-500" />
-                    Photo
-                  </span>
+            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+              <div className="flex gap-2">
+                <input
+                  type="file"
+                  id="image-upload"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleMediaSelect(e, 'image')}
+                />
+                <label htmlFor="image-upload">
+                  <Button variant="ghost" size="sm" className="rounded-full gap-2" asChild>
+                    <span>
+                      <Image className="w-5 h-5 text-violet-500" />
+                      Photo
+                    </span>
+                  </Button>
+                </label>
+
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="rounded-full gap-2"
+                  onClick={() => setShowImageGenerator(true)}
+                >
+                  <Sparkles className="w-5 h-5 text-pink-500" />
+                  AI Image
                 </Button>
-              </label>
               
               <input
                 type="file"
@@ -204,6 +261,23 @@ Post: "${content}"`,
           </div>
         </div>
       </DialogContent>
+
+      {/* AI Assistant Modal */}
+      <AIAssistantModal
+        isOpen={showAIModal}
+        onClose={() => setShowAIModal(false)}
+        mode={aiMode}
+        imageUrl={mediaPreview}
+        existingContent={content}
+        onApply={handleAIApply}
+      />
+
+      {/* AI Image Generator */}
+      <AIImageGenerator
+        isOpen={showImageGenerator}
+        onClose={() => setShowImageGenerator(false)}
+        onImageGenerated={handleGeneratedImage}
+      />
     </Dialog>
   );
 }

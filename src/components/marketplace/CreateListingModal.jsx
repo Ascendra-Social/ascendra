@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { ShoppingBag, X, Loader2, Image, Plus, Coins } from 'lucide-react';
+import { ShoppingBag, X, Loader2, Image, Plus, Coins, Wand2 } from 'lucide-react';
+import AIAssistantModal from '@/components/ai/AIAssistantModal';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -45,6 +46,7 @@ export default function CreateListingModal({ isOpen, onClose, user, onCreated })
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAIModal, setShowAIModal] = useState(false);
 
   const handleImageSelect = (e) => {
     const files = Array.from(e.target.files || []);
@@ -56,6 +58,22 @@ export default function CreateListingModal({ isOpen, onClose, user, onCreated })
   const removeImage = (index) => {
     setImages(prev => prev.filter((_, i) => i !== index));
     setImagePreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleAIApply = (result) => {
+    if (result.type === 'listing' && result.data) {
+      setFormData({
+        ...formData,
+        title: result.data.title || formData.title,
+        description: result.data.description || formData.description,
+      });
+      if (result.data.price_range) {
+        const priceMatch = result.data.price_range.match(/\d+/);
+        if (priceMatch) {
+          setFormData(prev => ({ ...prev, price: priceMatch[0] }));
+        }
+      }
+    }
   };
 
   const handleSubmit = async () => {
@@ -132,6 +150,16 @@ export default function CreateListingModal({ isOpen, onClose, user, onCreated })
               )}
             </div>
           </div>
+
+          {/* AI Generate button */}
+          <Button
+            onClick={() => setShowAIModal(true)}
+            variant="outline"
+            className="w-full h-12 rounded-xl gap-2 border-violet-200 text-violet-600 hover:bg-violet-50"
+          >
+            <Wand2 className="w-4 h-4" />
+            Generate with AI
+          </Button>
 
           {/* Title */}
           <div>
@@ -257,6 +285,16 @@ export default function CreateListingModal({ isOpen, onClose, user, onCreated })
           </Button>
         </div>
       </DialogContent>
+
+      {/* AI Assistant Modal */}
+      <AIAssistantModal
+        isOpen={showAIModal}
+        onClose={() => setShowAIModal(false)}
+        mode="listing"
+        imageUrl={imagePreviews[0]}
+        existingContent={formData.description}
+        onApply={handleAIApply}
+      />
     </Dialog>
   );
 }

@@ -4,8 +4,9 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { 
   Heart, MessageCircle, Share2, Bookmark, MoreHorizontal,
-  Coins, Sparkles
+  Coins, Sparkles, Wand2, RefreshCw
 } from 'lucide-react';
+import AIAssistantModal from '@/components/ai/AIAssistantModal';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,7 @@ export default function PostCard({ post, currentUserId, onLike, onComment }) {
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likes_count || 0);
   const [showComments, setShowComments] = useState(false);
+  const [showAIRepost, setShowAIRepost] = useState(false);
 
   const handleLike = async () => {
     if (isLiked) {
@@ -31,6 +33,18 @@ export default function PostCard({ post, currentUserId, onLike, onComment }) {
     }
     setIsLiked(!isLiked);
     if (onLike) onLike(post.id, !isLiked);
+  };
+
+  const handleAIRepost = (result) => {
+    // Open create post page with AI-generated repost content
+    const repostContent = result.content;
+    localStorage.setItem('repost_draft', JSON.stringify({
+      content: repostContent,
+      original_author: post.author_name,
+      media_url: post.media_url,
+      media_type: post.media_type
+    }));
+    window.location.href = createPageUrl('CreatePost');
   };
 
   return (
@@ -71,6 +85,10 @@ export default function PostCard({ post, currentUserId, onLike, onComment }) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="rounded-xl">
+            <DropdownMenuItem onClick={() => setShowAIRepost(true)}>
+              <Wand2 className="w-4 h-4 mr-2 text-violet-500" />
+              Repost with AI
+            </DropdownMenuItem>
             <DropdownMenuItem>Save post</DropdownMenuItem>
             <DropdownMenuItem>Copy link</DropdownMenuItem>
             <DropdownMenuItem className="text-red-500">Report</DropdownMenuItem>
