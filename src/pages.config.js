@@ -10,6 +10,7 @@ import Profile from './pages/Profile';
 import Reels from './pages/Reels';
 import Wallet from './pages/Wallet';
 import Moderation from './pages/Moderation';
+import CommunityModeration from './pages/CommunityModeration';
 import __Layout from './Layout.jsx';
 
 
@@ -26,6 +27,7 @@ export const PAGES = {
     "Reels": Reels,
     "Wallet": Wallet,
     "Moderation": Moderation,
+    "CommunityModeration": CommunityModeration,
 }
 
 export const pagesConfig = {

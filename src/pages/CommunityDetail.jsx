@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
-  Users, Lock, Settings, Plus, ArrowLeft, Share2
+  Users, Lock, Settings, Plus, ArrowLeft, Share2, Shield
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -163,6 +163,13 @@ export default function CommunityDetail() {
 
           {/* Actions */}
           <div className="absolute top-4 right-4 flex gap-2">
+            {isMember && members?.find(m => m.user_id === user?.id)?.role !== 'member' && (
+              <Link to={createPageUrl(`CommunityModeration?id=${communityId}`)}>
+                <Button size="icon" variant="secondary" className="rounded-full bg-white/20 backdrop-blur hover:bg-white/30 border-0">
+                  <Shield className="w-4 h-4 text-white" />
+                </Button>
+              </Link>
+            )}
             <Button size="icon" variant="secondary" className="rounded-full bg-white/20 backdrop-blur hover:bg-white/30 border-0">
               <Share2 className="w-4 h-4 text-white" />
             </Button>
