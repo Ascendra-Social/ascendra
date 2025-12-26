@@ -22,12 +22,26 @@ export default function Layout({ children, currentPageName }) {
       try {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
+        // Update online status
+        await base44.auth.updateMe({ 
+          online_status: 'online',
+          last_active: new Date().toISOString()
+        });
       } catch (e) {
         console.log('Not logged in');
       }
     };
     loadUser();
-  }, []);
+
+    // Update last active periodically
+    const interval = setInterval(() => {
+      if (user) {
+        base44.auth.updateMe({ last_active: new Date().toISOString() });
+      }
+    }, 60000); // Every minute
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   const navItems = [
     { name: 'Home', icon: Home, page: 'Home' },

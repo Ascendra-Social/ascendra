@@ -94,6 +94,33 @@ export default function Profile() {
     enabled: !!profileUser
   });
 
+  const { data: mutualData } = useQuery({
+    queryKey: ['mutual-data', profileUser?.id, currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser || profileUser?.id === currentUser.id) return null;
+      
+      // Get mutual friends
+      const userFollowing = await base44.entities.Follow.filter({ follower_id: currentUser.id });
+      const profileFollowing = await base44.entities.Follow.filter({ follower_id: profileUser.id });
+      const mutualFriendIds = userFollowing
+        .filter(f => profileFollowing.some(pf => pf.following_id === f.following_id))
+        .map(f => f.following_id);
+      
+      // Get mutual communities
+      const userCommunities = await base44.entities.CommunityMember.filter({ user_id: currentUser.id });
+      const profileCommunities = await base44.entities.CommunityMember.filter({ user_id: profileUser.id });
+      const mutualCommunityIds = userCommunities
+        .filter(uc => profileCommunities.some(pc => pc.community_id === uc.community_id))
+        .map(uc => uc.community_id);
+      
+      return {
+        mutualFriends: mutualFriendIds.length,
+        mutualCommunities: mutualCommunityIds.length
+      };
+    },
+    enabled: !!profileUser && !!currentUser && profileUser?.id !== currentUser?.id
+  });
+
   const followMutation = useMutation({
     mutationFn: async () => {
       if (followData?.isFollowing) {
@@ -133,6 +160,15 @@ export default function Profile() {
     }
   };
 
+  const handleBannerUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      await base44.auth.updateMe({ banner: file_url });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+    }
+  };
+
   const isOwnProfile = !profileId || profileId === currentUser?.id;
   const user = isOwnProfile ? currentUser : profileUser;
 
@@ -148,22 +184,51 @@ export default function Profile() {
     );
   }
 
+  const statusColors = {
+    online: 'bg-green-500',
+    offline: 'bg-slate-400',
+    away: 'bg-yellow-500'
+  };
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
+      {/* Banner */}
+      <div className="relative -mx-4 -mt-6 mb-6 h-48 md:h-64 bg-gradient-to-br from-violet-400 to-pink-400 overflow-hidden">
+        {user?.banner && (
+          <img src={user.banner} alt="" className="w-full h-full object-cover" />
+        )}
+        {isOwnProfile && (
+          <label className="absolute bottom-4 right-4 cursor-pointer">
+            <Button size="sm" className="bg-white/90 backdrop-blur hover:bg-white text-slate-700 rounded-full gap-2">
+              <Camera className="w-4 h-4" />
+              Edit Banner
+            </Button>
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleBannerUpload}
+            />
+          </label>
+        )}
+      </div>
+
       {/* Profile Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col items-center mb-8"
+        className="flex flex-col items-center mb-8 -mt-20"
       >
         {/* Avatar */}
         <div className="relative mb-4">
-          <Avatar className="w-28 h-28 ring-4 ring-violet-100">
+          <Avatar className="w-28 h-28 ring-4 ring-white shadow-xl">
             <AvatarImage src={user.avatar} />
             <AvatarFallback className="text-3xl bg-gradient-to-br from-violet-400 to-pink-400 text-white">
               {user.full_name?.[0] || 'U'}
             </AvatarFallback>
           </Avatar>
+          {/* Online Status Indicator */}
+          <div className={`absolute bottom-2 right-2 w-6 h-6 ${statusColors[user.online_status || 'offline']} rounded-full border-4 border-white`} />
           {isOwnProfile && (
             <label className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-violet-500 flex items-center justify-center cursor-pointer hover:bg-violet-600 transition-colors">
               <Camera className="w-4 h-4 text-white" />
@@ -186,7 +251,17 @@ export default function Profile() {
             </Badge>
           )}
         </h1>
-        <p className="text-slate-500">@{user.username || 'username'}</p>
+        <p className="text-slate-500 mb-1">@{user.username || 'username'}</p>
+        {user.online_status === 'online' && (
+          <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 mb-2">
+            🟢 Online
+          </Badge>
+        )}
+        {user.online_status === 'away' && (
+          <Badge variant="outline" className="text-yellow-600 border-yellow-200 bg-yellow-50 mb-2">
+            🟡 Away
+          </Badge>
+        )}
 
         {/* Bio */}
         {isEditing ? (
@@ -240,6 +315,24 @@ export default function Profile() {
             <p className="text-sm text-slate-500">Following</p>
           </div>
         </div>
+
+        {/* Mutual Connections */}
+        {mutualData && (mutualData.mutualFriends > 0 || mutualData.mutualCommunities > 0) && (
+          <div className="flex items-center gap-4 mt-4 text-sm text-slate-600">
+            {mutualData.mutualFriends > 0 && (
+              <div className="flex items-center gap-1">
+                <Users className="w-4 h-4" />
+                <span>{mutualData.mutualFriends} mutual friend{mutualData.mutualFriends !== 1 ? 's' : ''}</span>
+              </div>
+            )}
+            {mutualData.mutualCommunities > 0 && (
+              <div className="flex items-center gap-1">
+                <Users className="w-4 h-4" />
+                <span>{mutualData.mutualCommunities} mutual communit{mutualData.mutualCommunities !== 1 ? 'ies' : 'y'}</span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Token Balance Badge */}
         {wallet && (
