@@ -35,6 +35,8 @@ export default function Marketplace() {
   const [searchQuery, setSearchQuery] = useState('');
   const [category, setCategory] = useState('all');
   const [currency, setCurrency] = useState('all');
+  const [location, setLocation] = useState('');
+  const [shipping, setShipping] = useState('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
@@ -60,10 +62,14 @@ export default function Marketplace() {
     }
   });
 
-  const filteredListings = listings?.filter(listing =>
-    listing.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    listing.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredListings = listings?.filter(listing => {
+    const matchesSearch = listing.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         listing.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesLocation = !location || listing.location?.toLowerCase().includes(location.toLowerCase());
+    const matchesShipping = shipping === 'all' || listing.shipping_options?.includes(shipping);
+    
+    return matchesSearch && matchesLocation && matchesShipping;
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
@@ -120,30 +126,54 @@ export default function Marketplace() {
       </div>
 
       {/* Search & Filters */}
-      <div className="flex flex-col md:flex-row gap-4 mb-8">
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-          <Input
-            placeholder="Search listings..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 h-12 rounded-2xl border-slate-200 bg-white"
-          />
+      <div className="flex flex-col gap-4 mb-8">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <Input
+              placeholder="Search listings..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-12 h-12 rounded-2xl border-slate-200 bg-white"
+            />
+          </div>
+
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger className="w-full md:w-48 h-12 rounded-2xl">
+              <Filter className="w-4 h-4 mr-2" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CATEGORIES.map(cat => (
+                <SelectItem key={cat.value} value={cat.value}>
+                  {cat.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="w-full md:w-48 h-12 rounded-2xl">
-            <Filter className="w-4 h-4 mr-2" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {CATEGORIES.map(cat => (
-              <SelectItem key={cat.value} value={cat.value}>
-                {cat.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex flex-col md:flex-row gap-4">
+          <Input
+            placeholder="Filter by location..."
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            className="h-10 rounded-xl border-slate-200"
+          />
+
+          <Select value={shipping} onValueChange={setShipping}>
+            <SelectTrigger className="w-full md:w-48 h-10 rounded-xl">
+              <SelectValue placeholder="Shipping" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Shipping</SelectItem>
+              <SelectItem value="local_pickup">Local Pickup</SelectItem>
+              <SelectItem value="standard">Standard</SelectItem>
+              <SelectItem value="express">Express</SelectItem>
+              <SelectItem value="international">International</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Listings Grid */}

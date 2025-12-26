@@ -44,6 +44,16 @@ export default function ListingDetail() {
     enabled: !!listingId
   });
 
+  const { data: sellerReviews } = useQuery({
+    queryKey: ['seller-reviews', listing?.seller_id],
+    queryFn: () => base44.entities.SellerReview.filter({ seller_id: listing.seller_id }),
+    enabled: !!listing?.seller_id
+  });
+
+  const sellerRating = sellerReviews?.length > 0
+    ? sellerReviews.reduce((sum, r) => sum + r.rating, 0) / sellerReviews.length
+    : 0;
+
   const conditionLabels = {
     new: 'Brand New',
     like_new: 'Like New',
