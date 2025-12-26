@@ -7,12 +7,14 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import PostCard from '@/components/feed/PostCard';
 import CreatePostModal from '@/components/feed/CreatePostModal';
+import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
 import { motion } from 'framer-motion';
 
 export default function Home() {
   const [user, setUser] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [activeTab, setActiveTab] = useState('foryou');
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -20,6 +22,10 @@ export default function Home() {
       try {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
+        // Show onboarding if user hasn't completed it
+        if (!currentUser.onboarding_completed) {
+          setShowOnboarding(true);
+        }
       } catch (e) {
         console.log('Not logged in');
       }
@@ -67,6 +73,17 @@ export default function Home() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
+      {/* Onboarding Flow */}
+      {showOnboarding && user && (
+        <OnboardingFlow 
+          user={user}
+          onComplete={() => {
+            setShowOnboarding(false);
+            queryClient.invalidateQueries({ queryKey: ['posts'] });
+          }}
+        />
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
