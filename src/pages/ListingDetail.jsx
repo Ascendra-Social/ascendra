@@ -5,8 +5,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { 
   ArrowLeft, Heart, Share2, MessageCircle, Coins, 
-  ChevronLeft, ChevronRight, Shield, Clock
+  ChevronLeft, ChevronRight, Shield, Clock, MapPin, Truck
 } from 'lucide-react';
+import SellerRating from '@/components/marketplace/SellerRating';
+import MakeOfferModal from '@/components/marketplace/MakeOfferModal';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +20,7 @@ export default function ListingDetail() {
   const [user, setUser] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [showOfferModal, setShowOfferModal] = useState(false);
   const navigate = useNavigate();
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -43,6 +46,16 @@ export default function ListingDetail() {
     },
     enabled: !!listingId
   });
+
+  const { data: sellerReviews } = useQuery({
+    queryKey: ['seller-reviews', listing?.seller_id],
+    queryFn: () => base44.entities.SellerReview.filter({ seller_id: listing.seller_id }),
+    enabled: !!listing?.seller_id
+  });
+
+  const sellerRating = sellerReviews?.length > 0
+    ? sellerReviews.reduce((sum, r) => sum + r.rating, 0) / sellerReviews.length
+    : 0;
 
   const { data: sellerReviews } = useQuery({
     queryKey: ['seller-reviews', listing?.seller_id],
@@ -233,26 +246,48 @@ export default function ListingDetail() {
         <p className="text-slate-600 leading-relaxed mb-6">{listing.description}</p>
 
         {/* Seller */}
-        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-          <Link 
-            to={createPageUrl(`Profile?id=${listing.seller_id}`)}
-            className="flex items-center gap-3"
-          >
-            <Avatar className="w-12 h-12">
-              <AvatarImage src={listing.seller_avatar} />
-              <AvatarFallback className="bg-gradient-to-br from-violet-400 to-pink-400 text-white">
-                {listing.seller_name?.[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-semibold text-slate-800">{listing.seller_name}</p>
-              <p className="text-sm text-slate-500">Seller</p>
+        <div className="p-4 bg-slate-50 rounded-xl space-y-3">
+          <div className="flex items-center justify-between">
+            <Link 
+              to={createPageUrl(`Profile?id=${listing.seller_id}`)}
+              className="flex items-center gap-3"
+            >
+              <Avatar className="w-12 h-12">
+                <AvatarImage src={listing.seller_avatar} />
+                <AvatarFallback className="bg-gradient-to-br from-violet-400 to-pink-400 text-white">
+                  {listing.seller_name?.[0]}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-semibold text-slate-800">{listing.seller_name}</p>
+                {sellerReviews?.length > 0 && (
+                  <SellerRating rating={sellerRating} reviewCount={sellerReviews.length} size="sm" />
+                )}
+              </div>
+            </Link>
+            <Button variant="outline" className="rounded-full gap-2">
+              <MessageCircle className="w-4 h-4" />
+              Message
+            </Button>
+          </div>
+
+          {listing.location && (
+            <div className="flex items-center gap-2 text-sm text-slate-600">
+              <MapPin className="w-4 h-4" />
+              <span>{listing.location}</span>
             </div>
-          </Link>
-          <Button variant="outline" className="rounded-full gap-2">
-            <MessageCircle className="w-4 h-4" />
-            Message
-          </Button>
+          )}
+
+          {listing.shipping_options?.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <Truck className="w-4 h-4 text-slate-400" />
+              {listing.shipping_options.map(opt => (
+                <Badge key={opt} variant="outline" className="text-xs">
+                  {opt.replace('_', ' ')}
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
       </motion.div>
 
@@ -284,10 +319,27 @@ export default function ListingDetail() {
         <Button className="flex-1 h-14 rounded-2xl bg-gradient-to-r from-violet-500 to-pink-500 text-white text-lg font-semibold">
           Buy Now
         </Button>
-        <Button variant="outline" className="flex-1 h-14 rounded-2xl text-lg font-semibold">
-          Make Offer
-        </Button>
+        {listing.allows_offers && (
+          <Button 
+            variant="outline" 
+            className="flex-1 h-14 rounded-2xl text-lg font-semibold"
+            onClick={() => setShowOfferModal(true)}
+            disabled={!user}
+          >
+            Make Offer
+          </Button>
+        )}
       </motion.div>
+
+      {/* Make Offer Modal */}
+      {user && listing && (
+        <MakeOfferModal
+          isOpen={showOfferModal}
+          onClose={() => setShowOfferModal(false)}
+          listing={listing}
+          user={user}
+        />
+      )}
     </div>
   );
 }

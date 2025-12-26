@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { ShoppingBag, X, Loader2, Image, Plus, Coins, Wand2 } from 'lucide-react';
+import { ShoppingBag, X, Loader2, Image, Plus, Coins, Wand2, MapPin } from 'lucide-react';
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import AIAssistantModal from '@/components/ai/AIAssistantModal';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,7 +43,10 @@ export default function CreateListingModal({ isOpen, onClose, user, onCreated })
     price_in_tokens: '',
     currency: 'USD',
     category: '',
-    condition: 'good'
+    condition: 'good',
+    location: '',
+    shipping_options: [],
+    allows_offers: true
   });
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
@@ -265,6 +270,51 @@ export default function CreateListingModal({ isOpen, onClose, user, onCreated })
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          {/* Location */}
+          <div>
+            <Label className="text-sm text-slate-600 mb-2 block">Location</Label>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input
+                placeholder="City, State or ZIP"
+                value={formData.location}
+                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                className="h-12 rounded-xl pl-10"
+              />
+            </div>
+          </div>
+
+          {/* Shipping Options */}
+          <div>
+            <Label className="text-sm text-slate-600 mb-2 block">Shipping Options</Label>
+            <div className="grid grid-cols-2 gap-3">
+              {['local_pickup', 'standard', 'express', 'international'].map(opt => (
+                <label key={opt} className="flex items-center gap-2 cursor-pointer">
+                  <Checkbox
+                    checked={formData.shipping_options.includes(opt)}
+                    onCheckedChange={(checked) => {
+                      const newOptions = checked
+                        ? [...formData.shipping_options, opt]
+                        : formData.shipping_options.filter(o => o !== opt);
+                      setFormData({ ...formData, shipping_options: newOptions });
+                    }}
+                  />
+                  <span className="text-sm text-slate-700 capitalize">{opt.replace('_', ' ')}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Allow Offers */}
+          <div className="flex items-center justify-between">
+            <Label htmlFor="offers" className="text-sm text-slate-600">Allow Offers</Label>
+            <Switch
+              id="offers"
+              checked={formData.allows_offers}
+              onCheckedChange={(checked) => setFormData({ ...formData, allows_offers: checked })}
+            />
           </div>
         </div>
 
