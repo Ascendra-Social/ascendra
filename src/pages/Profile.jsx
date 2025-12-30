@@ -445,6 +445,19 @@ export default function Profile() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Verification Flow */}
+      {showVerification && (
+        <VerificationFlow
+          isOpen={showVerification}
+          onClose={() => setShowVerification(false)}
+          user={currentUser}
+          onVerified={() => {
+            setShowVerification(false);
+            queryClient.invalidateQueries({ queryKey: ['profile'] });
+          }}
+        />
+      )}
     </div>
   );
 }
