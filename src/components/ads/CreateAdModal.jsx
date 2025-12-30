@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { 
-  TrendingUp, X, Loader2, Image, Coins, Users, 
-  MapPin, Calendar, Target
+  TrendingUp, X, Loader2, Image, Coins, Target
 } from 'lucide-react';
+import AdvancedTargeting from './AdvancedTargeting';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,16 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-const CATEGORIES = [
-  'electronics', 'clothing', 'home', 'art', 
-  'collectibles', 'services', 'digital', 'other'
-];
-
-const LOCATIONS = [
-  'United States', 'Canada', 'United Kingdom', 'Australia',
-  'Germany', 'France', 'Spain', 'Italy', 'Japan', 'Global'
-];
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export default function CreateAdModal({ isOpen, onClose, user, wallet, ad, onCreated }) {
   const [formData, setFormData] = useState(ad || {
@@ -45,7 +36,12 @@ export default function CreateAdModal({ isOpen, onClose, user, wallet, ad, onCre
     target_audience: [],
     target_locations: [],
     target_age_min: '',
-    target_age_max: ''
+    target_age_max: '',
+    target_gender: 'all',
+    target_languages: [],
+    target_interests: [],
+    target_behaviors: [],
+    target_communities: []
   });
   const [mediaFile, setMediaFile] = useState(null);
   const [mediaPreview, setMediaPreview] = useState(ad?.media_url || null);
@@ -276,77 +272,13 @@ export default function CreateAdModal({ isOpen, onClose, user, wallet, ad, onCre
             </div>
           )}
 
-          {/* Target Audience */}
+          {/* Advanced Targeting */}
           <div>
             <Label className="text-sm text-slate-600 mb-3 block flex items-center gap-2">
               <Target className="w-4 h-4" />
-              Target Audience (Select interests)
+              Advanced Targeting
             </Label>
-            <div className="grid grid-cols-2 gap-3">
-              {CATEGORIES.map(cat => (
-                <label key={cat} className="flex items-center gap-2 cursor-pointer">
-                  <Checkbox
-                    checked={formData.target_audience?.includes(cat)}
-                    onCheckedChange={(checked) => {
-                      const newAudience = checked
-                        ? [...(formData.target_audience || []), cat]
-                        : (formData.target_audience || []).filter(c => c !== cat);
-                      setFormData({ ...formData, target_audience: newAudience });
-                    }}
-                  />
-                  <span className="text-sm text-slate-700 capitalize">{cat}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Target Locations */}
-          <div>
-            <Label className="text-sm text-slate-600 mb-3 block flex items-center gap-2">
-              <MapPin className="w-4 h-4" />
-              Target Locations
-            </Label>
-            <div className="grid grid-cols-2 gap-3">
-              {LOCATIONS.map(loc => (
-                <label key={loc} className="flex items-center gap-2 cursor-pointer">
-                  <Checkbox
-                    checked={formData.target_locations?.includes(loc)}
-                    onCheckedChange={(checked) => {
-                      const newLocations = checked
-                        ? [...(formData.target_locations || []), loc]
-                        : (formData.target_locations || []).filter(l => l !== loc);
-                      setFormData({ ...formData, target_locations: newLocations });
-                    }}
-                  />
-                  <span className="text-sm text-slate-700">{loc}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Age Range */}
-          <div>
-            <Label className="text-sm text-slate-600 mb-2 block flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              Age Range (Optional)
-            </Label>
-            <div className="flex items-center gap-4">
-              <Input
-                type="number"
-                placeholder="Min age"
-                value={formData.target_age_min}
-                onChange={(e) => setFormData({ ...formData, target_age_min: e.target.value })}
-                className="h-12 rounded-xl"
-              />
-              <span className="text-slate-400">to</span>
-              <Input
-                type="number"
-                placeholder="Max age"
-                value={formData.target_age_max}
-                onChange={(e) => setFormData({ ...formData, target_age_max: e.target.value })}
-                className="h-12 rounded-xl"
-              />
-            </div>
+            <AdvancedTargeting formData={formData} setFormData={setFormData} />
           </div>
         </div>
 

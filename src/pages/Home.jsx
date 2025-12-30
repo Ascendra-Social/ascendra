@@ -56,18 +56,47 @@ export default function Home() {
   });
 
   const { data: ads } = useQuery({
-    queryKey: ['active-ads'],
+    queryKey: ['active-ads', user?.id],
     queryFn: async () => {
       const activeAds = await base44.entities.Ad.filter({ status: 'active' });
-      // Filter ads based on user interests if available
-      if (user?.interests?.length > 0) {
-        return activeAds.filter(ad => 
-          !ad.target_audience?.length || 
-          ad.target_audience.some(cat => user.interests.includes(cat))
-        );
-      }
-      return activeAds;
-    }
+      
+      if (!user) return activeAds;
+
+      // Advanced filtering based on targeting
+      return activeAds.filter(ad => {
+        // Interest matching
+        if (ad.target_interests?.length > 0 && user.interests?.length > 0) {
+          const hasMatchingInterest = ad.target_interests.some(i => 
+            user.interests.includes(i)
+          );
+          if (!hasMatchingInterest) return false;
+        }
+
+        // Behavior matching
+        if (ad.target_behaviors?.length > 0) {
+          // Check if user matches any behavior criteria
+          const hasBehaviorMatch = ad.target_behaviors.some(behavior => {
+            if (behavior === 'verified_users' && !user.is_verified) return false;
+            // Add more behavior checks as needed
+            return true;
+          });
+          if (!hasBehaviorMatch) return false;
+        }
+
+        // Language matching
+        if (ad.target_languages?.length > 0 && user.language) {
+          if (!ad.target_languages.includes(user.language)) return false;
+        }
+
+        // Gender matching
+        if (ad.target_gender && ad.target_gender !== 'all' && user.gender) {
+          if (ad.target_gender !== user.gender) return false;
+        }
+
+        return true;
+      });
+    },
+    enabled: !!user
   });
 
   const { data: communities } = useQuery({

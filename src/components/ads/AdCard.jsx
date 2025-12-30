@@ -21,6 +21,10 @@ export default function AdCard({ ad, currentUserId }) {
         });
         
         if (existing.length === 0) {
+          // Get user data for segment tracking
+          const users = await base44.entities.User.filter({ id: currentUserId });
+          const user = users[0];
+
           // Record impression
           await base44.entities.AdImpression.create({
             ad_id: ad.id,
@@ -38,10 +42,39 @@ export default function AdCard({ ad, currentUserId }) {
             status: newSpent >= ad.budget_tokens ? 'completed' : ad.status
           });
 
+          // Track segment analytics
+          if (user) {
+            // Track by interests
+            if (user.interests?.length > 0) {
+              for (const interest of user.interests) {
+                const existingSegment = await base44.entities.AdSegmentAnalytics.filter({
+                  ad_id: ad.id,
+                  segment_type: 'interest',
+                  segment_value: interest
+                });
+
+                if (existingSegment[0]) {
+                  await base44.entities.AdSegmentAnalytics.update(existingSegment[0].id, {
+                    impressions: (existingSegment[0].impressions || 0) + 1,
+                    spent_tokens: (existingSegment[0].spent_tokens || 0) + (ad.cost_per_impression || 1)
+                  });
+                } else {
+                  await base44.entities.AdSegmentAnalytics.create({
+                    ad_id: ad.id,
+                    segment_type: 'interest',
+                    segment_value: interest,
+                    impressions: 1,
+                    spent_tokens: ad.cost_per_impression || 1
+                  });
+                }
+              }
+            }
+          }
+
           // Reward user for viewing ad
           const userWallet = await base44.entities.TokenWallet.filter({ user_id: currentUserId });
           if (userWallet[0]) {
-            const rewardAmount = 0.5; // Users get rewarded for viewing ads
+            const rewardAmount = 0.5;
             await base44.entities.TokenWallet.update(userWallet[0].id, {
               balance: (userWallet[0].balance || 0) + rewardAmount
             });

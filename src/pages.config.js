@@ -1,3 +1,4 @@
+import BusinessCenter from './pages/BusinessCenter';
 import Communities from './pages/Communities';
 import CommunityDetail from './pages/CommunityDetail';
 import CommunityModeration from './pages/CommunityModeration';
@@ -10,13 +11,13 @@ import Messages from './pages/Messages';
 import Moderation from './pages/Moderation';
 import Profile from './pages/Profile';
 import Reels from './pages/Reels';
-import Wallet from './pages/Wallet';
-import BusinessCenter from './pages/BusinessCenter';
 import VerificationReview from './pages/VerificationReview';
+import Wallet from './pages/Wallet';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "BusinessCenter": BusinessCenter,
     "Communities": Communities,
     "CommunityDetail": CommunityDetail,
     "CommunityModeration": CommunityModeration,
@@ -29,9 +30,8 @@ export const PAGES = {
     "Moderation": Moderation,
     "Profile": Profile,
     "Reels": Reels,
-    "Wallet": Wallet,
-    "BusinessCenter": BusinessCenter,
     "VerificationReview": VerificationReview,
+    "Wallet": Wallet,
 }
 
 export const pagesConfig = {

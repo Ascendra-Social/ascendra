@@ -3,12 +3,14 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Plus, TrendingUp, Eye, MousePointer, Coins, 
-  Play, Pause, Edit, Trash2, Briefcase
+  Play, Pause, Edit, Trash2, Briefcase, BarChart3
 } from 'lucide-react';
+import AdAnalytics from '@/components/ads/AdAnalytics';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import CreateAdModal from '@/components/ads/CreateAdModal';
 import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
@@ -17,6 +19,7 @@ export default function BusinessCenter() {
   const [user, setUser] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingAd, setEditingAd] = useState(null);
+  const [viewingAnalytics, setViewingAnalytics] = useState(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -230,6 +233,15 @@ export default function BusinessCenter() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setViewingAnalytics(ad)}
+                      className="rounded-full"
+                      title="View Analytics"
+                    >
+                      <BarChart3 className="w-4 h-4" />
+                    </Button>
                     {ad.status === 'active' ? (
                       <Button
                         variant="ghost"
@@ -310,6 +322,23 @@ export default function BusinessCenter() {
           queryClient.invalidateQueries({ queryKey: ['business-ads'] });
         }}
       />
+
+      {/* Analytics Modal */}
+      {viewingAnalytics && (
+        <Dialog open={!!viewingAnalytics} onOpenChange={() => setViewingAnalytics(null)}>
+          <DialogContent className="sm:max-w-4xl rounded-3xl p-0 overflow-hidden max-h-[90vh] overflow-y-auto">
+            <DialogHeader className="p-6 pb-4 border-b border-slate-100 sticky top-0 bg-white z-10">
+              <DialogTitle className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-violet-500" />
+                {viewingAnalytics.title} - Analytics
+              </DialogTitle>
+            </DialogHeader>
+            <div className="p-6">
+              <AdAnalytics ad={viewingAnalytics} />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
