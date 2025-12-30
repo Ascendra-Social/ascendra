@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import Reels from './pages/Reels';
 import Wallet from './pages/Wallet';
 import BusinessCenter from './pages/BusinessCenter';
+import VerificationReview from './pages/VerificationReview';
 import __Layout from './Layout.jsx';
 
 
@@ -30,6 +31,7 @@ export const PAGES = {
     "Reels": Reels,
     "Wallet": Wallet,
     "BusinessCenter": BusinessCenter,
+    "VerificationReview": VerificationReview,
 }
 
 export const pagesConfig = {

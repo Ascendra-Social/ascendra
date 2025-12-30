@@ -5,8 +5,9 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { 
   Settings, Grid, Bookmark, Coins, Users, 
-  MessageCircle, Edit2, Camera, Check, LogOut
+  MessageCircle, Edit2, Camera, Check, LogOut, Shield
 } from 'lucide-react';
+import VerificationFlow from '@/components/verification/VerificationFlow';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -21,6 +22,7 @@ export default function Profile() {
   const [currentUser, setCurrentUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
+  const [showVerification, setShowVerification] = useState(false);
   const queryClient = useQueryClient();
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -354,6 +356,15 @@ export default function Profile() {
                 <Edit2 className="w-4 h-4" />
                 Edit Profile
               </Button>
+              {!user.is_verified && (
+                <Button
+                  onClick={() => setShowVerification(true)}
+                  className="rounded-full gap-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
+                >
+                  <Shield className="w-4 h-4" />
+                  Get Verified
+                </Button>
+              )}
               <Link to={createPageUrl('Wallet')}>
                 <Button className="rounded-full gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white">
                   <Coins className="w-4 h-4" />

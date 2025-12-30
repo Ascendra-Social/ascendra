@@ -4,7 +4,7 @@ import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
 import { 
   Home, Search, PlusSquare, ShoppingBag, MessageCircle, 
-  User, Compass, Play, Wallet, Bell, Menu, X, Users, TrendingUp
+  User, Compass, Play, Wallet, Bell, Menu, X, Users, TrendingUp, Shield
 } from 'lucide-react';
 import AIFloatingButton from '@/components/ai/AIFloatingButton';
 import { Button } from "@/components/ui/button";
@@ -57,6 +57,10 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Business Center', icon: TrendingUp, page: 'BusinessCenter' },
   ] : [];
 
+  const adminNavItems = user?.role === 'admin' ? [
+    { name: 'Verification Review', icon: Shield, page: 'VerificationReview' },
+  ] : [];
+
   const isActive = (page) => currentPageName === page;
 
   return (
@@ -94,7 +98,7 @@ export default function Layout({ children, currentPageName }) {
         </div>
 
         <nav className="flex-1 px-4 space-y-1">
-          {[...navItems, ...businessNavItems].map((item) => (
+          {[...navItems, ...businessNavItems, ...adminNavItems].map((item) => (
             <Link
               key={item.page}
               to={createPageUrl(item.page)}
@@ -168,7 +172,7 @@ export default function Layout({ children, currentPageName }) {
         <div className="lg:hidden fixed inset-0 z-40 bg-black/20 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
           <div className="absolute right-0 top-16 w-64 h-[calc(100vh-4rem)] glass-effect border-l border-slate-200/50 p-4" onClick={e => e.stopPropagation()}>
               <nav className="space-y-1">
-                {[...navItems, ...businessNavItems].map((item) => (
+                {[...navItems, ...businessNavItems, ...adminNavItems].map((item) => (
                   <Link
                     key={item.page}
                     to={createPageUrl(item.page)}
