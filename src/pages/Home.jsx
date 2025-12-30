@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import PostCard from '@/components/feed/PostCard';
 import CreatePostModal from '@/components/feed/CreatePostModal';
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
+import AdCard from '@/components/ads/AdCard';
 import { motion } from 'framer-motion';
 
 export default function Home() {
@@ -51,6 +52,21 @@ export default function Home() {
         });
       }
       return allPosts;
+    }
+  });
+
+  const { data: ads } = useQuery({
+    queryKey: ['active-ads'],
+    queryFn: async () => {
+      const activeAds = await base44.entities.Ad.filter({ status: 'active' });
+      // Filter ads based on user interests if available
+      if (user?.interests?.length > 0) {
+        return activeAds.filter(ad => 
+          !ad.target_audience?.length || 
+          ad.target_audience.some(cat => user.interests.includes(cat))
+        );
+      }
+      return activeAds;
     }
   });
 
@@ -145,19 +161,33 @@ export default function Home() {
             </div>
           ))
         ) : posts?.length > 0 ? (
-          posts.map((post, i) => (
-            <motion.div
-              key={post.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-            >
-              <PostCard 
-                post={post} 
-                currentUserId={user?.id}
-              />
-            </motion.div>
-          ))
+          posts.map((post, i) => {
+            // Insert ads every 5 posts
+            const shouldShowAd = i > 0 && i % 5 === 0 && ads?.[Math.floor(i / 5) - 1];
+            return (
+              <React.Fragment key={post.id}>
+                {shouldShowAd && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                  >
+                    <AdCard ad={ads[Math.floor(i / 5) - 1]} currentUserId={user?.id} />
+                  </motion.div>
+                )}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                >
+                  <PostCard 
+                    post={post} 
+                    currentUserId={user?.id}
+                  />
+                </motion.div>
+              </React.Fragment>
+            );
+          })
         ) : (
           <div className="text-center py-16">
             <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-violet-100 to-pink-100 flex items-center justify-center mb-4">

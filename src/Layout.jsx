@@ -4,7 +4,7 @@ import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
 import { 
   Home, Search, PlusSquare, ShoppingBag, MessageCircle, 
-  User, Compass, Play, Wallet, Bell, Menu, X, Users
+  User, Compass, Play, Wallet, Bell, Menu, X, Users, TrendingUp
 } from 'lucide-react';
 import AIFloatingButton from '@/components/ai/AIFloatingButton';
 import { Button } from "@/components/ui/button";
@@ -53,6 +53,10 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Wallet', icon: Wallet, page: 'Wallet' },
   ];
 
+  const businessNavItems = user?.account_type === 'business' ? [
+    { name: 'Business Center', icon: TrendingUp, page: 'BusinessCenter' },
+  ] : [];
+
   const isActive = (page) => currentPageName === page;
 
   return (
@@ -90,7 +94,7 @@ export default function Layout({ children, currentPageName }) {
         </div>
 
         <nav className="flex-1 px-4 space-y-1">
-          {navItems.map((item) => (
+          {[...navItems, ...businessNavItems].map((item) => (
             <Link
               key={item.page}
               to={createPageUrl(item.page)}
@@ -163,25 +167,25 @@ export default function Layout({ children, currentPageName }) {
       {mobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-40 bg-black/20 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
           <div className="absolute right-0 top-16 w-64 h-[calc(100vh-4rem)] glass-effect border-l border-slate-200/50 p-4" onClick={e => e.stopPropagation()}>
-            <nav className="space-y-1">
-              {navItems.map((item) => (
-                <Link
-                  key={item.page}
-                  to={createPageUrl(item.page)}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
-                    isActive(item.page)
-                      ? "bg-violet-100 text-violet-600"
-                      : "text-slate-600 hover:bg-slate-100"
-                  )}
-                >
-                  <item.icon className="w-5 h-5" />
-                  <span className="font-medium">{item.name}</span>
-                </Link>
-              ))}
-            </nav>
-          </div>
+              <nav className="space-y-1">
+                {[...navItems, ...businessNavItems].map((item) => (
+                  <Link
+                    key={item.page}
+                    to={createPageUrl(item.page)}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
+                      isActive(item.page)
+                        ? "bg-violet-100 text-violet-600"
+                        : "text-slate-600 hover:bg-slate-100"
+                    )}
+                  >
+                    <item.icon className="w-5 h-5" />
+                    <span className="font-medium">{item.name}</span>
+                  </Link>
+                ))}
+              </nav>
+            </div>
         </div>
       )}
 
