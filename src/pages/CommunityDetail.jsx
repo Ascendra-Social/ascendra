@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
 export default function CommunityDetail() {
   const [user, setUser] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [activeTab, setActiveTab] = useState('posts');
   const queryClient = useQueryClient();
 
   const urlParams = new URLSearchParams(window.location.search);

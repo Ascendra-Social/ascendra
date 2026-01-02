@@ -4,9 +4,10 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { 
   Heart, MessageCircle, Share2, Bookmark, MoreHorizontal,
-  Coins, Sparkles, Wand2, RefreshCw
+  Coins, Sparkles, Wand2, RefreshCw, Flag
 } from 'lucide-react';
 import AIAssistantModal from '@/components/ai/AIAssistantModal';
+import ReportContentModal from '@/components/moderation/ReportContentModal';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,11 +20,25 @@ import {
 import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 
-export default function PostCard({ post, currentUserId, onLike, onComment }) {
+export default function PostCard({ post, currentUserId, communityId, onLike, onComment }) {
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likes_count || 0);
   const [showComments, setShowComments] = useState(false);
   const [showAIRepost, setShowAIRepost] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const [user, setUser] = useState(null);
+
+  React.useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const currentUser = await base44.auth.me();
+        setUser(currentUser);
+      } catch (e) {
+        console.log('Not logged in');
+      }
+    };
+    loadUser();
+  }, []);
 
   const handleLike = async () => {
     if (isLiked) {
@@ -91,7 +106,15 @@ export default function PostCard({ post, currentUserId, onLike, onComment }) {
             </DropdownMenuItem>
             <DropdownMenuItem>Save post</DropdownMenuItem>
             <DropdownMenuItem>Copy link</DropdownMenuItem>
-            <DropdownMenuItem className="text-red-500">Report</DropdownMenuItem>
+            {communityId && (
+              <DropdownMenuItem 
+                className="text-red-500"
+                onClick={() => setShowReport(true)}
+              >
+                <Flag className="w-4 h-4 mr-2" />
+                Report
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -171,6 +194,19 @@ export default function PostCard({ post, currentUserId, onLike, onComment }) {
         existingContent={post.content}
         onApply={handleAIRepost}
       />
-    </motion.div>
-  );
-}
+
+      {/* Report Modal */}
+      {showReport && user && communityId && (
+        <ReportContentModal
+          isOpen={showReport}
+          onClose={() => setShowReport(false)}
+          contentId={post.id}
+          contentType="post"
+          contentAuthorId={post.author_id}
+          communityId={communityId}
+          user={user}
+        />
+      )}
+      </motion.div>
+      );
+      }
