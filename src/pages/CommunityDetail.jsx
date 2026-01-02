@@ -4,10 +4,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Users, Lock, Settings, Plus, ArrowLeft, Share2, Shield
 } from 'lucide-react';
+import ModerationDashboard from '@/components/moderation/ModerationDashboard';
+import CommunityModerationSettings from '@/components/moderation/CommunityModerationSettings';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import PostCard from '@/components/feed/PostCard';
@@ -65,6 +68,10 @@ export default function CommunityDetail() {
   });
 
   const isMember = members?.some(m => m.user_id === user?.id);
+  const isOwner = community?.owner_id === user?.id;
+  const memberData = members?.find(m => m.user_id === user?.id);
+  const isModerator = memberData?.role === 'moderator' || memberData?.role === 'admin' || isOwner;
+  const canModerate = isModerator || isOwner;
 
   const joinMutation = useMutation({
     mutationFn: async () => {
@@ -164,12 +171,15 @@ export default function CommunityDetail() {
 
           {/* Actions */}
           <div className="absolute top-4 right-4 flex gap-2">
-            {isMember && members?.find(m => m.user_id === user?.id)?.role !== 'member' && (
-              <Link to={createPageUrl(`CommunityModeration?id=${communityId}`)}>
-                <Button size="icon" variant="secondary" className="rounded-full bg-white/20 backdrop-blur hover:bg-white/30 border-0">
-                  <Shield className="w-4 h-4 text-white" />
-                </Button>
-              </Link>
+            {canModerate && (
+              <Button 
+                size="icon" 
+                variant="secondary" 
+                className="rounded-full bg-white/20 backdrop-blur hover:bg-white/30 border-0"
+                onClick={() => setActiveTab(activeTab === 'moderation' ? 'posts' : 'moderation')}
+              >
+                <Shield className="w-4 h-4 text-white" />
+              </Button>
             )}
             <Button size="icon" variant="secondary" className="rounded-full bg-white/20 backdrop-blur hover:bg-white/30 border-0">
               <Share2 className="w-4 h-4 text-white" />
@@ -233,39 +243,62 @@ export default function CommunityDetail() {
         </div>
       </motion.div>
 
-      {/* Posts */}
+      {/* Content Section */}
       <div className="space-y-6">
-        <h2 className="text-lg font-semibold text-slate-800">Posts</h2>
-        
-        {postsLoading ? (
-          Array(3).fill(0).map((_, i) => (
-            <Skeleton key={i} className="h-80 rounded-3xl" />
-          ))
-        ) : posts?.length > 0 ? (
-          posts.map((post, i) => (
-            <motion.div
-              key={post.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-            >
-              <PostCard post={post} currentUserId={user?.id} />
-            </motion.div>
-          ))
-        ) : (
-          <div className="text-center py-12 bg-white rounded-2xl border border-slate-100">
-            <Users className="w-16 h-16 mx-auto text-slate-200 mb-4" />
-            <h3 className="font-medium text-slate-600 mb-2">No posts yet</h3>
-            {isMember && (
-              <Button
-                onClick={() => setShowCreateModal(true)}
-                className="bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-full"
-              >
-                Create the first post
-              </Button>
+        {activeTab === 'posts' ? (
+          <>
+            <h2 className="text-lg font-semibold text-slate-800">Posts</h2>
+            
+            {postsLoading ? (
+              Array(3).fill(0).map((_, i) => (
+                <Skeleton key={i} className="h-80 rounded-3xl" />
+              ))
+            ) : posts?.length > 0 ? (
+              posts.map((post, i) => (
+                <motion.div
+                  key={post.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <PostCard post={post} currentUserId={user?.id} communityId={communityId} />
+                </motion.div>
+              ))
+            ) : (
+              <div className="text-center py-12 bg-white rounded-2xl border border-slate-100">
+                <Users className="w-16 h-16 mx-auto text-slate-200 mb-4" />
+                <h3 className="font-medium text-slate-600 mb-2">No posts yet</h3>
+                {isMember && (
+                  <Button
+                    onClick={() => setShowCreateModal(true)}
+                    className="bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-full"
+                  >
+                    Create the first post
+                  </Button>
+                )}
+              </div>
             )}
-          </div>
-        )}
+          </>
+        ) : activeTab === 'moderation' && canModerate ? (
+          <Tabs defaultValue="dashboard">
+            <TabsList className="bg-slate-100 p-1 rounded-xl mb-6">
+              <TabsTrigger value="dashboard" className="rounded-lg data-[state=active]:bg-white">
+                Dashboard
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="rounded-lg data-[state=active]:bg-white">
+                Settings
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="dashboard">
+              <ModerationDashboard community={community} user={user} />
+            </TabsContent>
+
+            <TabsContent value="settings">
+              <CommunityModerationSettings community={community} />
+            </TabsContent>
+          </Tabs>
+        ) : null}
       </div>
 
       {/* Create Post Modal */}
