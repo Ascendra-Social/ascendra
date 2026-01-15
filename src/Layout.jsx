@@ -91,9 +91,9 @@ export default function Layout({ children, currentPageName }) {
         <div className="p-6">
           <Link to={createPageUrl('Home')} className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center">
-              <span className="text-white font-bold text-xl">V</span>
+              <span className="text-white font-bold text-xl">U</span>
             </div>
-            <span className="text-2xl font-bold gradient-text">Vibe</span>
+            <span className="text-2xl font-bold gradient-text">Univibe</span>
           </Link>
         </div>
 
@@ -147,9 +147,9 @@ export default function Layout({ children, currentPageName }) {
       <header className="lg:hidden fixed top-0 left-0 right-0 h-16 glass-effect border-b border-slate-200/50 z-50 flex items-center justify-between px-4">
         <Link to={createPageUrl('Home')} className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center">
-            <span className="text-white font-bold">V</span>
+            <span className="text-white font-bold">U</span>
           </div>
-          <span className="text-xl font-bold gradient-text">Vibe</span>
+          <span className="text-xl font-bold gradient-text">Univibe</span>
         </Link>
 
         <div className="flex items-center gap-3">

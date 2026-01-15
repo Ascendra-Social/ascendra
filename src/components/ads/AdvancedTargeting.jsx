@@ -42,7 +42,7 @@ const BEHAVIORS = [
   { value: 'marketplace_buyer', label: 'Marketplace Buyers', desc: 'Made purchases in marketplace' },
   { value: 'content_creator', label: 'Content Creators', desc: 'Post regularly' },
   { value: 'early_adopter', label: 'Early Adopters', desc: 'New platform users' },
-  { value: 'token_holder', label: 'Token Holders', desc: 'Have VIBE tokens in wallet' },
+  { value: 'token_holder', label: 'Token Holders', desc: 'Have UNIVIBE tokens in wallet' },
   { value: 'verified_users', label: 'Verified Users', desc: 'ID verified accounts' }
 ];
 

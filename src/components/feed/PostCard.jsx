@@ -150,7 +150,7 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
         <div className="px-4 pt-3">
           <Badge className="bg-gradient-to-r from-amber-100 to-orange-100 text-amber-700 border-amber-200 rounded-full px-3">
             <Coins className="w-3 h-3 mr-1" />
-            Earned {post.tokens_earned} VIBE
+            Earned {post.tokens_earned} UNIVIBE
           </Badge>
         </div>
       )}
