@@ -43,7 +43,9 @@ export default function BusinessCenter() {
       const wallets = await base44.entities.TokenWallet.filter({ user_id: user?.id });
       return wallets[0];
     },
-    enabled: !!user
+    enabled: !!user,
+    staleTime: 30000,
+    refetchOnWindowFocus: false
   });
 
   const { data: ads, isLoading } = useQuery({
@@ -52,7 +54,9 @@ export default function BusinessCenter() {
       { business_id: user?.id },
       '-created_date'
     ),
-    enabled: !!user
+    enabled: !!user,
+    staleTime: 30000,
+    refetchOnWindowFocus: false
   });
 
   const pauseAdMutation = useMutation({
@@ -130,7 +134,7 @@ export default function BusinessCenter() {
             <p className="text-2xl font-bold text-slate-800">
               {wallet?.balance?.toLocaleString() || 0}
             </p>
-            <p className="text-xs text-slate-400 mt-1">VIBE Tokens</p>
+            <p className="text-xs text-slate-400 mt-1">ASCENDRA Tokens</p>
           </CardContent>
         </Card>
 
