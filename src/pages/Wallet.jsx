@@ -115,7 +115,7 @@ export default function Wallet() {
       >
         <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
           <Zap className="w-5 h-5 text-violet-500" />
-          How You Earn UNIVIBE
+          How You Earn ASCENDRA
         </h3>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="flex items-center gap-2 text-slate-600">
@@ -154,7 +154,7 @@ export default function Wallet() {
                 </div>
                 <span className="text-slate-700">{item.label}</span>
               </div>
-              <span className="font-semibold text-slate-800">{item.amount} UNIVIBE</span>
+              <span className="font-semibold text-slate-800">{item.amount} ASCENDRA</span>
             </div>
           ))}
         </div>
@@ -210,7 +210,7 @@ export default function Wallet() {
                     </p>
                   </div>
                   <span className={`font-semibold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                    {isPositive ? '+' : '-'}{Math.abs(tx.amount)} UNIVIBE
+                    {isPositive ? '+' : '-'}{Math.abs(tx.amount)} ASCENDRA
                   </span>
                 </motion.div>
               );

@@ -340,7 +340,7 @@ export default function Profile() {
         {wallet && (
           <Badge className="mt-4 bg-gradient-to-r from-amber-100 to-orange-100 text-amber-700 border-amber-200 px-4 py-2 rounded-full">
             <Coins className="w-4 h-4 mr-1" />
-            {wallet.balance?.toLocaleString() || 0} UNIVIBE
+            {wallet.balance?.toLocaleString() || 0} ASCENDRA
           </Badge>
         )}
 
