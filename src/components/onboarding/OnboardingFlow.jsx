@@ -96,7 +96,7 @@ export default function OnboardingFlow({ user, onComplete }) {
 
   const steps = [
     {
-      title: 'Welcome to Vibe! 🎉',
+      title: 'Welcome to Ascendra! 🎉',
       subtitle: 'Your positive social marketplace',
       icon: Sparkles,
       content: (
@@ -106,7 +106,7 @@ export default function OnboardingFlow({ user, onComplete }) {
           </div>
           <div>
             <h3 className="text-2xl font-bold text-slate-800 mb-2">
-              Welcome to Vibe
+              Welcome to Ascendra
             </h3>
             <p className="text-slate-600">
               A social platform that rewards positivity and authentic connections. 
@@ -300,7 +300,7 @@ export default function OnboardingFlow({ user, onComplete }) {
               </div>
               <div>
                 <p className="font-semibold text-green-800">You're all set!</p>
-                <p className="text-sm text-green-600">Start exploring Vibe</p>
+                <p className="text-sm text-green-600">Start exploring Ascendra</p>
               </div>
             </div>
           </div>
