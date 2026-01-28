@@ -195,7 +195,7 @@ export default function Profile() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
       {/* Banner */}
-      <div className="relative -mx-4 -mt-6 mb-6 h-48 md:h-64 bg-gradient-to-br from-violet-400 to-pink-400 overflow-hidden">
+      <div className="relative -mx-4 -mt-6 mb-6 h-48 md:h-64 bg-gradient-to-br from-cyan-400 to-purple-400 overflow-hidden">
         {user?.banner && (
           <img src={user.banner} alt="" className="w-full h-full object-cover" />
         )}
@@ -225,14 +225,14 @@ export default function Profile() {
         <div className="relative mb-4">
           <Avatar className="w-28 h-28 ring-4 ring-white shadow-xl">
             <AvatarImage src={user.avatar} />
-            <AvatarFallback className="text-3xl bg-gradient-to-br from-violet-400 to-pink-400 text-white">
+            <AvatarFallback className="text-3xl bg-gradient-to-br from-cyan-400 to-purple-400 text-white">
               {user.full_name?.[0] || 'U'}
             </AvatarFallback>
           </Avatar>
           {/* Online Status Indicator */}
           <div className={`absolute bottom-2 right-2 w-6 h-6 ${statusColors[user.online_status || 'offline']} rounded-full border-4 border-white`} />
           {isOwnProfile && (
-            <label className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-violet-500 flex items-center justify-center cursor-pointer hover:bg-violet-600 transition-colors">
+            <label className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-cyan-500 flex items-center justify-center cursor-pointer hover:bg-cyan-600 transition-colors">
               <Camera className="w-4 h-4 text-white" />
               <input
                 type="file"
@@ -290,7 +290,7 @@ export default function Profile() {
               </Button>
               <Button
                 onClick={() => updateProfileMutation.mutate(editData)}
-                className="flex-1 bg-violet-500 text-white rounded-xl"
+                className="flex-1 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-xl"
               >
                 Save
               </Button>
@@ -387,7 +387,7 @@ export default function Profile() {
                 className={`rounded-full px-6 ${
                   followData?.isFollowing
                     ? 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    : 'bg-gradient-to-r from-violet-500 to-pink-500 text-white'
+                    : 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white'
                 }`}
               >
                 {followData?.isFollowing ? 'Following' : 'Follow'}

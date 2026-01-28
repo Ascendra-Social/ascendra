@@ -93,7 +93,7 @@ export default function Layout({ children, currentPageName }) {
             <img 
               src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/693b77daae7d72630553bc76/b38dd71b7_ChatGPTImageJan26202603_42_22PM.png" 
               alt="Ascendra" 
-              className="h-12 w-auto object-contain -ml-2"
+              className="h-16 w-auto object-contain"
             />
           </Link>
         </div>

@@ -101,8 +101,12 @@ export default function OnboardingFlow({ user, onComplete }) {
       icon: Sparkles,
       content: (
         <div className="space-y-6 text-center">
-          <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-violet-400 to-pink-400 flex items-center justify-center">
-            <Sparkles className="w-12 h-12 text-white" />
+          <div className="w-32 h-32 mx-auto flex items-center justify-center">
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/693b77daae7d72630553bc76/b38dd71b7_ChatGPTImageJan26202603_42_22PM.png" 
+              alt="Ascendra" 
+              className="w-full h-full object-contain"
+            />
           </div>
           <div>
             <h3 className="text-2xl font-bold text-slate-800 mb-2">
@@ -114,16 +118,16 @@ export default function OnboardingFlow({ user, onComplete }) {
             </p>
           </div>
           <div className="grid grid-cols-3 gap-4 text-left">
-            <div className="p-4 bg-violet-50 rounded-xl">
-              <div className="w-8 h-8 rounded-lg bg-violet-200 flex items-center justify-center mb-2">
-                <Sparkles className="w-4 h-4 text-violet-600" />
+            <div className="p-4 bg-cyan-50 rounded-xl">
+              <div className="w-8 h-8 rounded-lg bg-cyan-200 flex items-center justify-center mb-2">
+                <Sparkles className="w-4 h-4 text-cyan-600" />
               </div>
               <p className="text-sm font-medium text-slate-800">Earn Tokens</p>
               <p className="text-xs text-slate-500">For positive content</p>
             </div>
-            <div className="p-4 bg-pink-50 rounded-xl">
-              <div className="w-8 h-8 rounded-lg bg-pink-200 flex items-center justify-center mb-2">
-                <Users className="w-4 h-4 text-pink-600" />
+            <div className="p-4 bg-purple-50 rounded-xl">
+              <div className="w-8 h-8 rounded-lg bg-purple-200 flex items-center justify-center mb-2">
+                <Users className="w-4 h-4 text-purple-600" />
               </div>
               <p className="text-sm font-medium text-slate-800">Join Communities</p>
               <p className="text-xs text-slate-500">Find your tribe</p>
@@ -147,13 +151,13 @@ export default function OnboardingFlow({ user, onComplete }) {
         <div className="space-y-6">
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
-              <Avatar className="w-24 h-24 ring-4 ring-violet-100">
+              <Avatar className="w-24 h-24 ring-4 ring-cyan-100">
                 <AvatarImage src={user?.avatar} />
-                <AvatarFallback className="text-2xl bg-gradient-to-br from-violet-400 to-pink-400 text-white">
+                <AvatarFallback className="text-2xl bg-gradient-to-br from-cyan-400 to-purple-400 text-white">
                   {user?.full_name?.[0]}
                 </AvatarFallback>
               </Avatar>
-              <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-violet-500 flex items-center justify-center cursor-pointer hover:bg-violet-600 transition-colors">
+              <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center cursor-pointer hover:bg-cyan-600 transition-colors">
                 <Camera className="w-4 h-4 text-white" />
                 <input
                   type="file"
@@ -231,15 +235,15 @@ export default function OnboardingFlow({ user, onComplete }) {
                 }}
                 className={`p-4 rounded-xl border-2 transition-all text-left ${
                   selectedCommunities.includes(community.id)
-                    ? 'border-violet-500 bg-violet-50'
-                    : 'border-slate-200 hover:border-violet-300'
+                    ? 'border-cyan-500 bg-cyan-50'
+                    : 'border-slate-200 hover:border-cyan-300'
                 }`}
               >
                 <div className="flex items-start gap-3">
                   {community.icon ? (
                     <img src={community.icon} className="w-10 h-10 rounded-lg" alt="" />
                   ) : (
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-400 to-pink-400" />
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-400 to-purple-400" />
                   )}
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-slate-800 truncate text-sm">
@@ -250,7 +254,7 @@ export default function OnboardingFlow({ user, onComplete }) {
                     </p>
                   </div>
                   {selectedCommunities.includes(community.id) && (
-                    <Check className="w-5 h-5 text-violet-500 flex-shrink-0" />
+                    <Check className="w-5 h-5 text-cyan-500 flex-shrink-0" />
                   )}
                 </div>
               </button>
@@ -284,8 +288,8 @@ export default function OnboardingFlow({ user, onComplete }) {
                 }}
                 className={`px-4 py-2 rounded-full border-2 transition-all ${
                   selectedCategories.includes(cat)
-                    ? 'border-violet-500 bg-violet-500 text-white'
-                    : 'border-slate-200 text-slate-700 hover:border-violet-300'
+                    ? 'border-cyan-500 bg-gradient-to-r from-cyan-500 to-purple-500 text-white'
+                    : 'border-slate-200 text-slate-700 hover:border-cyan-300'
                 }`}
               >
                 {cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -324,8 +328,8 @@ export default function OnboardingFlow({ user, onComplete }) {
           <Progress value={progress} className="h-2" />
           <div className="flex justify-between items-center mt-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center">
-                <CurrentStepIcon className="w-5 h-5 text-violet-600" />
+              <div className="w-10 h-10 rounded-xl bg-cyan-100 flex items-center justify-center">
+                <CurrentStepIcon className="w-5 h-5 text-cyan-600" />
               </div>
               <div>
                 <h3 className="font-bold text-slate-800">{steps[currentStep].title}</h3>
@@ -364,7 +368,7 @@ export default function OnboardingFlow({ user, onComplete }) {
           </Button>
           <Button
             onClick={handleNext}
-            className="bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-xl px-6 gap-2"
+            className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-xl px-6 gap-2"
             disabled={updateProfileMutation.isPending || joinCommunitiesMutation.isPending}
           >
             {currentStep === steps.length - 1 ? 'Get Started' : 'Next'}
