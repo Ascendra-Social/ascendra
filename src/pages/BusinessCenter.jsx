@@ -106,7 +106,7 @@ export default function BusinessCenter() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center">
             <Briefcase className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -116,7 +116,7 @@ export default function BusinessCenter() {
         </div>
         <Button
           onClick={() => setShowCreateModal(true)}
-          className="bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-full gap-2"
+          className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full gap-2"
         >
           <Plus className="w-4 h-4" />
           Create Ad
@@ -290,8 +290,8 @@ export default function BusinessCenter() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-violet-100 to-pink-100 flex items-center justify-center mb-4">
-                <TrendingUp className="w-8 h-8 text-violet-400" />
+              <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-cyan-100 to-purple-100 flex items-center justify-center mb-4">
+                <TrendingUp className="w-8 h-8 text-cyan-400" />
               </div>
               <h3 className="text-lg font-semibold text-slate-700 mb-2">
                 No ads yet
@@ -301,7 +301,7 @@ export default function BusinessCenter() {
               </p>
               <Button
                 onClick={() => setShowCreateModal(true)}
-                className="bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-full"
+                className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full"
               >
                 Create Your First Ad
               </Button>

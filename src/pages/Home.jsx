@@ -138,7 +138,7 @@ export default function Home() {
         {user && (
           <Button 
             onClick={() => setShowCreateModal(true)}
-            className="bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-full gap-2"
+            className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full gap-2"
           >
             <Plus className="w-4 h-4" />
             Create
@@ -219,15 +219,15 @@ export default function Home() {
           })
         ) : (
           <div className="text-center py-16">
-            <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-violet-100 to-pink-100 flex items-center justify-center mb-4">
-              <Sparkles className="w-10 h-10 text-violet-400" />
+            <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-cyan-100 to-purple-100 flex items-center justify-center mb-4">
+              <Sparkles className="w-10 h-10 text-cyan-400" />
             </div>
             <h3 className="text-xl font-semibold text-slate-700 mb-2">No posts yet</h3>
             <p className="text-slate-500 mb-6">Be the first to share something positive!</p>
             {user && (
               <Button 
                 onClick={() => setShowCreateModal(true)}
-                className="bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-full"
+                className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full"
               >
                 Create your first post
               </Button>
