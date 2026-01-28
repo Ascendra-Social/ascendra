@@ -64,11 +64,11 @@ export default function Layout({ children, currentPageName }) {
   const isActive = (page) => currentPageName === page;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-violet-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50">
       <style>{`
         :root {
-          --primary: 139 92 246;
-          --primary-gradient: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+          --primary: 34 211 238;
+          --primary-gradient: linear-gradient(135deg, #22D3EE 0%, #A855F7 100%);
           --glass: rgba(255, 255, 255, 0.7);
         }
         .glass-effect {
@@ -77,7 +77,7 @@ export default function Layout({ children, currentPageName }) {
           border: 1px solid rgba(255, 255, 255, 0.3);
         }
         .gradient-text {
-          background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+          background: linear-gradient(135deg, #22D3EE 0%, #A855F7 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
@@ -90,10 +90,11 @@ export default function Layout({ children, currentPageName }) {
       <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-72 flex-col glass-effect border-r border-slate-200/50 z-50">
         <div className="p-6">
           <Link to={createPageUrl('Home')} className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center">
-              <span className="text-white font-bold text-xl">A</span>
-            </div>
-            <span className="text-2xl font-bold gradient-text">Ascendra</span>
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/693b77daae7d72630553bc76/b38dd71b7_ChatGPTImageJan26202603_42_22PM.png" 
+              alt="Ascendra" 
+              className="h-10 w-auto object-contain"
+            />
           </Link>
         </div>
 
@@ -105,11 +106,11 @@ export default function Layout({ children, currentPageName }) {
               className={cn(
                 "flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300",
                 isActive(item.page)
-                  ? "bg-gradient-to-r from-violet-500/10 to-pink-500/10 text-violet-600"
+                  ? "bg-gradient-to-r from-cyan-500/10 to-purple-500/10 text-cyan-600"
                   : "text-slate-600 hover:bg-slate-100/80"
               )}
             >
-              <item.icon className={cn("w-5 h-5", isActive(item.page) && "text-violet-500")} />
+              <item.icon className={cn("w-5 h-5", isActive(item.page) && "text-cyan-500")} />
               <span className="font-medium">{item.name}</span>
             </Link>
           ))}
@@ -121,9 +122,9 @@ export default function Layout({ children, currentPageName }) {
               to={createPageUrl('Profile')}
               className="flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-100/80 transition-all"
             >
-              <Avatar className="w-10 h-10 ring-2 ring-violet-200">
+              <Avatar className="w-10 h-10 ring-2 ring-cyan-200">
                 <AvatarImage src={user.avatar} />
-                <AvatarFallback className="bg-gradient-to-br from-violet-400 to-pink-400 text-white">
+                <AvatarFallback className="bg-gradient-to-br from-cyan-400 to-purple-400 text-white">
                   {user.full_name?.[0] || 'U'}
                 </AvatarFallback>
               </Avatar>
@@ -135,7 +136,7 @@ export default function Layout({ children, currentPageName }) {
           ) : (
             <Button 
               onClick={() => base44.auth.redirectToLogin()}
-              className="w-full bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-xl"
+              className="w-full bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-xl"
             >
               Sign In
             </Button>
@@ -146,10 +147,11 @@ export default function Layout({ children, currentPageName }) {
       {/* Mobile Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 h-16 glass-effect border-b border-slate-200/50 z-50 flex items-center justify-between px-4">
         <Link to={createPageUrl('Home')} className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center">
-            <span className="text-white font-bold">A</span>
-          </div>
-          <span className="text-xl font-bold gradient-text">Ascendra</span>
+          <img 
+            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/693b77daae7d72630553bc76/b38dd71b7_ChatGPTImageJan26202603_42_22PM.png" 
+            alt="Ascendra" 
+            className="h-8 w-auto object-contain"
+          />
         </Link>
 
         <div className="flex items-center gap-3">
@@ -180,7 +182,7 @@ export default function Layout({ children, currentPageName }) {
                     className={cn(
                       "flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
                       isActive(item.page)
-                        ? "bg-violet-100 text-violet-600"
+                        ? "bg-cyan-100 text-cyan-600"
                         : "text-slate-600 hover:bg-slate-100"
                     )}
                   >
@@ -207,7 +209,7 @@ export default function Layout({ children, currentPageName }) {
             to={createPageUrl(item.page)}
             className={cn(
               "flex flex-col items-center gap-1 p-2 rounded-xl transition-all",
-              isActive(item.page) ? "text-violet-500" : "text-slate-400"
+              isActive(item.page) ? "text-cyan-500" : "text-slate-400"
             )}
           >
             <item.icon className="w-6 h-6" />
