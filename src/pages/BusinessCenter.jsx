@@ -44,8 +44,9 @@ export default function BusinessCenter() {
       return wallets[0];
     },
     enabled: !!user,
-    staleTime: 30000,
-    refetchOnWindowFocus: false
+    staleTime: 60000,
+    refetchOnWindowFocus: false,
+    refetchInterval: false
   });
 
   const { data: ads, isLoading } = useQuery({
@@ -55,8 +56,9 @@ export default function BusinessCenter() {
       '-created_date'
     ),
     enabled: !!user,
-    staleTime: 30000,
-    refetchOnWindowFocus: false
+    staleTime: 60000,
+    refetchOnWindowFocus: false,
+    refetchInterval: false
   });
 
   const pauseAdMutation = useMutation({
@@ -142,7 +144,7 @@ export default function BusinessCenter() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-slate-500">Total Spent</p>
-              <TrendingUp className="w-4 h-4 text-violet-500" />
+              <TrendingUp className="w-4 h-4 text-cyan-500" />
             </div>
             <p className="text-2xl font-bold text-slate-800">
               {stats.totalSpent.toLocaleString()}
@@ -197,7 +199,7 @@ export default function BusinessCenter() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  className="flex items-center gap-4 p-4 rounded-2xl border border-slate-100 hover:border-violet-200 hover:bg-violet-50/30 transition-all"
+                  className="flex items-center gap-4 p-4 rounded-2xl border border-slate-100 hover:border-cyan-200 hover:bg-cyan-50/30 transition-all"
                 >
                   {ad.media_url && (
                     <img 
@@ -333,7 +335,7 @@ export default function BusinessCenter() {
           <DialogContent className="sm:max-w-4xl rounded-3xl p-0 overflow-hidden max-h-[90vh] overflow-y-auto">
             <DialogHeader className="p-6 pb-4 border-b border-slate-100 sticky top-0 bg-white z-10">
               <DialogTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-violet-500" />
+                <BarChart3 className="w-5 h-5 text-cyan-500" />
                 {viewingAnalytics.title} - Analytics
               </DialogTitle>
             </DialogHeader>

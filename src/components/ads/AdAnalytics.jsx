@@ -11,7 +11,10 @@ import { motion } from 'framer-motion';
 export default function AdAnalytics({ ad }) {
   const { data: segmentAnalytics, isLoading } = useQuery({
     queryKey: ['segment-analytics', ad.id],
-    queryFn: () => base44.entities.AdSegmentAnalytics.filter({ ad_id: ad.id })
+    queryFn: () => base44.entities.AdSegmentAnalytics.filter({ ad_id: ad.id }),
+    staleTime: 60000,
+    refetchOnWindowFocus: false,
+    refetchInterval: false
   });
 
   const getTopSegments = (type) => {
@@ -46,11 +49,11 @@ export default function AdAnalytics({ ad }) {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="p-4 rounded-xl border border-slate-100 hover:border-violet-200 hover:bg-violet-50/30 transition-all"
+        className="p-4 rounded-xl border border-slate-100 hover:border-cyan-200 hover:bg-cyan-50/30 transition-all"
       >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            {Icon && <Icon className="w-4 h-4 text-violet-500" />}
+            {Icon && <Icon className="w-4 h-4 text-cyan-500" />}
             <span className="font-medium text-slate-800 capitalize">
               {segment.segment_value.replace('_', ' ')}
             </span>
@@ -105,7 +108,7 @@ export default function AdAnalytics({ ad }) {
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
               <p className="text-xs text-slate-500">CTR</p>
-              <TrendingUp className="w-4 h-4 text-violet-500" />
+              <TrendingUp className="w-4 h-4 text-cyan-500" />
             </div>
             <p className="text-2xl font-bold text-slate-800">{overallCTR}%</p>
           </CardContent>
