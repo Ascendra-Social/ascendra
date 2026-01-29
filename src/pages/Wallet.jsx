@@ -30,7 +30,7 @@ const transactionColors = {
   transfer_in: 'text-blue-600 bg-blue-100',
   transfer_out: 'text-orange-600 bg-orange-100',
   ad_reward: 'text-amber-600 bg-amber-100',
-  creator_reward: 'text-violet-600 bg-violet-100',
+  creator_reward: 'text-cyan-600 bg-cyan-100',
   purchase: 'text-pink-600 bg-pink-100',
   sale: 'text-emerald-600 bg-emerald-100'
 };
@@ -111,19 +111,19 @@ export default function Wallet() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-gradient-to-r from-violet-50 to-pink-50 rounded-2xl p-5 border border-violet-100"
+        className="bg-gradient-to-r from-cyan-50 to-purple-50 rounded-2xl p-5 border border-cyan-100"
       >
         <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
-          <Zap className="w-5 h-5 text-violet-500" />
+          <Zap className="w-5 h-5 text-cyan-500" />
           How You Earn ASCENDRA
         </h3>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="flex items-center gap-2 text-slate-600">
-            <div className="w-2 h-2 rounded-full bg-violet-400" />
+            <div className="w-2 h-2 rounded-full bg-cyan-400" />
             50% of ad revenue to users
           </div>
           <div className="flex items-center gap-2 text-slate-600">
-            <div className="w-2 h-2 rounded-full bg-pink-400" />
+            <div className="w-2 h-2 rounded-full bg-purple-400" />
             Engagement rewards
           </div>
           <div className="flex items-center gap-2 text-slate-600">
