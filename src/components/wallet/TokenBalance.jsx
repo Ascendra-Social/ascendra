@@ -11,34 +11,34 @@ export default function TokenBalance({ wallet, onDeposit, onWithdraw }) {
       className="relative overflow-hidden"
     >
       {/* Main balance card */}
-      <div className="relative bg-gradient-to-br from-violet-600 via-purple-600 to-pink-600 rounded-3xl p-8 text-white">
+      <div className="relative bg-gradient-to-br from-cyan-500 via-blue-500 to-purple-600 rounded-3xl p-8 text-white">
         {/* Background decoration */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-pink-400/20 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-400/20 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
 
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-6">
             <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
               <Coins className="w-5 h-5" />
             </div>
-            <span className="font-medium text-white/80">VIBE Token Balance</span>
+            <span className="font-medium text-white/80">ASCENDRA Token Balance</span>
           </div>
 
           <div className="mb-8">
             <p className="text-5xl font-bold mb-2">
               {wallet?.balance?.toLocaleString() || '0'}
-              <span className="text-2xl ml-2 text-white/70">VIBE</span>
+              <span className="text-2xl ml-2 text-white/70">ASCENDRA</span>
             </p>
             <p className="text-white/60 text-sm flex items-center gap-1">
               <TrendingUp className="w-4 h-4" />
-              ≈ ${((wallet?.balance || 0) * 0.05).toFixed(2)} USD
+              ≈ ${((wallet?.balance || 0) * 0.10).toFixed(2)} USD
             </p>
           </div>
 
           <div className="flex gap-3">
             <Button 
               onClick={onDeposit}
-              className="flex-1 bg-white text-violet-600 hover:bg-white/90 rounded-xl h-12 font-semibold"
+              className="flex-1 bg-white text-cyan-600 hover:bg-white/90 rounded-xl h-12 font-semibold"
             >
               <ArrowDownLeft className="w-5 h-5 mr-2" />
               Deposit
