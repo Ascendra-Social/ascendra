@@ -92,11 +92,7 @@ export default function AppMarketplaceCard({ app, onClick }) {
                   <span className="bg-gradient-to-r from-cyan-600 to-purple-600 bg-clip-text text-transparent">
                     {app.price}
                   </span>
-                  {app.currency === 'ASCENDRA' ? (
-                    <Coins className="w-5 h-5 text-cyan-500" />
-                  ) : (
-                    <span className="text-slate-600 text-sm">USD</span>
-                  )}
+                  <Coins className="w-5 h-5 text-cyan-500" />
                 </>
               )}
             </div>

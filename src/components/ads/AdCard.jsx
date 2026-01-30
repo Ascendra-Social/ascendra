@@ -132,10 +132,10 @@ export default function AdCard({ ad, currentUserId }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-violet-50 to-pink-50 rounded-3xl border-2 border-violet-100 overflow-hidden"
+      className="bg-gradient-to-br from-cyan-50 to-purple-50 rounded-3xl border-2 border-cyan-100 overflow-hidden"
     >
-      <div className="p-3 bg-white/80 backdrop-blur border-b border-violet-100">
-        <Badge className="bg-violet-100 text-violet-700 text-xs">
+      <div className="p-3 bg-white/80 backdrop-blur border-b border-cyan-100">
+        <Badge className="bg-cyan-100 text-cyan-700 text-xs">
           <TrendingUp className="w-3 h-3 mr-1" />
           Sponsored
         </Badge>
@@ -143,9 +143,9 @@ export default function AdCard({ ad, currentUserId }) {
 
       {/* Business Header */}
       <div className="flex items-center gap-3 p-4 pb-3">
-        <Avatar className="w-11 h-11 ring-2 ring-violet-100">
+        <Avatar className="w-11 h-11 ring-2 ring-cyan-100">
           <AvatarImage src={ad.business_avatar} />
-          <AvatarFallback className="bg-gradient-to-br from-violet-400 to-pink-400 text-white">
+          <AvatarFallback className="bg-gradient-to-br from-cyan-400 to-purple-400 text-white">
             {ad.business_name?.[0] || 'B'}
           </AvatarFallback>
         </Avatar>
@@ -185,7 +185,7 @@ export default function AdCard({ ad, currentUserId }) {
       <div className="p-4">
         <Button
           onClick={handleClick}
-          className="w-full bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-xl h-12 gap-2 hover:from-violet-600 hover:to-pink-600"
+          className="w-full bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-xl h-12 gap-2 hover:from-cyan-600 hover:to-purple-600"
         >
           {ad.cta_text || 'Learn More'}
           <ExternalLink className="w-4 h-4" />

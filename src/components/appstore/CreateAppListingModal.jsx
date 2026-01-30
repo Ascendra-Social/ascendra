@@ -17,7 +17,6 @@ export default function CreateAppListingModal({ open, onClose, user, editApp = n
     description: '',
     category: 'integration',
     price: 0,
-    currency: 'ASCENDRA',
     version: '1.0.0',
     features: [],
     demo_url: '',
@@ -177,28 +176,14 @@ export default function CreateAppListingModal({ open, onClose, user, editApp = n
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Price</Label>
-              <Input
-                type="number"
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
-                placeholder="0"
-              />
-            </div>
-            <div>
-              <Label>Currency</Label>
-              <Select value={formData.currency} onValueChange={(val) => setFormData({ ...formData, currency: val })}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ASCENDRA">ASCENDRA</SelectItem>
-                  <SelectItem value="USD">USD</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div>
+            <Label>Price ($ASC)</Label>
+            <Input
+              type="number"
+              value={formData.price}
+              onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
+              placeholder="0"
+            />
           </div>
 
           <div>
