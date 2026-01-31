@@ -40,8 +40,6 @@ export default function CreateListingModal({ isOpen, onClose, user, onCreated })
     title: '',
     description: '',
     price: '',
-    price_in_tokens: '',
-    currency: 'USD',
     category: '',
     condition: 'good',
     location: '',
@@ -95,9 +93,6 @@ export default function CreateListingModal({ isOpen, onClose, user, onCreated })
       await base44.entities.MarketplaceListing.create({
         ...formData,
         price: parseFloat(formData.price) || 0,
-        price_in_tokens: formData.currency === 'TOKEN' 
-          ? parseFloat(formData.price_in_tokens) || 0 
-          : parseFloat(formData.price) * 20, // Convert USD to tokens (example rate)
         images: imageUrls,
         seller_id: user.id,
         seller_name: user.full_name,
@@ -118,7 +113,7 @@ export default function CreateListingModal({ isOpen, onClose, user, onCreated })
       <DialogContent className="sm:max-w-lg rounded-3xl p-0 overflow-hidden max-h-[90vh] overflow-y-auto">
         <DialogHeader className="p-6 pb-4 border-b border-slate-100 sticky top-0 bg-white z-10">
           <DialogTitle className="text-xl font-semibold flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-violet-500" />
+            <ShoppingBag className="w-5 h-5 text-cyan-500" />
             Create Listing
           </DialogTitle>
         </DialogHeader>
@@ -160,7 +155,7 @@ export default function CreateListingModal({ isOpen, onClose, user, onCreated })
           <Button
             onClick={() => setShowAIModal(true)}
             variant="outline"
-            className="w-full h-12 rounded-xl gap-2 border-violet-200 text-violet-600 hover:bg-violet-50"
+            className="w-full h-12 rounded-xl gap-2 border-cyan-200 text-cyan-600 hover:bg-cyan-50"
           >
             <Wand2 className="w-4 h-4" />
             Generate with AI
@@ -190,45 +185,18 @@ export default function CreateListingModal({ isOpen, onClose, user, onCreated })
             />
           </div>
 
-          {/* Price & Currency */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label className="text-sm text-slate-600 mb-2 block">Currency</Label>
-              <Select
-                value={formData.currency}
-                onValueChange={(value) => setFormData({ ...formData, currency: value })}
-              >
-                <SelectTrigger className="h-12 rounded-xl">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="USD">💵 USD</SelectItem>
-                  <SelectItem value="TOKEN">
-                    <span className="flex items-center gap-1">
-                      <Coins className="w-4 h-4 text-amber-500" />
-                      VIBE Tokens
-                    </span>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label className="text-sm text-slate-600 mb-2 block">Price</Label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                  {formData.currency === 'USD' ? '$' : '🪙'}
-                </span>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.currency === 'USD' ? formData.price : formData.price_in_tokens}
-                  onChange={(e) => setFormData({ 
-                    ...formData, 
-                    [formData.currency === 'USD' ? 'price' : 'price_in_tokens']: e.target.value 
-                  })}
-                  className="h-12 rounded-xl pl-10"
-                />
-              </div>
+          {/* Price */}
+          <div>
+            <Label className="text-sm text-slate-600 mb-2 block">Price ($ASC)</Label>
+            <div className="relative">
+              <Coins className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-cyan-500" />
+              <Input
+                type="number"
+                placeholder="0"
+                value={formData.price}
+                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                className="h-12 rounded-xl pl-10"
+              />
             </div>
           </div>
 
@@ -325,7 +293,7 @@ export default function CreateListingModal({ isOpen, onClose, user, onCreated })
           <Button
             onClick={handleSubmit}
             disabled={isSubmitting || !formData.title.trim() || !formData.price}
-            className="bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-xl px-6"
+            className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-xl px-6"
           >
             {isSubmitting ? (
               <Loader2 className="w-4 h-4 animate-spin" />

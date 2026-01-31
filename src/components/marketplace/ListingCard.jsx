@@ -65,23 +65,17 @@ export default function ListingCard({ listing }) {
             <h3 className="font-semibold text-slate-800 truncate">{listing.title}</h3>
             
             <div className="flex items-center gap-2 mt-2">
-              {listing.currency === 'TOKEN' ? (
-                <span className="text-lg font-bold text-amber-600 flex items-center gap-1">
-                  <Coins className="w-4 h-4" />
-                  {listing.price_in_tokens?.toLocaleString()} VIBE
-                </span>
-              ) : (
-                <span className="text-lg font-bold text-slate-900">
-                  ${listing.price?.toLocaleString()}
-                </span>
-              )}
+              <span className="text-lg font-bold bg-gradient-to-r from-cyan-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-1">
+                <Coins className="w-4 h-4 text-cyan-500" />
+                {listing.price?.toLocaleString()} $ASC
+              </span>
             </div>
 
             {/* Seller */}
             <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-50">
               <Avatar className="w-6 h-6">
                 <AvatarImage src={listing.seller_avatar} />
-                <AvatarFallback className="text-xs bg-gradient-to-br from-violet-400 to-pink-400 text-white">
+                <AvatarFallback className="text-xs bg-gradient-to-br from-cyan-400 to-purple-400 text-white">
                   {listing.seller_name?.[0]}
                 </AvatarFallback>
               </Avatar>

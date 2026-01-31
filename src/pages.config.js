@@ -47,6 +47,7 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import AppStore from './pages/AppStore';
 import BusinessCenter from './pages/BusinessCenter';
 import Communities from './pages/Communities';
 import CommunityDetail from './pages/CommunityDetail';
@@ -62,11 +63,11 @@ import Profile from './pages/Profile';
 import Reels from './pages/Reels';
 import VerificationReview from './pages/VerificationReview';
 import Wallet from './pages/Wallet';
-import AppStore from './pages/AppStore';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "AppStore": AppStore,
     "BusinessCenter": BusinessCenter,
     "Communities": Communities,
     "CommunityDetail": CommunityDetail,
@@ -82,7 +83,6 @@ export const PAGES = {
     "Reels": Reels,
     "VerificationReview": VerificationReview,
     "Wallet": Wallet,
-    "AppStore": AppStore,
 }
 
 export const pagesConfig = {

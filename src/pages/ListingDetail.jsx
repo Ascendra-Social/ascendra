@@ -215,21 +215,10 @@ export default function ListingDetail() {
             </div>
           </div>
           <div className="text-right">
-            {listing.currency === 'TOKEN' ? (
-              <div className="flex items-center gap-2 text-2xl font-bold text-amber-600">
-                <Coins className="w-6 h-6" />
-                {listing.price_in_tokens?.toLocaleString()} VIBE
-              </div>
-            ) : (
-              <p className="text-2xl font-bold text-slate-900">
-                ${listing.price?.toLocaleString()}
-              </p>
-            )}
-            {listing.currency === 'USD' && listing.price_in_tokens && (
-              <p className="text-sm text-slate-400 flex items-center justify-end gap-1">
-                or <Coins className="w-3 h-3" /> {listing.price_in_tokens} VIBE
-              </p>
-            )}
+            <div className="flex items-center gap-2 text-2xl font-bold bg-gradient-to-r from-cyan-600 to-purple-600 bg-clip-text text-transparent">
+              <Coins className="w-6 h-6 text-cyan-500" />
+              {listing.price?.toLocaleString()} $ASC
+            </div>
           </div>
         </div>
 
@@ -244,7 +233,7 @@ export default function ListingDetail() {
             >
               <Avatar className="w-12 h-12">
                 <AvatarImage src={listing.seller_avatar} />
-                <AvatarFallback className="bg-gradient-to-br from-violet-400 to-pink-400 text-white">
+                <AvatarFallback className="bg-gradient-to-br from-cyan-400 to-purple-400 text-white">
                   {listing.seller_name?.[0]}
                 </AvatarFallback>
               </Avatar>
@@ -306,7 +295,7 @@ export default function ListingDetail() {
         transition={{ delay: 0.3 }}
         className="flex gap-3"
       >
-        <Button className="flex-1 h-14 rounded-2xl bg-gradient-to-r from-violet-500 to-pink-500 text-white text-lg font-semibold">
+        <Button className="flex-1 h-14 rounded-2xl bg-gradient-to-r from-cyan-500 to-purple-500 text-white text-lg font-semibold">
           Buy Now
         </Button>
         {listing.allows_offers && (

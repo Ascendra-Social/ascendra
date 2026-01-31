@@ -52,22 +52,13 @@ export default function MakeOfferModal({ isOpen, onClose, listing, user }) {
           <div>
             <Label className="text-slate-600">Listing Price</Label>
             <div className="flex items-center gap-2 mt-1 text-slate-700">
-              {listing.currency === 'USD' ? (
-                <>
-                  <DollarSign className="w-4 h-4" />
-                  <span className="font-semibold">${listing.price}</span>
-                </>
-              ) : (
-                <>
-                  <Coins className="w-4 h-4 text-amber-600" />
-                  <span className="font-semibold">{listing.price_in_tokens} VIBE</span>
-                </>
-              )}
+              <Coins className="w-4 h-4 text-cyan-500" />
+              <span className="font-semibold">{listing.price} $ASC</span>
             </div>
           </div>
 
           <div>
-            <Label>Your Offer Amount</Label>
+            <Label>Your Offer Amount ($ASC)</Label>
             <div className="relative mt-1">
               <Input
                 type="number"
@@ -76,11 +67,7 @@ export default function MakeOfferModal({ isOpen, onClose, listing, user }) {
                 onChange={(e) => setOfferAmount(e.target.value)}
                 className="rounded-xl pl-10"
               />
-              {listing.currency === 'USD' ? (
-                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              ) : (
-                <Coins className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500" />
-              )}
+              <Coins className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cyan-500" />
             </div>
           </div>
 
@@ -98,7 +85,7 @@ export default function MakeOfferModal({ isOpen, onClose, listing, user }) {
           <Button
             onClick={handleSubmit}
             disabled={isSubmitting || !offerAmount}
-            className="w-full bg-violet-500 text-white rounded-xl gap-2"
+            className="w-full bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-xl gap-2"
           >
             <Send className="w-4 h-4" />
             Send Offer
