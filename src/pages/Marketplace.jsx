@@ -34,7 +34,6 @@ export default function Marketplace() {
   const [user, setUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [category, setCategory] = useState('all');
-  const [currency, setCurrency] = useState('all');
   const [location, setLocation] = useState('');
   const [shipping, setShipping] = useState('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -52,11 +51,10 @@ export default function Marketplace() {
   }, []);
 
   const { data: listings, isLoading, refetch } = useQuery({
-    queryKey: ['listings', category, currency],
+    queryKey: ['listings', category],
     queryFn: async () => {
       let query = { status: 'active' };
       if (category !== 'all') query.category = category;
-      if (currency !== 'all') query.currency = currency;
       
       return base44.entities.MarketplaceListing.filter(query, '-created_date', 50);
     }
@@ -77,12 +75,12 @@ export default function Marketplace() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Marketplace</h1>
-          <p className="text-slate-500">Buy & sell with VIBE tokens or USD</p>
+          <p className="text-slate-500">Buy & sell with Ascendra ($ASC)</p>
         </div>
         {user && (
           <Button 
             onClick={() => setShowCreateModal(true)}
-            className="bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-full gap-2"
+            className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full gap-2"
           >
             <Plus className="w-4 h-4" />
             Sell Something
@@ -90,40 +88,7 @@ export default function Marketplace() {
         )}
       </div>
 
-      {/* Currency Toggle */}
-      <div className="flex flex-wrap gap-3 mb-6">
-        <Badge 
-          onClick={() => setCurrency('all')}
-          className={`cursor-pointer px-4 py-2 rounded-full ${
-            currency === 'all' 
-              ? 'bg-violet-500 text-white' 
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
-        >
-          All
-        </Badge>
-        <Badge 
-          onClick={() => setCurrency('USD')}
-          className={`cursor-pointer px-4 py-2 rounded-full ${
-            currency === 'USD' 
-              ? 'bg-green-500 text-white' 
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
-        >
-          💵 USD
-        </Badge>
-        <Badge 
-          onClick={() => setCurrency('TOKEN')}
-          className={`cursor-pointer px-4 py-2 rounded-full flex items-center gap-1 ${
-            currency === 'TOKEN' 
-              ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' 
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
-        >
-          <Coins className="w-3 h-3" />
-          VIBE Tokens
-        </Badge>
-      </div>
+
 
       {/* Search & Filters */}
       <div className="flex flex-col gap-4 mb-8">
@@ -198,7 +163,7 @@ export default function Marketplace() {
         </div>
       ) : (
         <div className="text-center py-20">
-          <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-violet-100 to-pink-100 flex items-center justify-center mb-6">
+          <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-cyan-100 to-purple-100 flex items-center justify-center mb-6">
             <span className="text-5xl">🛍️</span>
           </div>
           <h3 className="text-xl font-semibold text-slate-700 mb-2">No listings found</h3>
@@ -206,7 +171,7 @@ export default function Marketplace() {
           {user && (
             <Button 
               onClick={() => setShowCreateModal(true)}
-              className="bg-gradient-to-r from-violet-500 to-pink-500 text-white rounded-full"
+              className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full"
             >
               Create Listing
             </Button>
