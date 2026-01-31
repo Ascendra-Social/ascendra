@@ -3,13 +3,17 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { 
   Coins, TrendingUp, ArrowUpRight, ArrowDownLeft, 
-  Clock, Sparkles, Gift, ShoppingBag, Zap 
+  Clock, Sparkles, Gift, ShoppingBag, Zap, Wallet as WalletIcon 
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import TokenBalance from '@/components/wallet/TokenBalance';
+import WalletProvider from '@/components/wallet/WalletProvider';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { formatDistanceToNow } from 'date-fns';
 import { motion } from 'framer-motion';
 
@@ -35,8 +39,11 @@ const transactionColors = {
   sale: 'text-emerald-600 bg-emerald-100'
 };
 
-export default function Wallet() {
+function WalletContent() {
   const [user, setUser] = useState(null);
+  const { publicKey, connected } = useWallet();
+  const { connection } = useConnection();
+  const [solBalance, setSolBalance] = useState(0);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -49,6 +56,25 @@ export default function Wallet() {
     };
     loadUser();
   }, []);
+
+  // Fetch SOL balance when wallet is connected
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (connected && publicKey) {
+        try {
+          const balance = await connection.getBalance(publicKey);
+          setSolBalance(balance / LAMPORTS_PER_SOL);
+        } catch (error) {
+          console.error('Failed to fetch SOL balance:', error);
+        }
+      }
+    };
+    fetchBalance();
+    
+    // Refresh balance every 30 seconds
+    const interval = setInterval(fetchBalance, 30000);
+    return () => clearInterval(interval);
+  }, [connected, publicKey, connection]);
 
   const { data: wallet, isLoading: walletLoading } = useQuery({
     queryKey: ['wallet', user?.id],
@@ -99,6 +125,45 @@ export default function Wallet() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+      {/* Phantom Wallet Connection */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-2xl p-5 border border-slate-100"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <WalletIcon className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-800">Phantom Wallet</h3>
+              <p className="text-sm text-slate-500">
+                {connected ? 'Connected' : 'Connect your wallet'}
+              </p>
+            </div>
+          </div>
+          <WalletMultiButton className="!bg-gradient-to-r !from-cyan-500 !to-purple-500 !rounded-xl !h-10" />
+        </div>
+
+        {connected && publicKey && (
+          <div className="space-y-3 pt-3 border-t border-slate-100">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-600">Wallet Address</span>
+              <span className="text-sm font-mono text-slate-800">
+                {publicKey.toString().slice(0, 4)}...{publicKey.toString().slice(-4)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-600">SOL Balance</span>
+              <span className="text-sm font-semibold text-slate-800">
+                {solBalance.toFixed(4)} SOL
+              </span>
+            </div>
+          </div>
+        )}
+      </motion.div>
+
       {/* Token Balance */}
       <TokenBalance 
         wallet={wallet}
@@ -224,5 +289,13 @@ export default function Wallet() {
         </div>
       </motion.div>
     </div>
+  );
+}
+
+export default function Wallet() {
+  return (
+    <WalletProvider>
+      <WalletContent />
+    </WalletProvider>
   );
 }
