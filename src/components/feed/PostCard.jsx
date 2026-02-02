@@ -102,7 +102,7 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="rounded-xl">
-            {post.author_id === currentUserId && (
+            {user && post.author_id === user.id && (
               <DropdownMenuItem onClick={() => setShowBoost(true)}>
                 <TrendingUp className="w-4 h-4 mr-2 text-cyan-500" />
                 Boost Post
