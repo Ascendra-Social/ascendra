@@ -63,6 +63,8 @@ import Profile from './pages/Profile';
 import Reels from './pages/Reels';
 import VerificationReview from './pages/VerificationReview';
 import Wallet from './pages/Wallet';
+import CreateBusinessPage from './pages/CreateBusinessPage';
+import BusinessPage from './pages/BusinessPage';
 import __Layout from './Layout.jsx';
 
 
@@ -83,6 +85,8 @@ export const PAGES = {
     "Reels": Reels,
     "VerificationReview": VerificationReview,
     "Wallet": Wallet,
+    "CreateBusinessPage": CreateBusinessPage,
+    "BusinessPage": BusinessPage,
 }
 
 export const pagesConfig = {

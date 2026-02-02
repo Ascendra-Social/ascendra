@@ -4,7 +4,7 @@ import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
 import { 
   Home, Search, PlusSquare, ShoppingBag, MessageCircle, 
-  User, Compass, Play, Wallet, Bell, Menu, X, Users, TrendingUp, Shield
+  User, Compass, Play, Wallet, Bell, Menu, X, Users, TrendingUp, Shield, Building2
 } from 'lucide-react';
 import AIFloatingButton from '@/components/ai/AIFloatingButton';
 import { Button } from "@/components/ui/button";
@@ -48,13 +48,14 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Explore', icon: Compass, page: 'Explore' },
     { name: 'Reels', icon: Play, page: 'Reels' },
     { name: 'Communities', icon: Users, page: 'Communities' },
+    { name: 'App Store', icon: ShoppingBag, page: 'AppStore' },
     { name: 'Marketplace', icon: ShoppingBag, page: 'Marketplace' },
     { name: 'Messages', icon: MessageCircle, page: 'Messages' },
     { name: 'Wallet', icon: Wallet, page: 'Wallet' },
   ];
 
-  const businessNavItems = user?.account_type === 'business' ? [
-    { name: 'Business Center', icon: TrendingUp, page: 'BusinessCenter' },
+  const businessNavItems = user ? [
+    { name: 'Create Business', icon: Building2, page: 'CreateBusinessPage' },
   ] : [];
 
   const adminNavItems = user?.role === 'admin' ? [
