@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-export default function CreateAdModal({ isOpen, onClose, user, wallet, ad, onCreated }) {
+export default function CreateAdModal({ isOpen, onClose, user, wallet, ad, onCreated, businessId, businessName, businessAvatar }) {
   const [formData, setFormData] = useState(ad || {
     title: '',
     description: '',
@@ -94,9 +94,9 @@ export default function CreateAdModal({ isOpen, onClose, user, wallet, ad, onCre
 
       const adData = {
         ...formData,
-        business_id: user.id,
-        business_name: user.business_name || user.full_name,
-        business_avatar: user.avatar,
+        business_id: businessId || user.id,
+        business_name: businessName || user.business_name || user.full_name,
+        business_avatar: businessAvatar || user.avatar,
         media_url: mediaUrl,
         budget_tokens: budget,
         cost_per_impression: parseFloat(formData.cost_per_impression) || 1,
