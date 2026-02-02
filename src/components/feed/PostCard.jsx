@@ -4,10 +4,11 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { 
   Heart, MessageCircle, Share2, Bookmark, MoreHorizontal,
-  Coins, Sparkles, Wand2, RefreshCw, Flag
+  Coins, Sparkles, Wand2, RefreshCw, Flag, TrendingUp
 } from 'lucide-react';
 import AIAssistantModal from '@/components/ai/AIAssistantModal';
 import ReportContentModal from '@/components/moderation/ReportContentModal';
+import BoostPostModal from '@/components/feed/BoostPostModal';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +27,7 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
   const [showComments, setShowComments] = useState(false);
   const [showAIRepost, setShowAIRepost] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [showBoost, setShowBoost] = useState(false);
   const [user, setUser] = useState(null);
 
   React.useEffect(() => {
@@ -100,6 +102,12 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="rounded-xl">
+            {post.author_id === currentUserId && (
+              <DropdownMenuItem onClick={() => setShowBoost(true)}>
+                <TrendingUp className="w-4 h-4 mr-2 text-cyan-500" />
+                Boost Post
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onClick={() => setShowAIRepost(true)}>
               <Wand2 className="w-4 h-4 mr-2 text-violet-500" />
               Repost with AI
@@ -207,6 +215,16 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
           user={user}
         />
       )}
-      </motion.div>
-      );
-      }
+
+      {/* Boost Post Modal */}
+      {showBoost && user && (
+        <BoostPostModal
+          open={showBoost}
+          onClose={() => setShowBoost(false)}
+          post={post}
+          user={user}
+        />
+      )}
+    </motion.div>
+  );
+}
