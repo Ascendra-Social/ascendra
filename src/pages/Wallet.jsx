@@ -180,7 +180,7 @@ function WalletContent() {
       >
         <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
           <Zap className="w-5 h-5 text-cyan-500" />
-          How You Earn ASCENDRA
+          How You Earn $ASC
         </h3>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="flex items-center gap-2 text-slate-600">
