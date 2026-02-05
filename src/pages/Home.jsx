@@ -132,8 +132,8 @@ export default function Home() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Feed</h1>
-          <p className="text-slate-500 text-sm">Discover positive vibes</p>
+          <h1 className="text-2xl font-bold text-white">Feed</h1>
+          <p className="text-slate-400 text-sm">Discover positive vibes</p>
         </div>
         {user && (
           <Button 
@@ -148,24 +148,24 @@ export default function Home() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-        <TabsList className="bg-slate-100/80 p-1 rounded-2xl">
+        <TabsList className="bg-slate-800/50 p-1 rounded-2xl border border-cyan-500/20">
           <TabsTrigger 
             value="foryou" 
-            className="rounded-xl px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            className="rounded-xl px-6 text-slate-400 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/20 data-[state=active]:to-purple-500/20 data-[state=active]:text-cyan-400"
           >
             <Sparkles className="w-4 h-4 mr-2" />
             For You
           </TabsTrigger>
           <TabsTrigger 
             value="following" 
-            className="rounded-xl px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            className="rounded-xl px-6 text-slate-400 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/20 data-[state=active]:to-purple-500/20 data-[state=active]:text-cyan-400"
           >
             <Users className="w-4 h-4 mr-2" />
             Following
           </TabsTrigger>
           <TabsTrigger 
             value="trending" 
-            className="rounded-xl px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            className="rounded-xl px-6 text-slate-400 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/20 data-[state=active]:to-purple-500/20 data-[state=active]:text-cyan-400"
           >
             <TrendingUp className="w-4 h-4 mr-2" />
             Trending
@@ -177,7 +177,7 @@ export default function Home() {
       <div className="space-y-6">
         {isLoading ? (
           Array(3).fill(0).map((_, i) => (
-            <div key={i} className="bg-white rounded-3xl p-4 space-y-4">
+            <div key={i} className="bg-slate-800/50 border border-cyan-500/20 rounded-3xl p-4 space-y-4">
               <div className="flex items-center gap-3">
                 <Skeleton className="w-11 h-11 rounded-full" />
                 <div className="space-y-2">
@@ -219,11 +219,11 @@ export default function Home() {
           })
         ) : (
           <div className="text-center py-16">
-            <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-cyan-100 to-purple-100 flex items-center justify-center mb-4">
+            <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center mb-4">
               <Sparkles className="w-10 h-10 text-cyan-400" />
             </div>
-            <h3 className="text-xl font-semibold text-slate-700 mb-2">No posts yet</h3>
-            <p className="text-slate-500 mb-6">Be the first to share something positive!</p>
+            <h3 className="text-xl font-semibold text-white mb-2">No posts yet</h3>
+            <p className="text-slate-400 mb-6">Be the first to share something positive!</p>
             {user && (
               <Button 
                 onClick={() => setShowCreateModal(true)}

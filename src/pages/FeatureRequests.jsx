@@ -63,12 +63,12 @@ export default function FeatureRequests() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-3xl border border-slate-100 p-6 mb-6"
+        className="bg-slate-800/50 border border-cyan-500/20 rounded-3xl p-6 mb-6"
       >
         <div className="flex items-start justify-between mb-4">
           <div>
             <h1 className="text-3xl font-bold gradient-text mb-2">Feature Requests</h1>
-            <p className="text-slate-600">
+            <p className="text-slate-300">
               Suggest improvements, pledge $ASC tokens, and earn by building requested features
             </p>
           </div>
@@ -131,8 +131,8 @@ export default function FeatureRequests() {
           ))
         ) : (
           <div className="text-center py-16">
-            <Lightbulb className="w-16 h-16 mx-auto text-slate-200 mb-4" />
-            <p className="text-slate-500">No feature requests yet</p>
+            <Lightbulb className="w-16 h-16 mx-auto text-slate-600 mb-4" />
+            <p className="text-slate-400">No feature requests yet</p>
             <Button 
               onClick={() => setShowCreateModal(true)}
               className="mt-4 bg-gradient-to-r from-cyan-500 to-purple-500 text-white"

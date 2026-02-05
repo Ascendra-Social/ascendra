@@ -157,11 +157,11 @@ export default function FeatureRequestCard({ request, user, wallet }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <Card className="hover:shadow-md transition-shadow">
+      <Card className="bg-slate-800/50 border-cyan-500/20 hover:shadow-lg hover:shadow-cyan-500/10 transition-all">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between mb-2">
             <div className="flex-1">
-              <h3 className="font-semibold text-slate-800 mb-2">{request.title}</h3>
+              <h3 className="font-semibold text-white mb-2">{request.title}</h3>
               <div className="flex flex-wrap gap-2">
                 <Badge className={categoryColors[request.category]}>
                   {request.category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
@@ -181,9 +181,9 @@ export default function FeatureRequestCard({ request, user, wallet }) {
             </div>
           </div>
 
-          <p className="text-sm text-slate-600 mt-2">{request.description}</p>
+          <p className="text-sm text-slate-300 mt-2">{request.description}</p>
 
-          <div className="flex items-center gap-4 mt-3 text-xs text-slate-500">
+          <div className="flex items-center gap-4 mt-3 text-xs text-slate-400">
             <div className="flex items-center gap-1">
               <User className="w-3 h-3" />
               {request.author_name}

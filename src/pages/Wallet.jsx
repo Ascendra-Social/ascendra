@@ -129,7 +129,7 @@ function WalletContent() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-2xl p-5 border border-slate-100"
+        className="bg-slate-800/50 border border-cyan-500/20 rounded-2xl p-5"
       >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -137,8 +137,8 @@ function WalletContent() {
               <WalletIcon className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-slate-800">Phantom Wallet</h3>
-              <p className="text-sm text-slate-500">
+              <h3 className="font-semibold text-white">Phantom Wallet</h3>
+              <p className="text-sm text-slate-400">
                 {connected ? 'Connected' : 'Connect your wallet'}
               </p>
             </div>
@@ -147,16 +147,16 @@ function WalletContent() {
         </div>
 
         {connected && publicKey && (
-          <div className="space-y-3 pt-3 border-t border-slate-100">
+          <div className="space-y-3 pt-3 border-t border-cyan-500/20">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-600">Wallet Address</span>
-              <span className="text-sm font-mono text-slate-800">
+              <span className="text-sm text-slate-400">Wallet Address</span>
+              <span className="text-sm font-mono text-slate-200">
                 {publicKey.toString().slice(0, 4)}...{publicKey.toString().slice(-4)}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-600">SOL Balance</span>
-              <span className="text-sm font-semibold text-slate-800">
+              <span className="text-sm text-slate-400">SOL Balance</span>
+              <span className="text-sm font-semibold text-white">
                 {solBalance.toFixed(4)} SOL
               </span>
             </div>
@@ -176,26 +176,26 @@ function WalletContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-gradient-to-r from-cyan-50 to-purple-50 rounded-2xl p-5 border border-cyan-100"
+        className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-2xl p-5 border border-cyan-500/20"
       >
-        <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
-          <Zap className="w-5 h-5 text-cyan-500" />
+        <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
+          <Zap className="w-5 h-5 text-cyan-400" />
           How You Earn $ASC
         </h3>
         <div className="grid grid-cols-2 gap-3 text-sm">
-          <div className="flex items-center gap-2 text-slate-600">
+          <div className="flex items-center gap-2 text-slate-300">
             <div className="w-2 h-2 rounded-full bg-cyan-400" />
             Receive tips from content
           </div>
-          <div className="flex items-center gap-2 text-slate-600">
+          <div className="flex items-center gap-2 text-slate-300">
             <div className="w-2 h-2 rounded-full bg-purple-400" />
             Sell digital goods on marketplace
           </div>
-          <div className="flex items-center gap-2 text-slate-600">
+          <div className="flex items-center gap-2 text-slate-300">
             <div className="w-2 h-2 rounded-full bg-amber-400" />
             Engage with boosted content
           </div>
-          <div className="flex items-center gap-2 text-slate-600">
+          <div className="flex items-center gap-2 text-slate-300">
             <div className="w-2 h-2 rounded-full bg-green-400" />
             And much more to come!
           </div>
@@ -207,19 +207,19 @@ function WalletContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-white rounded-2xl p-5 border border-slate-100"
+        className="bg-slate-800/50 border border-cyan-500/20 rounded-2xl p-5"
       >
-        <h3 className="font-semibold text-slate-800 mb-4">Earnings Breakdown</h3>
+        <h3 className="font-semibold text-white mb-4">Earnings Breakdown</h3>
         <div className="space-y-3">
           {earningsBreakdown.map((item, i) => (
             <div key={i} className="flex items-center justify-between py-2">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl bg-${item.color}-100 flex items-center justify-center`}>
-                  <item.icon className={`w-5 h-5 text-${item.color}-600`} />
+                <div className={`w-10 h-10 rounded-xl bg-${item.color}-500/20 flex items-center justify-center`}>
+                  <item.icon className={`w-5 h-5 text-${item.color}-400`} />
                 </div>
-                <span className="text-slate-700">{item.label}</span>
+                <span className="text-slate-300">{item.label}</span>
               </div>
-              <span className="font-semibold text-slate-800">{item.amount} ASCENDRA</span>
+              <span className="font-semibold text-white">{item.amount} $ASC</span>
             </div>
           ))}
         </div>
@@ -230,13 +230,13 @@ function WalletContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="bg-white rounded-2xl border border-slate-100 overflow-hidden"
+        className="bg-slate-800/50 border border-cyan-500/20 rounded-2xl overflow-hidden"
       >
-        <div className="p-5 border-b border-slate-100">
-          <h3 className="font-semibold text-slate-800">Transaction History</h3>
+        <div className="p-5 border-b border-cyan-500/20">
+          <h3 className="font-semibold text-white">Transaction History</h3>
         </div>
 
-        <div className="divide-y divide-slate-50">
+        <div className="divide-y divide-cyan-500/10">
           {transactionsLoading ? (
             Array(5).fill(0).map((_, i) => (
               <div key={i} className="p-4 flex items-center gap-3">
@@ -260,13 +260,13 @@ function WalletContent() {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  className="p-4 flex items-center gap-3 hover:bg-slate-50 transition-colors"
+                  className="p-4 flex items-center gap-3 hover:bg-slate-700/30 transition-colors"
                 >
-                  <div className={`w-10 h-10 rounded-xl ${colorClass.split(' ')[1]} flex items-center justify-center`}>
-                    <Icon className={`w-5 h-5 ${colorClass.split(' ')[0]}`} />
+                  <div className={`w-10 h-10 rounded-xl ${colorClass.split(' ')[1].replace('-100', '-500/20')} flex items-center justify-center`}>
+                    <Icon className={`w-5 h-5 ${colorClass.split(' ')[0].replace('-600', '-400')}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-slate-800 truncate">
+                    <p className="font-medium text-white truncate">
                       {tx.description || tx.type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                     </p>
                     <p className="text-xs text-slate-400 flex items-center gap-1">
@@ -274,16 +274,16 @@ function WalletContent() {
                       {tx.created_date && formatDistanceToNow(new Date(tx.created_date), { addSuffix: true })}
                     </p>
                   </div>
-                  <span className={`font-semibold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                    {isPositive ? '+' : '-'}{Math.abs(tx.amount)} ASCENDRA
+                  <span className={`font-semibold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                    {isPositive ? '+' : '-'}{Math.abs(tx.amount)} $ASC
                   </span>
                 </motion.div>
               );
             })
           ) : (
             <div className="p-8 text-center">
-              <Clock className="w-12 h-12 mx-auto text-slate-200 mb-3" />
-              <p className="text-slate-500">No transactions yet</p>
+              <Clock className="w-12 h-12 mx-auto text-slate-600 mb-3" />
+              <p className="text-slate-400">No transactions yet</p>
             </div>
           )}
         </div>
