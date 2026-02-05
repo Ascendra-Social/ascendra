@@ -65,17 +65,17 @@ export default function Layout({ children, currentPageName }) {
   const isActive = (page) => currentPageName === page;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50/30 to-purple-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       <style>{`
         :root {
           --primary: 34 211 238;
           --primary-gradient: linear-gradient(135deg, #22D3EE 0%, #A855F7 100%);
-          --glass: rgba(255, 255, 255, 0.7);
+          --glass: rgba(15, 23, 42, 0.7);
         }
         .glass-effect {
           backdrop-filter: blur(20px);
-          background: rgba(255, 255, 255, 0.85);
-          border: 1px solid rgba(255, 255, 255, 0.3);
+          background: rgba(15, 23, 42, 0.8);
+          border: 1px solid rgba(34, 211, 238, 0.2);
         }
         .gradient-text {
           background: linear-gradient(135deg, #22D3EE 0%, #A855F7 100%);
@@ -88,7 +88,7 @@ export default function Layout({ children, currentPageName }) {
       `}</style>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-72 flex-col glass-effect border-r border-slate-200/50 z-50">
+      <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-72 flex-col glass-effect border-r border-cyan-500/20 z-50">
         <div className="p-6">
           <Link to={createPageUrl('Home')} className="flex items-center gap-3">
             <img 
@@ -107,31 +107,31 @@ export default function Layout({ children, currentPageName }) {
               className={cn(
                 "flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300",
                 isActive(item.page)
-                  ? "bg-gradient-to-r from-cyan-500/10 to-purple-500/10 text-cyan-600"
-                  : "text-slate-600 hover:bg-slate-100/80"
+                  ? "bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-cyan-400"
+                  : "text-slate-300 hover:bg-slate-800/50"
               )}
             >
-              <item.icon className={cn("w-5 h-5", isActive(item.page) && "text-cyan-500")} />
+              <item.icon className={cn("w-5 h-5", isActive(item.page) && "text-cyan-400")} />
               <span className="font-medium">{item.name}</span>
             </Link>
           ))}
         </nav>
 
-        <div className="p-4 border-t border-slate-200/50">
+        <div className="p-4 border-t border-cyan-500/20">
           {user ? (
             <Link 
               to={createPageUrl('Profile')}
-              className="flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-100/80 transition-all"
+              className="flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-800/50 transition-all"
             >
-              <Avatar className="w-10 h-10 ring-2 ring-cyan-200">
+              <Avatar className="w-10 h-10 ring-2 ring-cyan-500/30">
                 <AvatarImage src={user.avatar} />
                 <AvatarFallback className="bg-gradient-to-br from-cyan-400 to-purple-400 text-white">
                   {user.full_name?.[0] || 'U'}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-slate-800 truncate">{user.full_name || 'User'}</p>
-                <p className="text-sm text-slate-500 truncate">@{user.username || 'username'}</p>
+                <p className="font-semibold text-slate-100 truncate">{user.full_name || 'User'}</p>
+                <p className="text-sm text-slate-400 truncate">@{user.username || 'username'}</p>
               </div>
             </Link>
           ) : (
@@ -146,7 +146,7 @@ export default function Layout({ children, currentPageName }) {
       </aside>
 
       {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 glass-effect border-b border-slate-200/50 z-50 flex items-center justify-between px-4">
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 glass-effect border-b border-cyan-500/20 z-50 flex items-center justify-between px-4">
         <Link to={createPageUrl('Home')} className="flex items-center gap-2">
           <img 
             src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/693b77daae7d72630553bc76/b38dd71b7_ChatGPTImageJan26202603_42_22PM.png" 
@@ -157,7 +157,7 @@ export default function Layout({ children, currentPageName }) {
 
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" className="rounded-xl">
-            <Bell className="w-5 h-5 text-slate-600" />
+            <Bell className="w-5 h-5 text-slate-300" />
           </Button>
           <Button 
             variant="ghost" 
@@ -165,15 +165,15 @@ export default function Layout({ children, currentPageName }) {
             className="rounded-xl"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-5 h-5 text-slate-300" /> : <Menu className="w-5 h-5 text-slate-300" />}
           </Button>
         </div>
       </header>
 
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-40 bg-black/20 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
-          <div className="absolute right-0 top-16 w-64 h-[calc(100vh-4rem)] glass-effect border-l border-slate-200/50 p-4" onClick={e => e.stopPropagation()}>
+        <div className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
+          <div className="absolute right-0 top-16 w-64 h-[calc(100vh-4rem)] glass-effect border-l border-cyan-500/20 p-4" onClick={e => e.stopPropagation()}>
               <nav className="space-y-1">
                 {[...navItems, ...businessNavItems, ...adminNavItems].map((item) => (
                   <Link
@@ -183,8 +183,8 @@ export default function Layout({ children, currentPageName }) {
                     className={cn(
                       "flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
                       isActive(item.page)
-                        ? "bg-cyan-100 text-cyan-600"
-                        : "text-slate-600 hover:bg-slate-100"
+                        ? "bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-cyan-400"
+                        : "text-slate-300 hover:bg-slate-800/50"
                     )}
                   >
                     <item.icon className="w-5 h-5" />
@@ -197,7 +197,7 @@ export default function Layout({ children, currentPageName }) {
       )}
 
       {/* Mobile Bottom Nav */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-20 glass-effect border-t border-slate-200/50 z-50 flex items-center justify-around px-2 pb-4">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-20 glass-effect border-t border-cyan-500/20 z-50 flex items-center justify-around px-2 pb-4">
         {[
           { icon: Home, page: 'Home' },
           { icon: Compass, page: 'Explore' },
@@ -210,7 +210,7 @@ export default function Layout({ children, currentPageName }) {
             to={createPageUrl(item.page)}
             className={cn(
               "flex flex-col items-center gap-1 p-2 rounded-xl transition-all",
-              isActive(item.page) ? "text-cyan-500" : "text-slate-400"
+              isActive(item.page) ? "text-cyan-400" : "text-slate-400"
             )}
           >
             <item.icon className="w-6 h-6" />
