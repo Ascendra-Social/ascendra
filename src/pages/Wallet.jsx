@@ -185,19 +185,19 @@ function WalletContent() {
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="flex items-center gap-2 text-slate-600">
             <div className="w-2 h-2 rounded-full bg-cyan-400" />
-            50% of ad revenue to users
+            Receive tips from content
           </div>
           <div className="flex items-center gap-2 text-slate-600">
             <div className="w-2 h-2 rounded-full bg-purple-400" />
-            Engagement rewards
+            Sell digital goods on marketplace
           </div>
           <div className="flex items-center gap-2 text-slate-600">
             <div className="w-2 h-2 rounded-full bg-amber-400" />
-            Content creation bonuses
+            Engage with boosted content
           </div>
           <div className="flex items-center gap-2 text-slate-600">
             <div className="w-2 h-2 rounded-full bg-green-400" />
-            Marketplace transactions
+            And much more to come!
           </div>
         </div>
       </motion.div>

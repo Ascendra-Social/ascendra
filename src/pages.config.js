@@ -49,9 +49,11 @@
  */
 import AppStore from './pages/AppStore';
 import BusinessCenter from './pages/BusinessCenter';
+import BusinessPage from './pages/BusinessPage';
 import Communities from './pages/Communities';
 import CommunityDetail from './pages/CommunityDetail';
 import CommunityModeration from './pages/CommunityModeration';
+import CreateBusinessPage from './pages/CreateBusinessPage';
 import CreatePost from './pages/CreatePost';
 import Explore from './pages/Explore';
 import Home from './pages/Home';
@@ -63,17 +65,17 @@ import Profile from './pages/Profile';
 import Reels from './pages/Reels';
 import VerificationReview from './pages/VerificationReview';
 import Wallet from './pages/Wallet';
-import CreateBusinessPage from './pages/CreateBusinessPage';
-import BusinessPage from './pages/BusinessPage';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "AppStore": AppStore,
     "BusinessCenter": BusinessCenter,
+    "BusinessPage": BusinessPage,
     "Communities": Communities,
     "CommunityDetail": CommunityDetail,
     "CommunityModeration": CommunityModeration,
+    "CreateBusinessPage": CreateBusinessPage,
     "CreatePost": CreatePost,
     "Explore": Explore,
     "Home": Home,
@@ -85,8 +87,6 @@ export const PAGES = {
     "Reels": Reels,
     "VerificationReview": VerificationReview,
     "Wallet": Wallet,
-    "CreateBusinessPage": CreateBusinessPage,
-    "BusinessPage": BusinessPage,
 }
 
 export const pagesConfig = {
