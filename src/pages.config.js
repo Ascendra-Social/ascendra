@@ -56,6 +56,7 @@ import CommunityModeration from './pages/CommunityModeration';
 import CreateBusinessPage from './pages/CreateBusinessPage';
 import CreatePost from './pages/CreatePost';
 import Explore from './pages/Explore';
+import FeatureRequests from './pages/FeatureRequests';
 import Home from './pages/Home';
 import ListingDetail from './pages/ListingDetail';
 import Marketplace from './pages/Marketplace';
@@ -65,7 +66,7 @@ import Profile from './pages/Profile';
 import Reels from './pages/Reels';
 import VerificationReview from './pages/VerificationReview';
 import Wallet from './pages/Wallet';
-import FeatureRequests from './pages/FeatureRequests';
+import CreatorDashboard from './pages/CreatorDashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -79,6 +80,7 @@ export const PAGES = {
     "CreateBusinessPage": CreateBusinessPage,
     "CreatePost": CreatePost,
     "Explore": Explore,
+    "FeatureRequests": FeatureRequests,
     "Home": Home,
     "ListingDetail": ListingDetail,
     "Marketplace": Marketplace,
@@ -88,7 +90,7 @@ export const PAGES = {
     "Reels": Reels,
     "VerificationReview": VerificationReview,
     "Wallet": Wallet,
-    "FeatureRequests": FeatureRequests,
+    "CreatorDashboard": CreatorDashboard,
 }
 
 export const pagesConfig = {

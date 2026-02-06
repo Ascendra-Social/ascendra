@@ -16,6 +16,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import PostCard from '@/components/feed/PostCard';
+import SubscriptionTiers from '@/components/creator/SubscriptionTiers';
+import DigitalProductsGrid from '@/components/creator/DigitalProductsGrid';
 import { motion } from 'framer-motion';
 
 export default function Profile() {
@@ -401,14 +403,22 @@ export default function Profile() {
         </div>
       </motion.div>
 
+      {/* Creator Monetization Section */}
+      {!isOwnProfile && (
+        <div className="space-y-6 mb-8">
+          <SubscriptionTiers creatorId={user.id} currentUserId={currentUser?.id} />
+          <DigitalProductsGrid creatorId={user.id} currentUserId={currentUser?.id} />
+        </div>
+      )}
+
       {/* Content Tabs */}
       <Tabs defaultValue="posts">
-        <TabsList className="w-full bg-slate-100/80 p-1 rounded-2xl mb-6">
-          <TabsTrigger value="posts" className="flex-1 rounded-xl data-[state=active]:bg-white">
+        <TabsList className="w-full bg-slate-800/50 border border-cyan-500/20 p-1 rounded-2xl mb-6">
+          <TabsTrigger value="posts" className="flex-1 rounded-xl text-slate-400 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/20 data-[state=active]:to-purple-500/20 data-[state=active]:text-cyan-400">
             <Grid className="w-4 h-4 mr-2" />
             Posts
           </TabsTrigger>
-          <TabsTrigger value="saved" className="flex-1 rounded-xl data-[state=active]:bg-white">
+          <TabsTrigger value="saved" className="flex-1 rounded-xl text-slate-400 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/20 data-[state=active]:to-purple-500/20 data-[state=active]:text-cyan-400">
             <Bookmark className="w-4 h-4 mr-2" />
             Saved
           </TabsTrigger>
@@ -432,16 +442,16 @@ export default function Profile() {
             ))
           ) : (
             <div className="text-center py-12">
-              <Grid className="w-16 h-16 mx-auto text-slate-200 mb-4" />
-              <h3 className="font-medium text-slate-600">No posts yet</h3>
+              <Grid className="w-16 h-16 mx-auto text-slate-600 mb-4" />
+              <h3 className="font-medium text-slate-400">No posts yet</h3>
             </div>
           )}
         </TabsContent>
 
         <TabsContent value="saved">
           <div className="text-center py-12">
-            <Bookmark className="w-16 h-16 mx-auto text-slate-200 mb-4" />
-            <h3 className="font-medium text-slate-600">No saved posts</h3>
+            <Bookmark className="w-16 h-16 mx-auto text-slate-600 mb-4" />
+            <h3 className="font-medium text-slate-400">No saved posts</h3>
           </div>
         </TabsContent>
       </Tabs>

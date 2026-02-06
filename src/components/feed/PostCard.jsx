@@ -9,6 +9,7 @@ import {
 import AIAssistantModal from '@/components/ai/AIAssistantModal';
 import ReportContentModal from '@/components/moderation/ReportContentModal';
 import BoostPostModal from '@/components/feed/BoostPostModal';
+import TipButton from '@/components/creator/TipButton';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -184,6 +185,7 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
             <MessageCircle className="w-5 h-5" />
             <span className="font-medium">{post.comments_count || 0}</span>
           </Button>
+          <TipButton post={post} currentUserId={currentUserId} className="rounded-full text-slate-500" />
           <Button variant="ghost" size="sm" className="rounded-full gap-2 text-slate-500">
             <Share2 className="w-5 h-5" />
           </Button>
