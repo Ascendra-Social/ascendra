@@ -55,6 +55,7 @@ import CommunityDetail from './pages/CommunityDetail';
 import CommunityModeration from './pages/CommunityModeration';
 import CreateBusinessPage from './pages/CreateBusinessPage';
 import CreatePost from './pages/CreatePost';
+import CreatorDashboard from './pages/CreatorDashboard';
 import Explore from './pages/Explore';
 import FeatureRequests from './pages/FeatureRequests';
 import Home from './pages/Home';
@@ -66,7 +67,6 @@ import Profile from './pages/Profile';
 import Reels from './pages/Reels';
 import VerificationReview from './pages/VerificationReview';
 import Wallet from './pages/Wallet';
-import CreatorDashboard from './pages/CreatorDashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -79,6 +79,7 @@ export const PAGES = {
     "CommunityModeration": CommunityModeration,
     "CreateBusinessPage": CreateBusinessPage,
     "CreatePost": CreatePost,
+    "CreatorDashboard": CreatorDashboard,
     "Explore": Explore,
     "FeatureRequests": FeatureRequests,
     "Home": Home,
@@ -90,7 +91,6 @@ export const PAGES = {
     "Reels": Reels,
     "VerificationReview": VerificationReview,
     "Wallet": Wallet,
-    "CreatorDashboard": CreatorDashboard,
 }
 
 export const pagesConfig = {

@@ -207,22 +207,10 @@ function WalletContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-slate-800/50 border border-cyan-500/20 rounded-2xl p-5"
+        className="bg-slate-800/50 border border-cyan-500/20 rounded-2xl p-8 text-center"
       >
-        <h3 className="font-semibold text-white mb-4">Earnings Breakdown</h3>
-        <div className="space-y-3">
-          {earningsBreakdown.map((item, i) => (
-            <div key={i} className="flex items-center justify-between py-2">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl bg-${item.color}-500/20 flex items-center justify-center`}>
-                  <item.icon className={`w-5 h-5 text-${item.color}-400`} />
-                </div>
-                <span className="text-slate-300">{item.label}</span>
-              </div>
-              <span className="font-semibold text-white">{item.amount} $ASC</span>
-            </div>
-          ))}
-        </div>
+        <h3 className="font-semibold text-white mb-2">Earnings Breakdown</h3>
+        <p className="text-slate-400">Coming Soon</p>
       </motion.div>
 
       {/* Transaction History */}
