@@ -3,18 +3,21 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { 
   Coins, TrendingUp, ArrowUpRight, ArrowDownLeft, 
-  Clock, Sparkles, Gift, ShoppingBag, Zap, Wallet as WalletIcon 
+  Clock, Sparkles, Gift, ShoppingBag, Zap, Wallet as WalletIcon, Send, Repeat, Filter
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import TokenBalance from '@/components/wallet/TokenBalance';
+import TransactionFilters from '@/components/wallet/TransactionFilters';
+import SendTokensModal from '@/components/wallet/SendTokensModal';
+import RecurringPaymentsModal from '@/components/wallet/RecurringPaymentsModal';
 import WalletProvider from '@/components/wallet/WalletProvider';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, isAfter, isBefore } from 'date-fns';
 import { motion } from 'framer-motion';
 
 const transactionIcons = {
@@ -44,6 +47,16 @@ function WalletContent() {
   const { publicKey, connected } = useWallet();
   const { connection } = useConnection();
   const [solBalance, setSolBalance] = useState(0);
+  const [showFilters, setShowFilters] = useState(false);
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [showRecurringModal, setShowRecurringModal] = useState(false);
+  const [filters, setFilters] = useState({
+    type: 'all',
+    dateFrom: null,
+    dateTo: null,
+    minAmount: '',
+    maxAmount: ''
+  });
 
   useEffect(() => {
     const loadUser = async () => {
@@ -96,15 +109,32 @@ function WalletContent() {
     enabled: !!user
   });
 
-  const { data: transactions, isLoading: transactionsLoading } = useQuery({
+  const { data: allTransactions, isLoading: transactionsLoading } = useQuery({
     queryKey: ['transactions', user?.id],
     queryFn: () => base44.entities.TokenTransaction.filter(
       { user_id: user?.id },
       '-created_date',
-      50
+      200
     ),
     enabled: !!user
   });
+
+  // Apply filters
+  const transactions = allTransactions?.filter(tx => {
+    // Type filter
+    if (filters.type !== 'all' && tx.type !== filters.type) return false;
+
+    // Date range filter
+    if (filters.dateFrom && isBefore(new Date(tx.created_date), filters.dateFrom)) return false;
+    if (filters.dateTo && isAfter(new Date(tx.created_date), filters.dateTo)) return false;
+
+    // Amount range filter
+    const amount = Math.abs(tx.amount);
+    if (filters.minAmount && amount < parseFloat(filters.minAmount)) return false;
+    if (filters.maxAmount && amount > parseFloat(filters.maxAmount)) return false;
+
+    return true;
+  }) || [];
 
   const earningsBreakdown = [
     { label: 'Content Creation', amount: 1250, icon: Sparkles, color: 'violet' },
@@ -171,6 +201,29 @@ function WalletContent() {
         onWithdraw={() => {}}
       />
 
+      {/* Quick Actions */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="grid grid-cols-2 gap-3"
+      >
+        <Button
+          onClick={() => setShowSendModal(true)}
+          className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white h-14"
+        >
+          <Send className="w-5 h-5 mr-2" />
+          Send Tokens
+        </Button>
+        <Button
+          onClick={() => setShowRecurringModal(true)}
+          className="bg-gradient-to-r from-purple-500 to-pink-500 text-white h-14"
+        >
+          <Repeat className="w-5 h-5 mr-2" />
+          Recurring Payments
+        </Button>
+      </motion.div>
+
       {/* Tokenomics Info */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -221,8 +274,25 @@ function WalletContent() {
         className="bg-slate-800/50 border border-cyan-500/20 rounded-2xl overflow-hidden"
       >
         <div className="p-5 border-b border-cyan-500/20">
-          <h3 className="font-semibold text-white">Transaction History</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-white">Transaction History</h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowFilters(!showFilters)}
+              className="text-cyan-400 hover:text-cyan-300"
+            >
+              <Filter className="w-4 h-4 mr-2" />
+              {showFilters ? 'Hide Filters' : 'Show Filters'}
+            </Button>
+          </div>
         </div>
+
+        {showFilters && (
+          <div className="p-4 border-b border-cyan-500/20">
+            <TransactionFilters filters={filters} onFiltersChange={setFilters} />
+          </div>
+        )}
 
         <div className="divide-y divide-cyan-500/10">
           {transactionsLoading ? (
@@ -276,6 +346,20 @@ function WalletContent() {
           )}
         </div>
       </motion.div>
+
+      {/* Modals */}
+      <SendTokensModal
+        isOpen={showSendModal}
+        onClose={() => setShowSendModal(false)}
+        userWallet={wallet}
+        currentUser={user}
+      />
+
+      <RecurringPaymentsModal
+        isOpen={showRecurringModal}
+        onClose={() => setShowRecurringModal(false)}
+        currentUser={user}
+      />
     </div>
   );
 }
