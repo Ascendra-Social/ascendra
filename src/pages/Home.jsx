@@ -43,11 +43,18 @@ export default function Home() {
         50
       );
       
-      // Sort by positivity score for "For You" to promote positive content
+      // Sort by positivity, engagement, and vote score for "For You"
       if (activeTab === 'foryou') {
         return allPosts.sort((a, b) => {
-          const scoreA = (a.positivity_score || 0.5) * 0.6 + (a.engagement_score || 0) * 0.4;
-          const scoreB = (b.positivity_score || 0.5) * 0.6 + (b.engagement_score || 0) * 0.4;
+          const voteScoreA = (a.vote_score || 0) / 10; // Normalize vote score
+          const voteScoreB = (b.vote_score || 0) / 10;
+          
+          const scoreA = (a.positivity_score || 0.5) * 0.4 + 
+                        (a.engagement_score || 0) * 0.3 + 
+                        voteScoreA * 0.3;
+          const scoreB = (b.positivity_score || 0.5) * 0.4 + 
+                        (b.engagement_score || 0) * 0.3 + 
+                        voteScoreB * 0.3;
           return scoreB - scoreA;
         });
       }
