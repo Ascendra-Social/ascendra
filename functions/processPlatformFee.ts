@@ -1,0 +1,64 @@
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+
+const PLATFORM_FEE_PERCENTAGE = 1; // 1% platform fee
+const PLATFORM_WALLET_ID = 'platform'; // Special platform user ID
+
+Deno.serve(async (req) => {
+  try {
+    const base44 = createClientFromRequest(req);
+    
+    const { transaction_amount, transaction_type, description, from_user_id, to_user_id } = await req.json();
+
+    if (!transaction_amount || transaction_amount <= 0) {
+      return Response.json({ error: 'Invalid transaction amount' }, { status: 400 });
+    }
+
+    // Calculate 1% fee
+    const feeAmount = (transaction_amount * PLATFORM_FEE_PERCENTAGE) / 100;
+    const netAmount = transaction_amount - feeAmount;
+
+    // Get or create platform wallet
+    let platformWallets = await base44.asServiceRole.entities.TokenWallet.filter({ 
+      user_id: PLATFORM_WALLET_ID 
+    });
+    
+    if (platformWallets.length === 0) {
+      await base44.asServiceRole.entities.TokenWallet.create({
+        user_id: PLATFORM_WALLET_ID,
+        balance: feeAmount
+      });
+    } else {
+      await base44.asServiceRole.entities.TokenWallet.update(platformWallets[0].id, {
+        balance: platformWallets[0].balance + feeAmount
+      });
+    }
+
+    // Record platform fee transaction
+    await base44.asServiceRole.entities.TokenTransaction.create({
+      user_id: PLATFORM_WALLET_ID,
+      type: 'earning',
+      amount: feeAmount,
+      description: `Platform fee (1%): ${description || transaction_type}`
+    });
+
+    // Record fee deduction from sender if specified
+    if (from_user_id) {
+      await base44.asServiceRole.entities.TokenTransaction.create({
+        user_id: from_user_id,
+        type: 'spending',
+        amount: -feeAmount,
+        description: `Platform fee (1%): ${description || transaction_type}`
+      });
+    }
+
+    return Response.json({ 
+      success: true,
+      original_amount: transaction_amount,
+      fee_amount: feeAmount,
+      net_amount: netAmount,
+      platform_wallet_id: PLATFORM_WALLET_ID
+    });
+  } catch (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+});

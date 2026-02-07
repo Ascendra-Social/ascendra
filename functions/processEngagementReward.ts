@@ -98,16 +98,35 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Add to user wallet
+    // Calculate 1% platform fee
+    const feeAmount = (rewardAmount * 1) / 100;
+    const netReward = rewardAmount - feeAmount;
+
+    // Add to user wallet (net amount)
     const wallets = await base44.entities.TokenWallet.filter({ user_id: user.id });
     if (wallets.length > 0) {
       await base44.entities.TokenWallet.update(wallets[0].id, {
-        balance: wallets[0].balance + rewardAmount
+        balance: wallets[0].balance + netReward
       });
     } else {
       await base44.entities.TokenWallet.create({
         user_id: user.id,
-        balance: rewardAmount
+        balance: netReward
+      });
+    }
+
+    // Platform fee
+    const platformWallets = await base44.asServiceRole.entities.TokenWallet.filter({ 
+      user_id: 'platform' 
+    });
+    if (platformWallets.length > 0) {
+      await base44.asServiceRole.entities.TokenWallet.update(platformWallets[0].id, {
+        balance: platformWallets[0].balance + feeAmount
+      });
+    } else {
+      await base44.asServiceRole.entities.TokenWallet.create({
+        user_id: 'platform',
+        balance: feeAmount
       });
     }
 
@@ -115,8 +134,16 @@ Deno.serve(async (req) => {
     await base44.entities.TokenTransaction.create({
       user_id: user.id,
       type: 'earning',
-      amount: rewardAmount,
+      amount: netReward,
       description: `${engagement_type} reward from ${contract.contract_name}`
+    });
+
+    // Platform fee transaction
+    await base44.asServiceRole.entities.TokenTransaction.create({
+      user_id: 'platform',
+      type: 'earning',
+      amount: feeAmount,
+      description: `Platform fee (1%): Engagement reward`
     });
 
     // Create payout record

@@ -37,18 +37,37 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Insufficient balance' }, { status: 400 });
     }
 
+    // Process 1% platform fee
+    const feeAmount = (post.access_price * 1) / 100;
+    const netAmount = post.access_price - feeAmount;
+
     // Deduct from buyer
     await base44.entities.TokenWallet.update(wallets[0].id, {
       balance: wallets[0].balance - post.access_price
     });
 
-    // Add to creator
+    // Add to creator (net amount after fee)
     const creatorWallets = await base44.entities.TokenWallet.filter({ 
       user_id: post.author_id 
     });
     if (creatorWallets.length > 0) {
       await base44.entities.TokenWallet.update(creatorWallets[0].id, {
-        balance: creatorWallets[0].balance + post.access_price
+        balance: creatorWallets[0].balance + netAmount
+      });
+    }
+
+    // Add platform fee to platform wallet
+    const platformWallets = await base44.asServiceRole.entities.TokenWallet.filter({ 
+      user_id: 'platform' 
+    });
+    if (platformWallets.length > 0) {
+      await base44.asServiceRole.entities.TokenWallet.update(platformWallets[0].id, {
+        balance: platformWallets[0].balance + feeAmount
+      });
+    } else {
+      await base44.asServiceRole.entities.TokenWallet.create({
+        user_id: 'platform',
+        balance: feeAmount
       });
     }
 
@@ -78,8 +97,16 @@ Deno.serve(async (req) => {
     await base44.entities.TokenTransaction.create({
       user_id: post.author_id,
       type: 'earning',
-      amount: post.access_price,
+      amount: netAmount,
       description: `Content sale: ${post.content.slice(0, 50)}`
+    });
+
+    // Platform fee transaction
+    await base44.asServiceRole.entities.TokenTransaction.create({
+      user_id: 'platform',
+      type: 'earning',
+      amount: feeAmount,
+      description: `Platform fee (1%): Content purchase`
     });
 
     // Record payout in smart contract
