@@ -11,6 +11,7 @@ import ReportContentModal from '@/components/moderation/ReportContentModal';
 import BoostPostModal from '@/components/feed/BoostPostModal';
 import TipButton from '@/components/creator/TipButton';
 import CommentsSection from './CommentsSection';
+import PayWall from '@/components/monetization/PayWall';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -277,21 +278,23 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
 
       {/* Media */}
       {post.media_url && post.media_type !== 'none' && (
-        <div className="relative">
-          {post.media_type === 'video' ? (
-            <video 
-              src={post.media_url} 
-              className="w-full aspect-video object-cover"
-              controls
-            />
-          ) : (
-            <img 
-              src={post.media_url} 
-              alt="" 
-              className="w-full aspect-square object-cover"
-            />
-          )}
-        </div>
+        <PayWall post={post} user={user}>
+          <div className="relative">
+            {post.media_type === 'video' ? (
+              <video 
+                src={post.media_url} 
+                className="w-full aspect-video object-cover"
+                controls
+              />
+            ) : (
+              <img 
+                src={post.media_url} 
+                alt="" 
+                className="w-full aspect-square object-cover"
+              />
+            )}
+          </div>
+        </PayWall>
       )}
 
       {/* Token Earnings Badge */}

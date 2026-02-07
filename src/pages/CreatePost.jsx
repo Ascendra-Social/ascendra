@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { 
-  Image, Video, X, Loader2, Sparkles, ArrowLeft, Play
+  Image, Video, X, Loader2, Sparkles, ArrowLeft, Play, DollarSign
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { motion } from 'framer-motion';
 import { moderateContent } from '@/components/moderation/ContentModerationCheck';
+import MonetizationSettings from '@/components/monetization/MonetizationSettings';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Shield } from 'lucide-react';
 
@@ -33,6 +34,9 @@ export default function CreatePost() {
   const [isReel, setIsReel] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [moderationResult, setModerationResult] = useState(null);
+  const [isPremium, setIsPremium] = useState(false);
+  const [accessPrice, setAccessPrice] = useState('');
+  const [previewDuration, setPreviewDuration] = useState('10');
   const navigate = useNavigate();
 
   // Check for repost draft
@@ -144,6 +148,27 @@ Post: "${content}"`,
         }
       }
 
+      // Create smart contract if premium
+      let contractId = null;
+      if (isPremium && parseFloat(accessPrice) > 0) {
+        const contract = await base44.entities.SmartContract.create({
+          creator_id: user.id,
+          creator_name: user.full_name,
+          contract_name: `Content: ${content.slice(0, 30)}...`,
+          description: 'Pay-per-view content monetization',
+          contract_type: 'pay_per_view',
+          total_budget: 0,
+          pay_per_view_config: {
+            price_per_view: parseFloat(accessPrice),
+            content_id: null,
+            preview_duration: parseFloat(previewDuration)
+          },
+          status: 'active',
+          start_date: new Date().toISOString()
+        });
+        contractId = contract.id;
+      }
+
       await base44.entities.Post.create({
         author_id: user.id,
         author_name: user.full_name,
@@ -154,6 +179,10 @@ Post: "${content}"`,
         is_reel: isReel,
         community_id: communityId || null,
         positivity_score: positivityScore,
+        is_premium: isPremium,
+        access_price: isPremium ? parseFloat(accessPrice) : 0,
+        preview_duration: parseFloat(previewDuration),
+        smart_contract_id: contractId
       });
 
       navigate(createPageUrl(isReel ? 'Reels' : 'Home'));
@@ -298,6 +327,17 @@ Post: "${content}"`,
               />
             </div>
           )}
+
+          {/* Monetization Settings */}
+          <MonetizationSettings
+            isPremium={isPremium}
+            setIsPremium={setIsPremium}
+            accessPrice={accessPrice}
+            setAccessPrice={setAccessPrice}
+            previewDuration={previewDuration}
+            setPreviewDuration={setPreviewDuration}
+            isVideo={mediaType === 'video'}
+          />
         </div>
 
         {/* Media Options */}
