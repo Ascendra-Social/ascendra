@@ -4,12 +4,13 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { 
   Heart, MessageCircle, Share2, Bookmark, MoreHorizontal,
-  Coins, Sparkles, Wand2, RefreshCw, Flag, TrendingUp
+  Coins, Sparkles, Wand2, RefreshCw, Flag, TrendingUp, Check
 } from 'lucide-react';
 import AIAssistantModal from '@/components/ai/AIAssistantModal';
 import ReportContentModal from '@/components/moderation/ReportContentModal';
 import BoostPostModal from '@/components/feed/BoostPostModal';
 import TipButton from '@/components/creator/TipButton';
+import CommentsSection from './CommentsSection';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
+import { toast } from 'sonner';
 
 export default function PostCard({ post, currentUserId, communityId, onLike, onComment }) {
   const [isLiked, setIsLiked] = useState(false);
@@ -29,6 +31,7 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
   const [showAIRepost, setShowAIRepost] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
   const [user, setUser] = useState(null);
 
   React.useEffect(() => {
@@ -63,6 +66,36 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
       media_type: post.media_type
     }));
     window.location.href = createPageUrl('CreatePost');
+  };
+
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}${createPageUrl('Home')}?post=${post.id}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${post.author_name}'s post`,
+          text: post.content,
+          url: shareUrl
+        });
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          copyToClipboard(shareUrl);
+        }
+      }
+    } else {
+      copyToClipboard(shareUrl);
+    }
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Link copied to clipboard!');
+  };
+
+  const handleBookmark = () => {
+    setIsBookmarked(!isBookmarked);
+    toast.success(isBookmarked ? 'Removed from bookmarks' : 'Added to bookmarks');
   };
 
   return (
@@ -186,14 +219,29 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
             <span className="font-medium">{post.comments_count || 0}</span>
           </Button>
           <TipButton post={post} currentUserId={currentUserId} className="rounded-full text-slate-500" />
-          <Button variant="ghost" size="sm" className="rounded-full gap-2 text-slate-500">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleShare}
+            className="rounded-full gap-2 text-slate-500"
+          >
             <Share2 className="w-5 h-5" />
           </Button>
         </div>
-        <Button variant="ghost" size="icon" className="rounded-full text-slate-400">
-          <Bookmark className="w-5 h-5" />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={handleBookmark}
+          className={`rounded-full ${isBookmarked ? 'text-cyan-500' : 'text-slate-400'}`}
+        >
+          <Bookmark className={`w-5 h-5 ${isBookmarked ? 'fill-cyan-500' : ''}`} />
         </Button>
       </div>
+
+      {/* Comments Section */}
+      {showComments && (
+        <CommentsSection postId={post.id} currentUserId={currentUserId} />
+      )}
 
       {/* AI Repost Modal */}
       <AIAssistantModal
