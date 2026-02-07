@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { 
   Heart, MessageCircle, Share2, Bookmark, MoreHorizontal,
-  Coins, Sparkles, Wand2, RefreshCw, Flag, TrendingUp, Check
+  Coins, Sparkles, Wand2, RefreshCw, Flag, TrendingUp, Check, ArrowUp, ArrowDown
 } from 'lucide-react';
 import AIAssistantModal from '@/components/ai/AIAssistantModal';
 import ReportContentModal from '@/components/moderation/ReportContentModal';
@@ -33,18 +33,31 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
   const [showBoost, setShowBoost] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [user, setUser] = useState(null);
+  const [userVote, setUserVote] = useState(null);
+  const [upvotesCount, setUpvotesCount] = useState(post.upvotes_count || 0);
+  const [downvotesCount, setDownvotesCount] = useState(post.downvotes_count || 0);
 
   React.useEffect(() => {
     const loadUser = async () => {
       try {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
+        
+        // Load user's existing vote
+        const votes = await base44.entities.Vote.filter({
+          user_id: currentUser.id,
+          content_id: post.id,
+          content_type: 'post'
+        });
+        if (votes.length > 0) {
+          setUserVote(votes[0].vote_type);
+        }
       } catch (e) {
         console.log('Not logged in');
       }
     };
     loadUser();
-  }, []);
+  }, [post.id]);
 
   const handleLike = async () => {
     if (isLiked) {
@@ -100,6 +113,96 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
   const handleBookmark = () => {
     setIsBookmarked(!isBookmarked);
     toast.success(isBookmarked ? 'Removed from bookmarks' : 'Added to bookmarks');
+  };
+
+  const handleVote = async (voteType) => {
+    if (!user) {
+      toast.error('Please log in to vote');
+      return;
+    }
+
+    try {
+      const existingVotes = await base44.entities.Vote.filter({
+        user_id: user.id,
+        content_id: post.id,
+        content_type: 'post'
+      });
+
+      // Remove existing vote if same type is clicked
+      if (userVote === voteType) {
+        if (existingVotes.length > 0) {
+          await base44.entities.Vote.delete(existingVotes[0].id);
+        }
+        
+        // Update counts
+        if (voteType === 'upvote') {
+          setUpvotesCount(prev => prev - 1);
+          await base44.entities.Post.update(post.id, {
+            upvotes_count: Math.max(0, (post.upvotes_count || 0) - 1),
+            vote_score: ((post.upvotes_count || 0) - 1) - (post.downvotes_count || 0)
+          });
+        } else {
+          setDownvotesCount(prev => prev - 1);
+          await base44.entities.Post.update(post.id, {
+            downvotes_count: Math.max(0, (post.downvotes_count || 0) - 1),
+            vote_score: (post.upvotes_count || 0) - ((post.downvotes_count || 0) - 1)
+          });
+        }
+        setUserVote(null);
+        return;
+      }
+
+      // Update existing vote or create new one
+      if (existingVotes.length > 0) {
+        await base44.entities.Vote.update(existingVotes[0].id, { vote_type: voteType });
+        
+        // Adjust counts when switching vote
+        if (userVote === 'upvote') {
+          setUpvotesCount(prev => prev - 1);
+          setDownvotesCount(prev => prev + 1);
+          await base44.entities.Post.update(post.id, {
+            upvotes_count: Math.max(0, (post.upvotes_count || 0) - 1),
+            downvotes_count: (post.downvotes_count || 0) + 1,
+            vote_score: ((post.upvotes_count || 0) - 1) - ((post.downvotes_count || 0) + 1)
+          });
+        } else {
+          setUpvotesCount(prev => prev + 1);
+          setDownvotesCount(prev => prev - 1);
+          await base44.entities.Post.update(post.id, {
+            upvotes_count: (post.upvotes_count || 0) + 1,
+            downvotes_count: Math.max(0, (post.downvotes_count || 0) - 1),
+            vote_score: ((post.upvotes_count || 0) + 1) - ((post.downvotes_count || 0) - 1)
+          });
+        }
+      } else {
+        await base44.entities.Vote.create({
+          user_id: user.id,
+          content_id: post.id,
+          content_type: 'post',
+          vote_type: voteType
+        });
+        
+        // Update counts for new vote
+        if (voteType === 'upvote') {
+          setUpvotesCount(prev => prev + 1);
+          await base44.entities.Post.update(post.id, {
+            upvotes_count: (post.upvotes_count || 0) + 1,
+            vote_score: ((post.upvotes_count || 0) + 1) - (post.downvotes_count || 0)
+          });
+        } else {
+          setDownvotesCount(prev => prev + 1);
+          await base44.entities.Post.update(post.id, {
+            downvotes_count: (post.downvotes_count || 0) + 1,
+            vote_score: (post.upvotes_count || 0) - ((post.downvotes_count || 0) + 1)
+          });
+        }
+      }
+
+      setUserVote(voteType);
+    } catch (error) {
+      toast.error('Failed to vote');
+      console.error('Vote error:', error);
+    }
   };
 
   return (
@@ -204,6 +307,29 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
       {/* Actions */}
       <div className="flex items-center justify-between p-4 border-t border-slate-50 mt-2">
         <div className="flex items-center gap-1">
+          {/* Vote Buttons */}
+          <div className="flex items-center gap-1 mr-2 bg-slate-100 rounded-full px-2">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => handleVote('upvote')}
+              className={`rounded-full p-2 ${userVote === 'upvote' ? 'text-green-600' : 'text-slate-500'}`}
+            >
+              <ArrowUp className={`w-5 h-5 ${userVote === 'upvote' ? 'fill-green-600' : ''}`} />
+            </Button>
+            <span className="font-semibold text-sm text-slate-700 min-w-[24px] text-center">
+              {upvotesCount - downvotesCount}
+            </span>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => handleVote('downvote')}
+              className={`rounded-full p-2 ${userVote === 'downvote' ? 'text-red-600' : 'text-slate-500'}`}
+            >
+              <ArrowDown className={`w-5 h-5 ${userVote === 'downvote' ? 'fill-red-600' : ''}`} />
+            </Button>
+          </div>
+          
           <Button 
             variant="ghost" 
             size="sm"
