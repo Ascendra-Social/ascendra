@@ -67,6 +67,7 @@ import Profile from './pages/Profile';
 import Reels from './pages/Reels';
 import VerificationReview from './pages/VerificationReview';
 import Wallet from './pages/Wallet';
+import SmartContracts from './pages/SmartContracts';
 import __Layout from './Layout.jsx';
 
 
@@ -91,6 +92,7 @@ export const PAGES = {
     "Reels": Reels,
     "VerificationReview": VerificationReview,
     "Wallet": Wallet,
+    "SmartContracts": SmartContracts,
 }
 
 export const pagesConfig = {

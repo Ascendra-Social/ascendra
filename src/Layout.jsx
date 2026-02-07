@@ -52,6 +52,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Marketplace', icon: ShoppingBag, page: 'Marketplace' },
     { name: 'Messages', icon: MessageCircle, page: 'Messages' },
     { name: 'Wallet', icon: Wallet, page: 'Wallet' },
+    { name: 'Smart Contracts', icon: TrendingUp, page: 'SmartContracts' },
     { name: 'Creator Dashboard', icon: TrendingUp, page: 'CreatorDashboard' },
   ];
 
