@@ -71,6 +71,19 @@ export default function SmartContracts() {
 
   const totalEarned = myPayouts.reduce((sum, p) => sum + p.amount_paid, 0);
 
+  const getContractTypeLabel = (type) => {
+    const labels = {
+      engagement_rewards: 'Engagement Rewards',
+      pay_per_view: 'Pay-Per-View',
+      royalty_distribution: 'Royalty Distribution',
+      fan_tokens: 'Fan Tokens',
+      milestone_payment: 'Milestone Payment',
+      subscription_split: 'Subscription Split',
+      custom: 'Custom'
+    };
+    return labels[type] || type;
+  };
+
   const ContractCard = ({ contract }) => {
     const StatusIcon = statusConfig[contract.status]?.icon || FileCode;
     const statusColor = statusConfig[contract.status]?.color || 'text-slate-400';
@@ -83,15 +96,20 @@ export default function SmartContracts() {
       >
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <Badge className="bg-slate-700/50 text-slate-300 text-xs border-slate-600">
+                {getContractTypeLabel(contract.contract_type)}
+              </Badge>
+              <Badge className={statusColor}>
+                <StatusIcon className="w-3 h-3 mr-1" />
+                {statusConfig[contract.status]?.label}
+              </Badge>
+            </div>
             <h3 className="text-lg font-semibold text-white mb-1">
               {contract.contract_name}
             </h3>
             <p className="text-sm text-slate-400">{contract.description}</p>
           </div>
-          <Badge className={statusColor}>
-            <StatusIcon className="w-3 h-3 mr-1" />
-            {statusConfig[contract.status]?.label}
-          </Badge>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
@@ -101,20 +119,20 @@ export default function SmartContracts() {
           </div>
           <div>
             <p className="text-xs text-slate-400">Spent</p>
-            <p className="text-white font-semibold">{contract.spent_amount} $ASC</p>
+            <p className="text-white font-semibold">{contract.spent_amount || 0} $ASC</p>
           </div>
           <div>
             <p className="text-xs text-slate-400">Participants</p>
-            <p className="text-white font-semibold">{contract.total_participants}</p>
+            <p className="text-white font-semibold">{contract.total_participants || 0}</p>
           </div>
           <div>
             <p className="text-xs text-slate-400">Payouts</p>
-            <p className="text-white font-semibold">{contract.total_payouts}</p>
+            <p className="text-white font-semibold">{contract.total_payouts || 0}</p>
           </div>
         </div>
 
         {contract.engagement_requirements && (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 mb-3">
             {contract.engagement_requirements.like_required && (
               <Badge className="bg-rose-500/20 text-rose-400 border-rose-500/30">
                 Like: {contract.engagement_requirements.like_reward} $ASC
@@ -134,6 +152,15 @@ export default function SmartContracts() {
               <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
                 Follow: {contract.engagement_requirements.follow_reward} $ASC
               </Badge>
+            )}
+          </div>
+        )}
+
+        {contract.security_features && (
+          <div className="text-xs text-slate-500 flex items-center gap-2">
+            <span>🔒 Security enabled</span>
+            {contract.security_features.cooldown_period && (
+              <span>• {contract.security_features.cooldown_period}h cooldown</span>
             )}
           </div>
         )}
