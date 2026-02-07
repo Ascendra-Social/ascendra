@@ -33,7 +33,7 @@ export default function SmartContracts() {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
       } catch (e) {
-        base44.auth.redirectToLogin();
+        console.log('Not logged in');
       }
     };
     loadUser();
@@ -147,8 +147,18 @@ export default function SmartContracts() {
 
   if (!user) {
     return (
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        <Skeleton className="h-64 rounded-2xl" />
+      <div className="max-w-6xl mx-auto px-4 py-6 text-center">
+        <div className="bg-slate-800/50 border border-cyan-500/20 rounded-2xl p-8">
+          <FileCode className="w-16 h-16 mx-auto text-cyan-400 mb-4" />
+          <h2 className="text-xl font-semibold text-white mb-2">Sign in to access Smart Contracts</h2>
+          <p className="text-slate-400 mb-6">Create and manage engagement reward campaigns</p>
+          <Button
+            onClick={() => base44.auth.redirectToLogin()}
+            className="bg-gradient-to-r from-cyan-500 to-purple-500"
+          >
+            Sign In
+          </Button>
+        </div>
       </div>
     );
   }
