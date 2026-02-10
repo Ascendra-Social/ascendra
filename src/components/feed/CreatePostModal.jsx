@@ -98,6 +98,7 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
       onClose();
     } catch (error) {
       console.error('Error creating post:', error);
+      alert('Failed to create post: ' + (error.message || JSON.stringify(error)));
     } finally {
       setIsSubmitting(false);
     }

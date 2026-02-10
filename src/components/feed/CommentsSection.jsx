@@ -38,8 +38,9 @@ export default function CommentsSection({ postId, currentUserId }) {
       setNewComment('');
       toast.success('Comment posted!');
     },
-    onError: () => {
-      toast.error('Failed to post comment');
+    onError: (error) => {
+      console.error('Comment error:', error);
+      toast.error('Failed to post comment: ' + (error.message || JSON.stringify(error)));
     }
   });
 
