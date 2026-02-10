@@ -44,6 +44,10 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
         const currentUser = await base44.auth.me();
         setUser(currentUser);
         
+        // Check if bookmarked
+        const bookmarks = currentUser.bookmarked_posts || [];
+        setIsBookmarked(bookmarks.includes(post.id));
+        
         // Load user's existing vote
         const votes = await base44.entities.Vote.filter({
           user_id: currentUser.id,
@@ -111,9 +115,36 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
     }
   };
 
-  const handleBookmark = () => {
-    setIsBookmarked(!isBookmarked);
-    toast.success(isBookmarked ? 'Removed from bookmarks' : 'Added to bookmarks');
+  const handleBookmark = async () => {
+    if (!user) {
+      toast.error('Please log in to bookmark');
+      return;
+    }
+
+    try {
+      const newBookmarkState = !isBookmarked;
+      setIsBookmarked(newBookmarkState);
+
+      // Get current bookmarks
+      const currentBookmarks = user.bookmarked_posts || [];
+      
+      if (newBookmarkState) {
+        // Add bookmark
+        await base44.auth.updateMe({ 
+          bookmarked_posts: [...currentBookmarks, post.id] 
+        });
+        toast.success('Added to bookmarks');
+      } else {
+        // Remove bookmark
+        await base44.auth.updateMe({ 
+          bookmarked_posts: currentBookmarks.filter(id => id !== post.id) 
+        });
+        toast.success('Removed from bookmarks');
+      }
+    } catch (error) {
+      setIsBookmarked(isBookmarked);
+      toast.error('Failed to update bookmark');
+    }
   };
 
   const handleVote = async (voteType) => {
@@ -309,7 +340,7 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
 
       {/* Actions */}
       <div className="flex items-center justify-between p-4 border-t border-slate-50 mt-2">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 flex-wrap">
           {/* Vote Buttons */}
           <div className="flex items-center gap-1 mr-2 bg-slate-100 rounded-full px-2">
             <Button 
@@ -340,7 +371,7 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
             className={`rounded-full gap-2 ${isLiked ? 'text-rose-500' : 'text-slate-500'}`}
           >
             <Heart className={`w-5 h-5 ${isLiked ? 'fill-rose-500' : ''}`} />
-            <span className="font-medium">{likesCount}</span>
+            <span className="font-medium hidden sm:inline">{likesCount}</span>
           </Button>
           <Button 
             variant="ghost" 
@@ -349,7 +380,7 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
             className="rounded-full gap-2 text-slate-500"
           >
             <MessageCircle className="w-5 h-5" />
-            <span className="font-medium">{post.comments_count || 0}</span>
+            <span className="font-medium hidden sm:inline">{post.comments_count || 0}</span>
           </Button>
           <TipButton post={post} currentUserId={currentUserId} className="rounded-full text-slate-500" />
           <Button 
@@ -360,15 +391,15 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
           >
             <Share2 className="w-5 h-5" />
           </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleBookmark}
+            className={`rounded-full ${isBookmarked ? 'text-cyan-500' : 'text-slate-400'}`}
+          >
+            <Bookmark className={`w-5 h-5 ${isBookmarked ? 'fill-cyan-500' : ''}`} />
+          </Button>
         </div>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={handleBookmark}
-          className={`rounded-full ${isBookmarked ? 'text-cyan-500' : 'text-slate-400'}`}
-        >
-          <Bookmark className={`w-5 h-5 ${isBookmarked ? 'fill-cyan-500' : ''}`} />
-        </Button>
       </div>
 
       {/* Comments Section */}
