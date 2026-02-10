@@ -22,16 +22,22 @@ export default function Home() {
     const loadUser = async () => {
       try {
         const currentUser = await base44.auth.me();
+        console.log('User loaded:', currentUser);
         setUser(currentUser);
         // Show onboarding if user hasn't completed it
         if (!currentUser.onboarding_completed) {
           setShowOnboarding(true);
         }
       } catch (e) {
-        console.log('Not logged in');
+        console.log('User not logged in:', e);
       }
     };
     loadUser();
+    
+    // Reload user when window regains focus (after login redirect)
+    const handleFocus = () => loadUser();
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
   }, []);
 
   const { data: posts, isLoading } = useQuery({
