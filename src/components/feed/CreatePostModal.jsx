@@ -194,7 +194,7 @@ Post: "${content}"`,
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={null}>Your Feed</SelectItem>
-                  {communities.map(c => (
+                  {communities?.map(c => (
                     <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                   ))}
                 </SelectContent>
