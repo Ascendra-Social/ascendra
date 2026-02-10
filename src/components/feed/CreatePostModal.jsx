@@ -242,7 +242,6 @@ Post: "${content}"`,
               >
                 <X className="w-4 h-4 text-white" />
               </Button>
-            {mediaPreview && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -255,9 +254,8 @@ Post: "${content}"`,
                 <Wand2 className="w-4 h-4 text-violet-500" />
                 Enhance
               </Button>
-            )}
             </div>
-            )}
+          )}
 
             <div className="flex items-center justify-between pt-4 border-t border-slate-100">
               <div className="flex gap-2">
