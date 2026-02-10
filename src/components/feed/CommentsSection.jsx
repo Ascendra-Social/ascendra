@@ -21,7 +21,6 @@ export default function CommentsSection({ postId, currentUserId }) {
     mutationFn: async () => {
       return base44.entities.Comment.create({
         post_id: postId,
-        author_id: currentUserId,
         content: newComment
       });
     },
