@@ -62,6 +62,13 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
 
   const handleSubmit = async () => {
     console.log('=== POST SUBMIT STARTED ===');
+    console.log('User object:', user);
+    
+    if (!user?.id) {
+      alert('You must be logged in to create a post');
+      return;
+    }
+    
     if (!content.trim() && !mediaFile) {
       console.log('No content or media, returning');
       return;
@@ -82,7 +89,6 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
       }
 
       const postData = { 
-        author_id: user.id,
         content 
       };
 
