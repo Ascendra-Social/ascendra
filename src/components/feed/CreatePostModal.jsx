@@ -95,7 +95,7 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
         });
       }
 
-      let mediaUrl = '';
+      let mediaUrl = mediaPreview || '';
       if (mediaFile) {
         const { file_url } = await base44.integrations.Core.UploadFile({ file: mediaFile });
         mediaUrl = file_url;
