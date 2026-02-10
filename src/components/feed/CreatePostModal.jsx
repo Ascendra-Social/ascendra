@@ -317,7 +317,6 @@ Post: "${content}"`,
             </Button>
           </div>
         </div>
-        </div>
       </DialogContent>
 
       {/* AI Assistant Modal */}
