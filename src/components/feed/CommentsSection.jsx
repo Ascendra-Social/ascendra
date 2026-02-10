@@ -19,12 +19,9 @@ export default function CommentsSection({ postId, currentUserId }) {
 
   const createCommentMutation = useMutation({
     mutationFn: async () => {
-      const user = await base44.auth.me();
       return base44.entities.Comment.create({
         post_id: postId,
         author_id: currentUserId,
-        author_name: user.full_name,
-        author_avatar: user.avatar,
         content: newComment
       });
     },
