@@ -65,8 +65,10 @@ export default function Communities() {
   const memberCommunityIds = new Set(memberships?.map(m => m.community_id) || []);
 
   const filteredCommunities = communities?.filter(c => {
-    const matchesSearch = c.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         c.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = searchQuery
+      ? c.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
     
     if (activeTab === 'joined') {
       return matchesSearch && memberCommunityIds.has(c.id);
