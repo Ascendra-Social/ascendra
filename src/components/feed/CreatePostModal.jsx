@@ -81,7 +81,10 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
         console.log('Using existing media:', mediaUrl);
       }
 
-      const postData = { content };
+      const postData = { 
+        author_id: user.id,
+        content 
+      };
 
       if (mediaUrl) {
         postData.media_url = mediaUrl;

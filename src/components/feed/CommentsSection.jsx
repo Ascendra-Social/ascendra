@@ -25,6 +25,7 @@ export default function CommentsSection({ postId, currentUserId }) {
       
       const result = await base44.entities.Comment.create({
         post_id: postId,
+        author_id: currentUserId,
         content: newComment
       });
       
