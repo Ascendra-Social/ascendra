@@ -19,12 +19,20 @@ export default function CommentsSection({ postId, currentUserId }) {
 
   const createCommentMutation = useMutation({
     mutationFn: async () => {
-      return base44.entities.Comment.create({
+      console.log('=== COMMENT SUBMIT STARTED ===');
+      console.log('Post ID:', postId);
+      console.log('Comment content:', newComment);
+      
+      const result = await base44.entities.Comment.create({
         post_id: postId,
         content: newComment
       });
+      
+      console.log('Comment created successfully:', result);
+      return result;
     },
     onSuccess: async () => {
+      console.log('Comment mutation success callback');
       queryClient.invalidateQueries({ queryKey: ['comments', postId] });
       
       // Update post comments count
@@ -37,9 +45,10 @@ export default function CommentsSection({ postId, currentUserId }) {
       
       setNewComment('');
       toast.success('Comment posted!');
+      console.log('=== COMMENT SUBMIT ENDED ===');
     },
     onError: (error) => {
-      console.error('Comment error:', error);
+      console.error('=== COMMENT ERROR ===', error);
       toast.error('Failed to post comment: ' + (error.message || JSON.stringify(error)));
     }
   });

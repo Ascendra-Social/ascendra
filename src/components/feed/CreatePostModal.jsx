@@ -61,18 +61,24 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
   };
 
   const handleSubmit = async () => {
-    if (!content.trim() && !mediaFile) return;
+    console.log('=== POST SUBMIT STARTED ===');
+    if (!content.trim() && !mediaFile) {
+      console.log('No content or media, returning');
+      return;
+    }
     
     setIsSubmitting(true);
     
     try {
       let mediaUrl = null;
       if (mediaFile) {
+        console.log('Uploading file...');
         const { file_url } = await base44.integrations.Core.UploadFile({ file: mediaFile });
         mediaUrl = file_url;
+        console.log('File uploaded:', mediaUrl);
       } else if (mediaPreview && !mediaPreview.startsWith('blob:')) {
-        // AI-generated image or external URL
         mediaUrl = mediaPreview;
+        console.log('Using existing media:', mediaUrl);
       }
 
       const postData = { content };
@@ -86,7 +92,9 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
         postData.community_id = communityId;
       }
 
+      console.log('Creating post with data:', postData);
       const post = await base44.entities.Post.create(postData);
+      console.log('Post created successfully:', post);
 
       setContent('');
       setMediaFile(null);
@@ -94,13 +102,16 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
       setMediaType('none');
       setCommunityId('');
       setModerationResult(null);
+      console.log('Calling onPostCreated callback');
       if (onPostCreated) onPostCreated(post);
+      console.log('Closing modal');
       onClose();
     } catch (error) {
-      console.error('Error creating post:', error);
+      console.error('=== POST CREATION ERROR ===', error);
       alert('Failed to create post: ' + (error.message || JSON.stringify(error)));
     } finally {
       setIsSubmitting(false);
+      console.log('=== POST SUBMIT ENDED ===');
     }
   };
 
