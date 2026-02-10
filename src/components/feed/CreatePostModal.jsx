@@ -64,37 +64,8 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
     if (!content.trim() && !mediaFile) return;
     
     setIsSubmitting(true);
-    setModerationResult(null);
     
     try {
-      // Step 1: Content Moderation Check
-      const moderation = await moderateContent(
-        content,
-        mediaPreview,
-        'post',
-        user.id
-      );
-
-      // Block harmful content
-      if (!moderation.approved) {
-        setModerationResult({
-          blocked: true,
-          reason: moderation.explanation,
-          violation: moderation.violation_type
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Warn if flagged but not blocked
-      if (moderation.flagged) {
-        setModerationResult({
-          blocked: false,
-          flagged: true,
-          reason: moderation.explanation
-        });
-      }
-
       let mediaUrl = null;
       if (mediaFile) {
         const { file_url } = await base44.integrations.Core.UploadFile({ file: mediaFile });
@@ -104,29 +75,7 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
         mediaUrl = mediaPreview;
       }
 
-      // Step 2: Analyze content positivity
-      let positivityScore = moderation.safety_score || 0.5;
-      try {
-        const analysis = await base44.integrations.Core.InvokeLLM({
-          prompt: `Analyze the following social media post and rate its positivity on a scale of 0 to 1, where 0 is very negative/fear-based and 1 is very positive/uplifting. Only return a number.
-
-Post: "${content}"`,
-          response_json_schema: {
-            type: "object",
-            properties: {
-              score: { type: "number" }
-            }
-          }
-        });
-        positivityScore = analysis.score || 0.5;
-      } catch (e) {
-        console.log('Positivity analysis failed, using default');
-      }
-
-      const postData = {
-        content,
-        positivity_score: positivityScore,
-      };
+      const postData = { content };
 
       if (mediaUrl) {
         postData.media_url = mediaUrl;
