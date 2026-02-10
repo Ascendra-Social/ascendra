@@ -202,26 +202,28 @@ Post: "${content}"`,
             </div>
           </div>
 
-          <Textarea
-            placeholder="What's on your mind?"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="min-h-[120px] resize-none border-0 focus-visible:ring-0 text-lg placeholder:text-slate-300"
-          />
-          
-          {/* AI Helper */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute bottom-2 right-2 rounded-full gap-2 text-violet-500 hover:text-violet-600 hover:bg-violet-50"
-            onClick={() => {
-              setAIMode(mediaPreview ? 'caption' : 'caption');
-              setShowAIModal(true);
-            }}
-          >
-            <Wand2 className="w-4 h-4" />
-            AI Help
-          </Button>
+          <div className="relative">
+            <Textarea
+              placeholder="What's on your mind?"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="min-h-[120px] resize-none border-0 focus-visible:ring-0 text-lg placeholder:text-slate-300"
+            />
+            
+            {/* AI Helper */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute bottom-2 right-2 rounded-full gap-2 text-violet-500 hover:text-violet-600 hover:bg-violet-50"
+              onClick={() => {
+                setAIMode(mediaPreview ? 'caption' : 'caption');
+                setShowAIModal(true);
+              }}
+            >
+              <Wand2 className="w-4 h-4" />
+              AI Help
+            </Button>
+          </div>
 
           {mediaPreview && (
             <div className="relative rounded-2xl overflow-hidden">
