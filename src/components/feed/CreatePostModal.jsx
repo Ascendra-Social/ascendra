@@ -122,8 +122,6 @@ Post: "${content}"`,
 
       const post = await base44.entities.Post.create({
         author_id: user.id,
-        author_name: user.full_name,
-        author_avatar: user.avatar,
         content,
         media_url: mediaUrl,
         media_type: mediaType,
