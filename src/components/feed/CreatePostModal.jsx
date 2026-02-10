@@ -259,34 +259,34 @@ Post: "${content}"`,
             </div>
           )}
 
-            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-              <div className="flex gap-2">
-                <input
-                  type="file"
-                  id="image-upload"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handleMediaSelect(e, 'image')}
-                />
-                <label htmlFor="image-upload">
-                  <Button variant="ghost" size="sm" className="rounded-full gap-2" asChild>
-                    <span>
-                      <Image className="w-5 h-5 text-violet-500" />
-                      Photo
-                    </span>
-                  </Button>
-                </label>
-
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="rounded-full gap-2"
-                  onClick={() => setShowImageGenerator(true)}
-                >
-                  <Sparkles className="w-5 h-5 text-pink-500" />
-                  AI Image
+          <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+            <div className="flex gap-2">
+              <input
+                type="file"
+                id="image-upload"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleMediaSelect(e, 'image')}
+              />
+              <label htmlFor="image-upload">
+                <Button variant="ghost" size="sm" className="rounded-full gap-2" asChild>
+                  <span>
+                    <Image className="w-5 h-5 text-violet-500" />
+                    Photo
+                  </span>
                 </Button>
-              
+              </label>
+
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="rounded-full gap-2"
+                onClick={() => setShowImageGenerator(true)}
+              >
+                <Sparkles className="w-5 h-5 text-pink-500" />
+                AI Image
+              </Button>
+            
               <input
                 type="file"
                 id="video-upload"
@@ -316,6 +316,7 @@ Post: "${content}"`,
               )}
             </Button>
           </div>
+        </div>
         </div>
       </DialogContent>
 
