@@ -124,7 +124,6 @@ Post: "${content}"`,
       }
 
       const postData = {
-        author_id: user.id,
         content,
         positivity_score: positivityScore,
       };
@@ -138,7 +137,7 @@ Post: "${content}"`,
         postData.community_id = communityId;
       }
 
-      await base44.entities.Post.create(postData);
+      const post = await base44.entities.Post.create(postData);
 
       setContent('');
       setMediaFile(null);
