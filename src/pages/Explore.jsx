@@ -36,10 +36,12 @@ export default function Explore() {
     { tag: 'gratitude', count: '4.1K' },
   ];
 
-  const filteredPosts = posts?.filter(post => 
-    post.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    post.author_name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredPosts = searchQuery 
+    ? posts?.filter(post => 
+        post.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.author_name?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : posts;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">

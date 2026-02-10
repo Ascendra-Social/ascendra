@@ -68,20 +68,24 @@ export default function OnboardingFlow({ user, onComplete }) {
   };
 
   const handleNext = async () => {
-    if (currentStep === 1) {
-      await updateProfileMutation.mutateAsync(profileData);
-    } else if (currentStep === 2 && selectedCommunities.length > 0) {
-      await joinCommunitiesMutation.mutateAsync();
-    }
+    try {
+      if (currentStep === 1 && profileData.username) {
+        await updateProfileMutation.mutateAsync(profileData);
+      } else if (currentStep === 2 && selectedCommunities.length > 0) {
+        await joinCommunitiesMutation.mutateAsync();
+      }
 
-    if (currentStep === steps.length - 1) {
-      await base44.auth.updateMe({ 
-        onboarding_completed: true,
-        interests: selectedCategories 
-      });
-      onComplete();
-    } else {
-      setCurrentStep(prev => prev + 1);
+      if (currentStep === steps.length - 1) {
+        await base44.auth.updateMe({ 
+          onboarding_completed: true,
+          interests: selectedCategories 
+        });
+        onComplete();
+      } else {
+        setCurrentStep(prev => prev + 1);
+      }
+    } catch (error) {
+      console.error('Onboarding error:', error);
     }
   };
 

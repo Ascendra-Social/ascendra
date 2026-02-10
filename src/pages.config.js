@@ -65,9 +65,9 @@ import Messages from './pages/Messages';
 import Moderation from './pages/Moderation';
 import Profile from './pages/Profile';
 import Reels from './pages/Reels';
+import SmartContracts from './pages/SmartContracts';
 import VerificationReview from './pages/VerificationReview';
 import Wallet from './pages/Wallet';
-import SmartContracts from './pages/SmartContracts';
 import __Layout from './Layout.jsx';
 
 
@@ -90,9 +90,9 @@ export const PAGES = {
     "Moderation": Moderation,
     "Profile": Profile,
     "Reels": Reels,
+    "SmartContracts": SmartContracts,
     "VerificationReview": VerificationReview,
     "Wallet": Wallet,
-    "SmartContracts": SmartContracts,
 }
 
 export const pagesConfig = {

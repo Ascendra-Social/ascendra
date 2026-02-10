@@ -17,7 +17,7 @@ export default function AIFloatingButton() {
 
   return (
     <>
-      <div className="fixed bottom-24 right-6 z-40">
+      <div className="fixed bottom-24 lg:bottom-8 right-6 z-40">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
