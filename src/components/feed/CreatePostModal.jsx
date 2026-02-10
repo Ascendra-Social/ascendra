@@ -95,10 +95,13 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
         });
       }
 
-      let mediaUrl = mediaPreview || '';
+      let mediaUrl = null;
       if (mediaFile) {
         const { file_url } = await base44.integrations.Core.UploadFile({ file: mediaFile });
         mediaUrl = file_url;
+      } else if (mediaPreview && !mediaPreview.startsWith('blob:')) {
+        // AI-generated image or external URL
+        mediaUrl = mediaPreview;
       }
 
       // Step 2: Analyze content positivity
@@ -120,14 +123,21 @@ Post: "${content}"`,
         console.log('Positivity analysis failed, using default');
       }
 
-      const post = await base44.entities.Post.create({
-        author_id: user.id,
+      const postData = {
         content,
-        media_url: mediaUrl,
-        media_type: mediaType,
-        community_id: communityId || null,
         positivity_score: positivityScore,
-      });
+      };
+
+      if (mediaUrl) {
+        postData.media_url = mediaUrl;
+        postData.media_type = mediaType;
+      }
+
+      if (communityId && communityId !== '') {
+        postData.community_id = communityId;
+      }
+
+      const post = await base44.entities.Post.create(postData);
 
       setContent('');
       setMediaFile(null);
