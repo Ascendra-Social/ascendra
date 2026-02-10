@@ -89,6 +89,7 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
       }
 
       const postData = { 
+        author_id: user.id,
         content 
       };
 
