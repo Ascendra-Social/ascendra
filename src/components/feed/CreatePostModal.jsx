@@ -74,6 +74,7 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
       // Get fresh authenticated user
       const currentUser = await base44.auth.me();
       console.log('Authenticated user:', currentUser);
+      console.log('User ID:', currentUser.id);
       
       let mediaUrl = null;
       if (mediaFile) {
@@ -87,6 +88,7 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
       }
 
       const postData = { 
+        author_id: currentUser.id,
         content
       };
 
@@ -100,6 +102,7 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
       }
 
       console.log('Creating post with data:', postData);
+      console.log('Post data author_id:', postData.author_id);
       const post = await base44.entities.Post.create(postData);
       console.log('Post created successfully:', post);
 
