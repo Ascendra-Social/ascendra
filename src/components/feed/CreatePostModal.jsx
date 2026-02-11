@@ -62,12 +62,6 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
 
   const handleSubmit = async () => {
     console.log('=== POST SUBMIT STARTED ===');
-    console.log('User object:', user);
-    
-    if (!user?.id) {
-      alert('You must be logged in to create a post');
-      return;
-    }
     
     if (!content.trim() && !mediaFile) {
       console.log('No content or media, returning');
@@ -77,6 +71,10 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
     setIsSubmitting(true);
     
     try {
+      // Get fresh authenticated user
+      const currentUser = await base44.auth.me();
+      console.log('Authenticated user:', currentUser);
+      
       let mediaUrl = null;
       if (mediaFile) {
         console.log('Uploading file...');
@@ -89,9 +87,9 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
       }
 
       const postData = { 
-        author_id: user.id,
-        author_name: user.full_name,
-        author_avatar: user.avatar,
+        author_id: currentUser.id,
+        author_name: currentUser.full_name,
+        author_avatar: currentUser.avatar,
         content 
       };
 
