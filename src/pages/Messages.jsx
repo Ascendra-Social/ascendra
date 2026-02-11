@@ -51,28 +51,26 @@ export default function Messages() {
     enabled: !!selectedConversation
   });
 
-  // Real-time message updates
+  // Real-time message updates with polling
   useEffect(() => {
     if (!selectedConversation) return;
 
-    const unsubscribe = base44.entities.Message.subscribe((event) => {
-      if (event.data?.conversation_id === selectedConversation.id) {
-        queryClient.invalidateQueries({ queryKey: ['messages', selectedConversation.id] });
-      }
-    });
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ['messages', selectedConversation.id] });
+    }, 3000);
 
-    return unsubscribe;
+    return () => clearInterval(interval);
   }, [selectedConversation, queryClient]);
 
-  // Real-time conversation updates
+  // Real-time conversation updates with polling
   useEffect(() => {
     if (!user) return;
 
-    const unsubscribe = base44.entities.Conversation.subscribe(() => {
+    const interval = setInterval(() => {
       queryClient.invalidateQueries({ queryKey: ['conversations', user.id] });
-    });
+    }, 5000);
 
-    return unsubscribe;
+    return () => clearInterval(interval);
   }, [user, queryClient]);
 
   const sendMutation = useMutation({
