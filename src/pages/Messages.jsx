@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import ConversationItem from '@/components/messages/ConversationItem';
+import NewConversationModal from '@/components/messages/NewConversationModal';
 import { formatDistanceToNow } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -15,6 +16,7 @@ export default function Messages() {
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [newMessage, setNewMessage] = useState('');
   const [showMobileChat, setShowMobileChat] = useState(false);
+  const [showNewConversationModal, setShowNewConversationModal] = useState(false);
   const messagesEndRef = useRef(null);
   const queryClient = useQueryClient();
 
@@ -46,9 +48,32 @@ export default function Messages() {
       'created_date',
       100
     ),
-    enabled: !!selectedConversation,
-    refetchInterval: 3000
+    enabled: !!selectedConversation
   });
+
+  // Real-time message updates
+  useEffect(() => {
+    if (!selectedConversation) return;
+
+    const unsubscribe = base44.entities.Message.subscribe((event) => {
+      if (event.data?.conversation_id === selectedConversation.id) {
+        queryClient.invalidateQueries({ queryKey: ['messages', selectedConversation.id] });
+      }
+    });
+
+    return unsubscribe;
+  }, [selectedConversation, queryClient]);
+
+  // Real-time conversation updates
+  useEffect(() => {
+    if (!user) return;
+
+    const unsubscribe = base44.entities.Conversation.subscribe(() => {
+      queryClient.invalidateQueries({ queryKey: ['conversations', user.id] });
+    });
+
+    return unsubscribe;
+  }, [user, queryClient]);
 
   const sendMutation = useMutation({
     mutationFn: async (content) => {
@@ -105,7 +130,16 @@ export default function Messages() {
       {/* Conversations List */}
       <div className={`w-full lg:w-96 bg-white border-r border-slate-100 flex flex-col ${showMobileChat ? 'hidden lg:flex' : 'flex'}`}>
         <div className="p-4 border-b border-slate-100">
-          <h1 className="text-xl font-bold text-slate-800 mb-4">Messages</h1>
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-xl font-bold text-slate-800">Messages</h1>
+            <Button
+              size="icon"
+              onClick={() => setShowNewConversationModal(true)}
+              className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full w-9 h-9"
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input
@@ -253,6 +287,18 @@ export default function Messages() {
           </div>
         )}
       </div>
+
+      {/* New Conversation Modal */}
+      <NewConversationModal
+        isOpen={showNewConversationModal}
+        onClose={() => setShowNewConversationModal(false)}
+        currentUser={user}
+        onConversationCreated={(conversation) => {
+          setSelectedConversation(conversation);
+          setShowMobileChat(true);
+          queryClient.invalidateQueries({ queryKey: ['conversations'] });
+        }}
+      />
     </div>
   );
 }
