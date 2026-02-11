@@ -87,8 +87,7 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
       }
 
       const postData = { 
-        content,
-        author_id: currentUser.id
+        content
       };
 
       if (mediaUrl) {
