@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function NewConversationModal({ isOpen, onClose, currentUser, onConversationCreated }) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectingUserId, setSelectingUserId] = useState(null);
 
   const { data: users, isLoading } = useQuery({
     queryKey: ['users-search', searchQuery],
