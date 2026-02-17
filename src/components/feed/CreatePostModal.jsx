@@ -71,24 +71,20 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
     setIsSubmitting(true);
     
     try {
-      // Get fresh authenticated user
       const currentUser = await base44.auth.me();
-      console.log('Authenticated user:', currentUser);
-      console.log('User ID:', currentUser.id);
-      
+
       let mediaUrl = null;
       if (mediaFile) {
-        console.log('Uploading file...');
         const { file_url } = await base44.integrations.Core.UploadFile({ file: mediaFile });
         mediaUrl = file_url;
-        console.log('File uploaded:', mediaUrl);
       } else if (mediaPreview && !mediaPreview.startsWith('blob:')) {
         mediaUrl = mediaPreview;
-        console.log('Using existing media:', mediaUrl);
       }
 
       const postData = { 
         author_id: currentUser.id,
+        author_name: currentUser.full_name,
+        author_avatar: currentUser.avatar,
         content
       };
 
@@ -101,8 +97,6 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
         postData.community_id = communityId;
       }
 
-      console.log('Creating post with data:', postData);
-      console.log('Post data author_id:', postData.author_id);
       const post = await base44.entities.Post.create(postData);
       console.log('Post created successfully:', post);
 
