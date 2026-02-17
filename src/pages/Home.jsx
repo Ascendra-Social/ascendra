@@ -43,11 +43,7 @@ export default function Home() {
   const { data: posts, isLoading } = useQuery({
     queryKey: ['posts', activeTab],
     queryFn: async () => {
-      const allPosts = await base44.entities.Post.filter(
-        { is_reel: false },
-        '-created_date',
-        50
-      );
+      const allPosts = await base44.entities.Post.list('-created_date', 50);
       
       // Sort by positivity, engagement, and vote score for "For You"
       if (activeTab === 'foryou') {
