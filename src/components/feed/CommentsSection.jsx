@@ -19,34 +19,41 @@ export default function CommentsSection({ postId, currentUserId }) {
 
   const createCommentMutation = useMutation({
     mutationFn: async () => {
-      console.log('=== COMMENT SUBMIT STARTED ===');
-      console.log('Post ID:', postId);
-      console.log('Comment content:', newComment);
-      
+      const currentUser = await base44.auth.me();
       const result = await base44.entities.Comment.create({
         post_id: postId,
         author_id: currentUserId,
+        author_name: currentUser.full_name,
+        author_avatar: currentUser.avatar,
         content: newComment
       });
-      
-      console.log('Comment created successfully:', result);
-      return result;
+      return { result, currentUser };
     },
-    onSuccess: async () => {
-      console.log('Comment mutation success callback');
+    onSuccess: async ({ result, currentUser }) => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId] });
       
-      // Update post comments count
-      const post = await base44.entities.Post.filter({ id: postId });
-      if (post[0]) {
+      // Update post comments count and notify post author
+      const posts = await base44.entities.Post.filter({ id: postId });
+      if (posts[0]) {
         await base44.entities.Post.update(postId, {
-          comments_count: (post[0].comments_count || 0) + 1
+          comments_count: (posts[0].comments_count || 0) + 1
         });
+        // Notify post author
+        if (posts[0].author_id && posts[0].author_id !== currentUserId) {
+          base44.entities.Notification.create({
+            recipient_id: posts[0].author_id,
+            sender_id: currentUserId,
+            sender_name: currentUser.full_name,
+            sender_avatar: currentUser.avatar,
+            type: 'comment',
+            content_id: postId,
+            content_preview: newComment.slice(0, 80)
+          }).catch(() => {});
+        }
       }
       
       setNewComment('');
       toast.success('Comment posted!');
-      console.log('=== COMMENT SUBMIT ENDED ===');
     },
     onError: (error) => {
       console.error('=== COMMENT ERROR ===', error);

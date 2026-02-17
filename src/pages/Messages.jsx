@@ -76,13 +76,14 @@ export default function Messages() {
   const sendMutation = useMutation({
     mutationFn: async (content) => {
       const otherIndex = selectedConversation.participant_ids.findIndex(id => id !== user.id);
+      const recipientId = selectedConversation.participant_ids[otherIndex];
       
       await base44.entities.Message.create({
         conversation_id: selectedConversation.id,
         sender_id: user.id,
         sender_name: user.full_name,
         sender_avatar: user.avatar,
-        recipient_id: selectedConversation.participant_ids[otherIndex],
+        recipient_id: recipientId,
         content
       });
 
@@ -90,6 +91,19 @@ export default function Messages() {
         last_message: content,
         last_message_at: new Date().toISOString()
       });
+
+      // Notify recipient
+      if (recipientId) {
+        base44.entities.Notification.create({
+          recipient_id: recipientId,
+          sender_id: user.id,
+          sender_name: user.full_name,
+          sender_avatar: user.avatar,
+          type: 'message',
+          content_id: selectedConversation.id,
+          content_preview: content.slice(0, 80)
+        }).catch(() => {});
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['messages'] });
