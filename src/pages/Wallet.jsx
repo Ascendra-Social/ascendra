@@ -340,9 +340,5 @@ function WalletContent() {
 }
 
 export default function Wallet() {
-  return (
-    <WalletProvider>
-      <WalletContent />
-    </WalletProvider>
-  );
+  return <WalletContent />;
 }
