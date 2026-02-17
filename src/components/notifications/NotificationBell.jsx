@@ -27,8 +27,8 @@ export default function NotificationBell({ user }) {
     if (!user) return;
     fetchNotifications();
 
-    // Poll every 15 seconds
-    const interval = setInterval(fetchNotifications, 15000);
+    // Poll every 60 seconds to avoid rate limits
+    const interval = setInterval(fetchNotifications, 60000);
     return () => clearInterval(interval);
   }, [user]);
 

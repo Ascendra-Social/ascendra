@@ -16,13 +16,14 @@ export default function NewConversationModal({ isOpen, onClose, currentUser, onC
     queryKey: ['users-search', searchQuery],
     queryFn: async () => {
       const allUsers = await base44.entities.User.list();
-      return allUsers.filter(u => 
-        u.id !== currentUser.id && 
-        (u.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-         u.username?.toLowerCase().includes(searchQuery.toLowerCase()))
-      ).slice(0, 10);
+      return allUsers.filter(u =>
+        u.id !== currentUser?.id &&
+        (searchQuery === '' ||
+          u.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          u.username?.toLowerCase().includes(searchQuery.toLowerCase()))
+      ).slice(0, 20);
     },
-    enabled: isOpen
+    enabled: isOpen && !!currentUser
   });
 
   const handleSelectUser = async (otherUser) => {
