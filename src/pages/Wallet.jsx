@@ -132,43 +132,35 @@ function WalletContent() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-      {/* Phantom Wallet Connection */}
+      {/* Multi-Wallet Connection */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-slate-800/50 border border-cyan-500/20 rounded-2xl p-5"
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center">
               <WalletIcon className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-white">Phantom Wallet</h3>
+              <h3 className="font-semibold text-white">
+                {connectedWallet ? connectedWallet.wallet : 'Connect Wallet'}
+              </h3>
               <p className="text-sm text-slate-400">
-                {connected ? 'Connected' : 'Connect your wallet'}
+                {connectedWallet
+                  ? `${connectedWallet.address.slice(0, 6)}...${connectedWallet.address.slice(-4)}`
+                  : 'MetaMask, Phantom, Coinbase & more'}
               </p>
             </div>
           </div>
-          <WalletMultiButton className="!bg-gradient-to-r !from-cyan-500 !to-purple-500 !rounded-xl !h-10" />
+          <Button
+            onClick={() => setShowConnectModal(true)}
+            className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-xl h-10 px-4"
+          >
+            {connectedWallet ? 'Switch' : 'Connect'}
+          </Button>
         </div>
-
-        {connected && publicKey && (
-          <div className="space-y-3 pt-3 border-t border-cyan-500/20">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-400">Wallet Address</span>
-              <span className="text-sm font-mono text-slate-200">
-                {publicKey.toString().slice(0, 4)}...{publicKey.toString().slice(-4)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-400">SOL Balance</span>
-              <span className="text-sm font-semibold text-white">
-                {solBalance.toFixed(4)} SOL
-              </span>
-            </div>
-          </div>
-        )}
       </motion.div>
 
       {/* Token Balance */}
