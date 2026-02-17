@@ -317,6 +317,12 @@ function WalletContent() {
       </motion.div>
 
       {/* Modals */}
+      <WalletConnectionModal
+        isOpen={showConnectModal}
+        onClose={() => setShowConnectModal(false)}
+        onConnected={(w) => setConnectedWallet(w)}
+      />
+
       <SendTokensModal
         isOpen={showSendModal}
         onClose={() => setShowSendModal(false)}
