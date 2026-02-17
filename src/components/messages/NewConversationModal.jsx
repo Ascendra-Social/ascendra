@@ -29,14 +29,7 @@ export default function NewConversationModal({ isOpen, onClose, currentUser, onC
   const handleSelectUser = async (otherUser) => {
     setSelectingUserId(otherUser.id);
     try {
-      // Check if conversation already exists
-      const existingConvos = await base44.entities.Conversation.list();
-      const existing = existingConvos.find(c =>
-        c.participant_ids?.includes(currentUser.id) &&
-        c.participant_ids?.includes(otherUser.id)
-      );
-
-      const conversation = existing || await base44.entities.Conversation.create({
+      const conversation = await base44.entities.Conversation.create({
         participant_ids: [currentUser.id, otherUser.id],
         participant_names: [currentUser.full_name, otherUser.full_name],
         participant_avatars: [currentUser.avatar, otherUser.avatar],
