@@ -13,10 +13,7 @@ import TokenBalance from '@/components/wallet/TokenBalance';
 import TransactionFilters from '@/components/wallet/TransactionFilters';
 import SendTokensModal from '@/components/wallet/SendTokensModal';
 import RecurringPaymentsModal from '@/components/wallet/RecurringPaymentsModal';
-import WalletProvider from '@/components/wallet/WalletProvider';
-import { useWallet, useConnection } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import WalletConnectionModal from '@/components/wallet/WalletConnectionModal';
 import { formatDistanceToNow, isAfter, isBefore } from 'date-fns';
 import { motion } from 'framer-motion';
 
