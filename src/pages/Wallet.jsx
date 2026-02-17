@@ -41,9 +41,8 @@ const transactionColors = {
 
 function WalletContent() {
   const [user, setUser] = useState(null);
-  const { publicKey, connected } = useWallet();
-  const { connection } = useConnection();
-  const [solBalance, setSolBalance] = useState(0);
+  const [connectedWallet, setConnectedWallet] = useState(null);
+  const [showConnectModal, setShowConnectModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showSendModal, setShowSendModal] = useState(false);
   const [showRecurringModal, setShowRecurringModal] = useState(false);
