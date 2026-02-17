@@ -140,6 +140,14 @@ export default function Profile() {
           follower_id: currentUser.id,
           following_id: profileUser.id
         });
+        // Notify the person being followed
+        base44.entities.Notification.create({
+          recipient_id: profileUser.id,
+          sender_id: currentUser.id,
+          sender_name: currentUser.full_name,
+          sender_avatar: currentUser.avatar,
+          type: 'follow'
+        }).catch(() => {});
       }
     },
     onSuccess: () => {
