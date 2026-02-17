@@ -25,33 +25,32 @@ export default function NewConversationModal({ isOpen, onClose, currentUser, onC
     enabled: isOpen
   });
 
-  const createConversationMutation = useMutation({
-    mutationFn: async (otherUser) => {
+  const handleSelectUser = async (otherUser) => {
+    setSelectingUserId(otherUser.id);
+    try {
       // Check if conversation already exists
       const existingConvos = await base44.entities.Conversation.list();
-      const existing = existingConvos.find(c => 
-        c.participant_ids?.includes(currentUser.id) && 
+      const existing = existingConvos.find(c =>
+        c.participant_ids?.includes(currentUser.id) &&
         c.participant_ids?.includes(otherUser.id)
       );
 
-      if (existing) {
-        return existing;
-      }
-
-      // Create new conversation
-      return await base44.entities.Conversation.create({
+      const conversation = existing || await base44.entities.Conversation.create({
         participant_ids: [currentUser.id, otherUser.id],
         participant_names: [currentUser.full_name, otherUser.full_name],
         participant_avatars: [currentUser.avatar, otherUser.avatar],
         last_message: '',
         last_message_at: new Date().toISOString()
       });
-    },
-    onSuccess: (conversation) => {
+
       onConversationCreated(conversation);
       onClose();
+    } catch (e) {
+      console.error('Failed to create conversation', e);
+    } finally {
+      setSelectingUserId(null);
     }
-  });
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
