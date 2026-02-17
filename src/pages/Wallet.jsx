@@ -66,25 +66,6 @@ function WalletContent() {
     loadUser();
   }, []);
 
-  // Fetch SOL balance when wallet is connected
-  useEffect(() => {
-    const fetchBalance = async () => {
-      if (connected && publicKey) {
-        try {
-          const balance = await connection.getBalance(publicKey);
-          setSolBalance(balance / LAMPORTS_PER_SOL);
-        } catch (error) {
-          console.error('Failed to fetch SOL balance:', error);
-        }
-      }
-    };
-    fetchBalance();
-    
-    // Refresh balance every 30 seconds
-    const interval = setInterval(fetchBalance, 30000);
-    return () => clearInterval(interval);
-  }, [connected, publicKey, connection]);
-
   const { data: wallet, isLoading: walletLoading } = useQuery({
     queryKey: ['wallet', user?.id],
     queryFn: async () => {
