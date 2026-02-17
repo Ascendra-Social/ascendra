@@ -65,13 +65,23 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
   }, [post.id]);
 
   const handleLike = async () => {
-    if (isLiked) {
-      setLikesCount(prev => prev - 1);
-    } else {
-      setLikesCount(prev => prev + 1);
+    const newLiked = !isLiked;
+    setIsLiked(newLiked);
+    setLikesCount(prev => prev + (newLiked ? 1 : -1));
+    if (onLike) onLike(post.id, newLiked);
+
+    // Send notification to post author
+    if (newLiked && user && post.author_id && post.author_id !== user.id) {
+      base44.entities.Notification.create({
+        recipient_id: post.author_id,
+        sender_id: user.id,
+        sender_name: user.full_name,
+        sender_avatar: user.avatar,
+        type: 'like',
+        content_id: post.id,
+        content_preview: post.content?.slice(0, 80)
+      }).catch(() => {});
     }
-    setIsLiked(!isLiked);
-    if (onLike) onLike(post.id, !isLiked);
   };
 
   const handleAIRepost = (result) => {

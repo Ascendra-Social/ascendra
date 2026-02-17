@@ -7,6 +7,7 @@ import {
   User, Compass, Play, Wallet, Bell, Menu, X, Users, TrendingUp, Shield, Building2
 } from 'lucide-react';
 import AIFloatingButton from '@/components/ai/AIFloatingButton';
+import NotificationBell from '@/components/notifications/NotificationBell';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
