@@ -84,9 +84,9 @@ export default function NewConversationModal({ isOpen, onClose, currentUser, onC
             users.map(user => (
               <button
                 key={user.id}
-                onClick={() => createConversationMutation.mutate(user)}
-                disabled={createConversationMutation.isPending}
-                className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 rounded-xl transition-colors"
+                onClick={() => handleSelectUser(user)}
+                disabled={!!selectingUserId}
+                className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-60"
               >
                 <Avatar className="w-12 h-12">
                   <AvatarImage src={user.avatar} />
@@ -98,7 +98,7 @@ export default function NewConversationModal({ isOpen, onClose, currentUser, onC
                   <p className="font-semibold text-slate-800">{user.full_name || 'User'}</p>
                   <p className="text-sm text-slate-500">@{user.username || 'username'}</p>
                 </div>
-                {createConversationMutation.isPending && (
+                {selectingUserId === user.id && (
                   <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
                 )}
               </button>
