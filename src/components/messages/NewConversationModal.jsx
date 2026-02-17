@@ -31,8 +31,8 @@ export default function NewConversationModal({ isOpen, onClose, currentUser, onC
     try {
       const conversation = await base44.entities.Conversation.create({
         participant_ids: [currentUser.id, otherUser.id],
-        participant_names: [currentUser.full_name, otherUser.full_name],
-        participant_avatars: [currentUser.avatar, otherUser.avatar],
+        participant_names: [currentUser.full_name || 'User', otherUser.full_name || 'User'],
+        participant_avatars: [currentUser.avatar || '', otherUser.avatar || ''],
         last_message: '',
         last_message_at: new Date().toISOString()
       });
