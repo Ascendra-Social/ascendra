@@ -81,8 +81,8 @@ export default function Messages() {
       await base44.entities.Message.create({
         conversation_id: selectedConversation.id,
         sender_id: user.id,
-        sender_name: user.full_name,
-        sender_avatar: user.avatar,
+        sender_name: user.full_name || 'User',
+        sender_avatar: user.avatar || '',
         recipient_id: recipientId,
         content
       });
