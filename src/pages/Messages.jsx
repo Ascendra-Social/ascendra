@@ -109,6 +109,10 @@ export default function Messages() {
       queryClient.invalidateQueries({ queryKey: ['messages'] });
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
       setNewMessage('');
+    },
+    onError: (e) => {
+      console.error('Send message error:', e?.message, e);
+      alert('Failed to send: ' + e?.message);
     }
   });
 
