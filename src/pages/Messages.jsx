@@ -76,14 +76,14 @@ export default function Messages() {
   const sendMutation = useMutation({
     mutationFn: async (content) => {
       const otherIndex = selectedConversation.participant_ids.findIndex(id => id !== user.id);
-      const recipientId = selectedConversation.participant_ids[otherIndex];
+      const recipientId = selectedConversation.participant_ids[otherIndex] || selectedConversation.participant_ids[0];
       
       await base44.entities.Message.create({
         conversation_id: selectedConversation.id,
         sender_id: user.id,
         sender_name: user.full_name || 'User',
         sender_avatar: user.avatar || '',
-        recipient_id: recipientId,
+        recipient_id: recipientId || user.id,
         content
       });
 
