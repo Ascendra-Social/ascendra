@@ -104,23 +104,79 @@ export default function Reels() {
   }
 
   return (
-    <div 
-      ref={containerRef}
-      className="h-screen overflow-y-scroll snap-y snap-mandatory scrollbar-hide"
-      style={{ scrollSnapType: 'y mandatory' }}
-    >
-      {reels.map((reel, index) => (
-        <div 
-          key={reel.id}
-          className="h-screen w-full snap-start"
-          style={{ scrollSnapAlign: 'start' }}
+    <div className="relative">
+      <div 
+        ref={containerRef}
+        className="h-screen overflow-y-scroll snap-y snap-mandatory scrollbar-hide"
+        style={{ scrollSnapType: 'y mandatory' }}
+      >
+        {reels.map((reel, index) => (
+          <div 
+            key={reel.id}
+            className="h-screen w-full snap-start"
+            style={{ scrollSnapAlign: 'start' }}
+          >
+            <ReelCard 
+              reel={reel}
+              isActive={index === currentIndex}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Create Reel Button */}
+      {user && (
+        <button
+          onClick={() => setShowCreate(true)}
+          className="fixed bottom-28 lg:bottom-10 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 flex items-center justify-center shadow-lg"
         >
-          <ReelCard 
-            reel={reel}
-            isActive={index === currentIndex}
-          />
+          <Plus className="w-7 h-7 text-white" />
+        </button>
+      )}
+
+      {/* Create Reel Modal */}
+      {showCreate && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-end lg:items-center justify-center">
+          <div className="bg-slate-900 rounded-t-3xl lg:rounded-2xl w-full lg:max-w-md p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-white font-bold text-lg">Create Reel</h2>
+              <button onClick={() => setShowCreate(false)} className="text-slate-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <Textarea
+              value={newReelContent}
+              onChange={e => setNewReelContent(e.target.value)}
+              placeholder="What's your reel about?"
+              className="bg-slate-800 border-slate-700 text-white resize-none rounded-xl"
+              rows={3}
+            />
+            <div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="video/*,image/*"
+                className="hidden"
+                onChange={e => setNewReelFile(e.target.files[0])}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300"
+              >
+                <Upload className="w-4 h-4" />
+                {newReelFile ? newReelFile.name : 'Upload video or image'}
+              </button>
+            </div>
+            <Button
+              onClick={handleCreateReel}
+              disabled={creating || (!newReelContent.trim() && !newReelFile)}
+              className="w-full bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-xl"
+            >
+              {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Post Reel'}
+            </Button>
+          </div>
         </div>
-      ))}
+      )}
     </div>
   );
 }
