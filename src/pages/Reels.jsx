@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+// Note: Create functionality moved to Layout CreateModal
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import ReelCard from '@/components/reels/ReelCard';
