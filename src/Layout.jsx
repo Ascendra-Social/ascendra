@@ -233,6 +233,9 @@ export default function Layout({ children, currentPageName }) {
 
       {/* AI Floating Button */}
       <AIFloatingButton />
+
+      {/* Create Modal */}
+      <CreateModal isOpen={showCreate} onClose={() => setShowCreate(false)} user={user} />
     </div>
   );
 }
