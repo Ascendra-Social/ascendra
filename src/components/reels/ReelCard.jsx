@@ -100,7 +100,9 @@ export default function ReelCard({ reel, isActive }) {
   };
 
   const submitComment = async () => {
-    if (!commentText.trim() || !user) return;
+    if (!commentText.trim()) return;
+    const currentUser = user || await base44.auth.me().catch(() => null);
+    if (!currentUser) return;
     const comment = await base44.entities.Comment.create({
       post_id: reel.id,
       author_id: user.id,
