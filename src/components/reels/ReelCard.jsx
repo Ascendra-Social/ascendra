@@ -277,6 +277,65 @@ export default function ReelCard({ reel, isActive }) {
         )}
       </div>
 
+      {/* Share Panel */}
+      <AnimatePresence>
+        {showShare && (
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 25 }}
+            className="absolute inset-x-0 bottom-0 bg-slate-900/95 backdrop-blur-md rounded-t-3xl z-50"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-700">
+              <h3 className="text-white font-semibold">Share</h3>
+              <button onClick={() => setShowShare(false)} className="text-slate-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="px-4 py-3 space-y-2 pb-8">
+              <button
+                onClick={handleRepost}
+                className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white transition-colors"
+              >
+                <div className="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center">
+                  <Repeat2 className="w-5 h-5 text-cyan-400" />
+                </div>
+                <div className="text-left">
+                  <p className="font-medium">Repost</p>
+                  <p className="text-xs text-slate-400">Share to your reel feed</p>
+                </div>
+              </button>
+              <button
+                onClick={handleShareInMessages}
+                className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white transition-colors"
+              >
+                <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                  <MessageSquare className="w-5 h-5 text-purple-400" />
+                </div>
+                <div className="text-left">
+                  <p className="font-medium">Share in Messages</p>
+                  <p className="text-xs text-slate-400">Send to a conversation</p>
+                </div>
+              </button>
+              <button
+                onClick={handleCopyLink}
+                className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white transition-colors"
+              >
+                <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center">
+                  <Copy className="w-5 h-5 text-amber-400" />
+                </div>
+                <div className="text-left">
+                  <p className="font-medium">Copy Link</p>
+                  <p className="text-xs text-slate-400">Copy reel link to clipboard</p>
+                </div>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Comments Panel */}
       <AnimatePresence>
         {showComments && (
