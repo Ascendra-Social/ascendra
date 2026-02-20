@@ -7,17 +7,7 @@ import { Loader2 } from 'lucide-react';
 export default function Reels() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const containerRef = useRef(null);
-  const [showCreate, setShowCreate] = useState(false);
-  const [newReelContent, setNewReelContent] = useState('');
-  const [newReelFile, setNewReelFile] = useState(null);
-  const [creating, setCreating] = useState(false);
-  const [user, setUser] = useState(null);
   const queryClient = useQueryClient();
-  const fileInputRef = useRef(null);
-
-  useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
-  }, []);
 
   const { data: reels, isLoading } = useQuery({
     queryKey: ['reels'],
