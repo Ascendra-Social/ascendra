@@ -228,14 +228,16 @@ export default function ReelCard({ reel, isActive }) {
         </div>
 
         {/* Share */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleShare}
-          className="rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 w-12 h-12"
-        >
-          <Share2 className="w-7 h-7 text-white" />
-        </Button>
+        <div className="flex flex-col items-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleShare}
+            className="rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 w-12 h-12"
+          >
+            <Share2 className="w-7 h-7 text-white" />
+          </Button>
+        </div>
 
         {/* Save */}
         <Button
