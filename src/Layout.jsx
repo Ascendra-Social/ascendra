@@ -204,7 +204,6 @@ export default function Layout({ children, currentPageName }) {
         {[
           { icon: Home, page: 'Home' },
           { icon: Compass, page: 'Explore' },
-          { icon: PlusSquare, page: 'CreatePost' },
           { icon: Play, page: 'Reels' },
           { icon: User, page: 'Profile' },
         ].map((item) => (
@@ -219,6 +218,12 @@ export default function Layout({ children, currentPageName }) {
             <item.icon className="w-6 h-6" />
           </Link>
         ))}
+        <button
+          onClick={() => setShowCreate(true)}
+          className="flex flex-col items-center gap-1 p-2 rounded-xl transition-all text-slate-400"
+        >
+          <PlusSquare className="w-6 h-6" />
+        </button>
       </nav>
 
       {/* Main Content */}
