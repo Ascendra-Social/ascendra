@@ -24,13 +24,13 @@ export default function NotificationBell({ user }) {
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
   useEffect(() => {
-    if (!user) return;
+    if (!user?.id) return;
     fetchNotifications();
 
-    // Poll every 60 seconds to avoid rate limits
-    const interval = setInterval(fetchNotifications, 60000);
+    // Poll every 2 minutes to avoid rate limits
+    const interval = setInterval(fetchNotifications, 120000);
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user?.id]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
