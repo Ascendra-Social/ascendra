@@ -57,49 +57,13 @@ export default function Reels() {
 
   if (!reels?.length) {
     return (
-      <div className="relative h-screen flex flex-col items-center justify-center bg-gradient-to-br from-violet-600 to-pink-600 text-white p-8">
+      <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-violet-600 to-pink-600 text-white p-8">
         <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center mb-6">
           <span className="text-5xl">🎬</span>
         </div>
         <h2 className="text-2xl font-bold mb-2">No Reels Yet</h2>
-        <p className="text-white/70 text-center mb-6">Be the first to create a positive reel and earn $ASC tokens!</p>
-        <Button
-          onClick={() => setShowCreate(true)}
-          className="bg-white text-violet-600 font-bold rounded-full px-8 hover:bg-white/90"
-        >
-          <Plus className="w-5 h-5 mr-2" /> Create Reel
-        </Button>
-
-        {/* Create Reel Modal */}
-        {showCreate && (
-          <div className="fixed inset-0 z-50 bg-black/70 flex items-end lg:items-center justify-center">
-            <div className="bg-slate-900 rounded-t-3xl lg:rounded-2xl w-full lg:max-w-md p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-white font-bold text-lg">Create Reel</h2>
-                <button onClick={() => setShowCreate(false)} className="text-slate-400 hover:text-white">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <Textarea
-                value={newReelContent}
-                onChange={e => setNewReelContent(e.target.value)}
-                placeholder="What's your reel about?"
-                className="bg-slate-800 border-slate-700 text-white resize-none rounded-xl"
-                rows={3}
-              />
-              <div>
-                <input ref={fileInputRef} type="file" accept="video/*,image/*" className="hidden" onChange={e => setNewReelFile(e.target.files[0])} />
-                <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300">
-                  <Upload className="w-4 h-4" />
-                  {newReelFile ? newReelFile.name : 'Upload video or image'}
-                </button>
-              </div>
-              <Button onClick={handleCreateReel} disabled={creating || (!newReelContent.trim() && !newReelFile)} className="w-full bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-xl">
-                {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Post Reel'}
-              </Button>
-            </div>
-          </div>
-        )}
+        <p className="text-white/70 text-center">Be the first to create a positive reel and earn $ASC tokens!</p>
+        <p className="text-white/50 text-sm mt-2">Tap the + button in the navigation to get started.</p>
       </div>
     );
   }
