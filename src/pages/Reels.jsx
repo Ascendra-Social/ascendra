@@ -2,9 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import ReelCard from '@/components/reels/ReelCard';
-import { Loader2, Plus, X, Upload } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Loader2 } from 'lucide-react';
 
 export default function Reels() {
   const [currentIndex, setCurrentIndex] = useState(0);
