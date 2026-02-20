@@ -17,14 +17,14 @@ export default function AIFloatingButton() {
 
   return (
     <>
-      <div className="fixed bottom-24 lg:bottom-8 left-6 z-40">
+      <div className="fixed top-20 lg:top-4 left-4 z-40">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              size="lg"
-              className="w-14 h-14 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 text-white shadow-lg hover:shadow-xl transition-all"
+              size="sm"
+              className="w-9 h-9 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 text-white shadow-md hover:shadow-lg transition-all p-0"
             >
-              <Sparkles className="w-6 h-6" />
+              <Sparkles className="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="rounded-xl w-56">
