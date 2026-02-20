@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 export default function Layout({ children, currentPageName }) {
   const [user, setUser] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
