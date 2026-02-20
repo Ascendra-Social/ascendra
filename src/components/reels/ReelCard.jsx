@@ -105,9 +105,9 @@ export default function ReelCard({ reel, isActive }) {
     if (!currentUser) return;
     const comment = await base44.entities.Comment.create({
       post_id: reel.id,
-      author_id: user.id,
-      author_name: user.full_name || 'User',
-      author_avatar: user.avatar || '',
+      author_id: currentUser.id,
+      author_name: currentUser.full_name || 'User',
+      author_avatar: currentUser.avatar || '',
       content: commentText.trim()
     });
     const newCount = commentsCount + 1;
