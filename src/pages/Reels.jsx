@@ -45,31 +45,6 @@ export default function Reels() {
     return () => container.removeEventListener('scroll', handleScroll);
   }, [currentIndex]);
 
-  const handleCreateReel = async () => {
-    if (!newReelContent.trim() && !newReelFile) return;
-    setCreating(true);
-    let media_url = '';
-    let media_type = 'none';
-    if (newReelFile) {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file: newReelFile });
-      media_url = file_url;
-      media_type = newReelFile.type.startsWith('video') ? 'video' : 'image';
-    }
-    await base44.entities.Post.create({
-      content: newReelContent,
-      media_url,
-      media_type,
-      is_reel: true,
-      author_id: user.id,
-      author_name: user.full_name || 'User',
-      author_avatar: user.avatar || ''
-    });
-    queryClient.invalidateQueries({ queryKey: ['reels'] });
-    setNewReelContent('');
-    setNewReelFile(null);
-    setShowCreate(false);
-    setCreating(false);
-  };
 
   if (isLoading) {
     return (
