@@ -6,6 +6,7 @@ import {
   Home, Search, PlusSquare, ShoppingBag, MessageCircle, 
   User, Compass, Play, Wallet, Bell, Menu, X, Users, TrendingUp, Shield, Building2
 } from 'lucide-react';
+import CreateModal from '@/components/create/CreateModal';
 import AIFloatingButton from '@/components/ai/AIFloatingButton';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import { Button } from "@/components/ui/button";
