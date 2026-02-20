@@ -98,7 +98,7 @@ export default function Reels() {
           <span className="text-5xl">🎬</span>
         </div>
         <h2 className="text-2xl font-bold mb-2">No Reels Yet</h2>
-        <p className="text-white/70 text-center">Be the first to create a positive reel and earn VIBE tokens!</p>
+        <p className="text-white/70 text-center">Be the first to create a positive reel and earn $ASC tokens!</p>
       </div>
     );
   }
