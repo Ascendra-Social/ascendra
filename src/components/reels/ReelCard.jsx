@@ -178,7 +178,7 @@ export default function ReelCard({ reel, isActive, onLike }) {
         {reel.tokens_earned > 0 && (
           <Badge className="bg-gradient-to-r from-amber-500/80 to-orange-500/80 text-white border-0 rounded-full">
             <Coins className="w-3 h-3 mr-1" />
-            +{reel.tokens_earned} VIBE earned
+            +{reel.tokens_earned} $ASC earned
           </Badge>
         )}
       </div>
