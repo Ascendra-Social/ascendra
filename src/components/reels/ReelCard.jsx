@@ -83,11 +83,33 @@ export default function ReelCard({ reel, isActive }) {
   };
 
   const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({ title: reel.content || 'Check out this reel', url: window.location.href });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-    }
+    setShowShare(true);
+  };
+
+  const handleRepost = async () => {
+    if (!user) return;
+    await base44.entities.Post.create({
+      content: `Reposted: ${reel.content || ''}`,
+      media_url: reel.media_url || '',
+      media_type: reel.media_type || 'none',
+      is_reel: true,
+      author_id: user.id,
+      author_name: user.full_name || 'User',
+      author_avatar: user.avatar || ''
+    });
+    setShowShare(false);
+  };
+
+  const handleShareInMessages = () => {
+    const reelLink = `${window.location.origin}${createPageUrl('Reels')}`;
+    window.location.href = createPageUrl(`Messages?share=${reel.id}`);
+    setShowShare(false);
+  };
+
+  const handleCopyLink = () => {
+    const link = `${window.location.origin}${window.location.pathname}`;
+    navigator.clipboard.writeText(link);
+    setShowShare(false);
   };
 
   const loadComments = async () => {
