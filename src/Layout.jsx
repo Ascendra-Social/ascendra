@@ -122,6 +122,16 @@ export default function Layout({ children, currentPageName }) {
           ))}
         </nav>
 
+        <div className="px-4 pb-2">
+          <button
+            onClick={() => setShowCreate(true)}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 hover:from-cyan-500/30 hover:to-purple-500/30 text-cyan-400 transition-all"
+          >
+            <PlusSquare className="w-5 h-5" />
+            <span className="font-medium">Create</span>
+          </button>
+        </div>
+
         <div className="p-4 border-t border-cyan-500/20">
           {user ? (
             <Link 
