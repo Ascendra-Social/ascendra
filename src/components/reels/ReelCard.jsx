@@ -21,6 +21,7 @@ export default function ReelCard({ reel, isActive }) {
   const [commentsCount, setCommentsCount] = useState(reel.comments_count || 0);
   const [showHeart, setShowHeart] = useState(false);
   const [showComments, setShowComments] = useState(false);
+  const [showShare, setShowShare] = useState(false);
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
   const [user, setUser] = useState(null);
