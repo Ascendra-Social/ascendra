@@ -101,11 +101,12 @@ export default function CommentsSection({ postId, currentUserId }) {
             <Loader2 className="w-5 h-5 animate-spin mx-auto text-slate-400" />
           </div>
         ) : comments.length > 0 ? (
-          comments.map(comment => (
+          comments.filter(c => !c.parent_comment_id).map(comment => (
             <CommentItem 
               key={comment.id} 
               comment={comment} 
-              currentUserId={currentUserId} 
+              currentUserId={currentUserId}
+              postId={postId}
             />
           ))
         ) : (
