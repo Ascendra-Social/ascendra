@@ -24,6 +24,10 @@ export default function ReelCard({ reel, isActive }) {
   const [showShare, setShowShare] = useState(false);
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
+  const [replyingTo, setReplyingTo] = useState(null); // { commentId, authorName }
+  const [replyText, setReplyText] = useState('');
+  const [expandedReplies, setExpandedReplies] = useState({});
+  const [repliesMap, setRepliesMap] = useState({});
   const [user, setUser] = useState(null);
   const lastTap = useRef(0);
 
