@@ -151,6 +151,18 @@ export default function CommentItem({ comment, currentUserId, postId, onReply })
               <span className="text-xs">Like</span>
             </Button>
 
+            {currentUserId && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowReplyInput(prev => !prev)}
+                className="h-7 px-2 text-slate-400 hover:text-cyan-400"
+              >
+                <CornerDownRight className="w-3 h-3 mr-1" />
+                <span className="text-xs">Reply</span>
+              </Button>
+            )}
+
             {currentUserId && currentUserId !== comment.author_id && (
               <Button
                 variant="ghost"
@@ -163,6 +175,54 @@ export default function CommentItem({ comment, currentUserId, postId, onReply })
               </Button>
             )}
           </div>
+
+          {/* Reply Input */}
+          {showReplyInput && (
+            <div className="mt-2 flex gap-2">
+              <input
+                value={replyText}
+                onChange={e => setReplyText(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && submitReply()}
+                placeholder={`Reply to ${comment.author_name}...`}
+                className="flex-1 bg-slate-700/50 border border-cyan-500/20 rounded-full px-3 py-1.5 text-xs text-white placeholder-slate-400 outline-none focus:border-cyan-500/50"
+                autoFocus
+              />
+              <Button size="sm" onClick={submitReply} disabled={!replyText.trim()} className="h-7 px-3 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 text-xs">
+                Post
+              </Button>
+            </div>
+          )}
+
+          {/* View Replies */}
+          {!showReplies && comment.id && (
+            <button
+              onClick={loadReplies}
+              className="text-xs text-cyan-400 hover:text-cyan-300 mt-1 ml-2 flex items-center gap-1"
+            >
+              {repliesLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <CornerDownRight className="w-3 h-3" />}
+              View replies
+            </button>
+          )}
+
+          {/* Replies List */}
+          {showReplies && replies.length > 0 && (
+            <div className="mt-2 ml-2 space-y-2 border-l-2 border-cyan-500/20 pl-3">
+              {replies.map(reply => (
+                <div key={reply.id} className="flex gap-2">
+                  <Avatar className="w-6 h-6 shrink-0">
+                    <AvatarImage src={reply.author_avatar} />
+                    <AvatarFallback className="bg-gradient-to-br from-cyan-400 to-purple-400 text-white text-xs">
+                      {reply.author_name?.[0] || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="bg-slate-800/50 rounded-xl px-3 py-1.5 border border-cyan-500/10 flex-1">
+                    <span className="font-semibold text-white text-xs">{reply.author_name} </span>
+                    <span className="text-slate-300 text-xs">{reply.content}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
