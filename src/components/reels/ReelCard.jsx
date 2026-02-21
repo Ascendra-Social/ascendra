@@ -385,22 +385,72 @@ export default function ReelCard({ reel, isActive }) {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-4 py-2 space-y-3">
-              {comments.length === 0 ? (
+            <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
+              {comments.filter(c => !c.parent_comment_id).length === 0 ? (
                 <p className="text-slate-400 text-center py-8 text-sm">No comments yet. Be the first!</p>
               ) : (
-                comments.map(c => (
-                  <div key={c.id} className="flex gap-3">
-                    <Avatar className="w-8 h-8 shrink-0">
-                      <AvatarImage src={c.author_avatar} />
-                      <AvatarFallback className="bg-gradient-to-br from-cyan-400 to-purple-400 text-white text-xs">
-                        {c.author_name?.[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <span className="text-sm font-semibold text-white">{c.author_name} </span>
-                      <span className="text-sm text-slate-300">{c.content}</span>
+                comments.filter(c => !c.parent_comment_id).map(c => (
+                  <div key={c.id}>
+                    <div className="flex gap-3">
+                      <Avatar className="w-8 h-8 shrink-0">
+                        <AvatarImage src={c.author_avatar} />
+                        <AvatarFallback className="bg-gradient-to-br from-cyan-400 to-purple-400 text-white text-xs">
+                          {c.author_name?.[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="bg-slate-800/60 rounded-xl px-3 py-2">
+                          <span className="text-sm font-semibold text-white">{c.author_name} </span>
+                          <span className="text-sm text-slate-300">{c.content}</span>
+                        </div>
+                        <div className="flex gap-3 mt-1 ml-1">
+                          <button
+                            onClick={() => setReplyingTo({ commentId: c.id, authorName: c.author_name })}
+                            className="text-xs text-slate-400 hover:text-cyan-400 flex items-center gap-1"
+                          >
+                            <CornerDownRight className="w-3 h-3" /> Reply
+                          </button>
+                          {!expandedReplies[c.id] && (
+                            <button onClick={() => loadReplies(c.id)} className="text-xs text-slate-400 hover:text-cyan-400">
+                              View replies
+                            </button>
+                          )}
+                        </div>
+                        {/* Replies */}
+                        {expandedReplies[c.id] && repliesMap[c.id]?.length > 0 && (
+                          <div className="mt-2 ml-1 border-l-2 border-cyan-500/20 pl-3 space-y-2">
+                            {repliesMap[c.id].map(r => (
+                              <div key={r.id} className="flex gap-2">
+                                <Avatar className="w-6 h-6 shrink-0">
+                                  <AvatarImage src={r.author_avatar} />
+                                  <AvatarFallback className="bg-gradient-to-br from-cyan-400 to-purple-400 text-white text-xs">{r.author_name?.[0]}</AvatarFallback>
+                                </Avatar>
+                                <div className="bg-slate-800/40 rounded-xl px-3 py-1.5">
+                                  <span className="text-xs font-semibold text-white">{r.author_name} </span>
+                                  <span className="text-xs text-slate-300">{r.content}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
+                    {/* Reply input for this comment */}
+                    {replyingTo?.commentId === c.id && (
+                      <div className="mt-2 ml-11 flex gap-2">
+                        <input
+                          value={replyText}
+                          onChange={e => setReplyText(e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && submitReply()}
+                          placeholder={`Reply to ${c.author_name}...`}
+                          className="flex-1 bg-slate-700 rounded-full px-3 py-1.5 text-xs text-white placeholder-slate-400 outline-none"
+                          autoFocus
+                        />
+                        <Button size="icon" onClick={submitReply} disabled={!replyText.trim()} className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 shrink-0">
+                          <Send className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 ))
               )}
