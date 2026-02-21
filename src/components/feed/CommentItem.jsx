@@ -10,12 +10,43 @@ import { Heart, Coins, Loader2, CornerDownRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 
-export default function CommentItem({ comment, currentUserId }) {
+export default function CommentItem({ comment, currentUserId, postId, onReply }) {
   const [isLiked, setIsLiked] = useState(false);
   const [showTipModal, setShowTipModal] = useState(false);
+  const [showReplyInput, setShowReplyInput] = useState(false);
+  const [replyText, setReplyText] = useState('');
+  const [replies, setReplies] = useState([]);
+  const [showReplies, setShowReplies] = useState(false);
+  const [repliesLoading, setRepliesLoading] = useState(false);
   const [tipAmount, setTipAmount] = useState('');
   const [tipMessage, setTipMessage] = useState('');
   const queryClient = useQueryClient();
+
+  const loadReplies = async () => {
+    setRepliesLoading(true);
+    const data = await base44.entities.Comment.filter({ post_id: postId, parent_comment_id: comment.id }, 'created_date', 20);
+    setReplies(data);
+    setRepliesLoading(false);
+    setShowReplies(true);
+  };
+
+  const submitReply = async () => {
+    if (!replyText.trim()) return;
+    const currentUser = await base44.auth.me().catch(() => null);
+    if (!currentUser) return;
+    const reply = await base44.entities.Comment.create({
+      post_id: postId,
+      parent_comment_id: comment.id,
+      author_id: currentUser.id,
+      author_name: currentUser.full_name || 'User',
+      author_avatar: currentUser.avatar || '',
+      content: replyText.trim()
+    });
+    setReplies(prev => [...prev, reply]);
+    setReplyText('');
+    setShowReplyInput(false);
+    setShowReplies(true);
+  };
 
   const { data: wallet } = useQuery({
     queryKey: ['wallet', currentUserId],
