@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { 
   Heart, MessageCircle, Share2, Bookmark, Volume2, VolumeX,
-  Play, Coins, Sparkles, X, Send, Copy, Repeat2, MessageSquare
+  Play, Coins, Sparkles, X, Send, Copy, Repeat2, MessageSquare, CornerDownRight
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
