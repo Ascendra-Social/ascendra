@@ -144,6 +144,33 @@ export default function ReelCard({ reel, isActive }) {
     setCommentText('');
   };
 
+  const submitReply = async () => {
+    if (!replyText.trim() || !replyingTo) return;
+    const currentUser = user || await base44.auth.me().catch(() => null);
+    if (!currentUser) return;
+    const reply = await base44.entities.Comment.create({
+      post_id: reel.id,
+      parent_comment_id: replyingTo.commentId,
+      author_id: currentUser.id,
+      author_name: currentUser.full_name || 'User',
+      author_avatar: currentUser.avatar || '',
+      content: replyText.trim()
+    });
+    setRepliesMap(prev => ({
+      ...prev,
+      [replyingTo.commentId]: [...(prev[replyingTo.commentId] || []), reply]
+    }));
+    setExpandedReplies(prev => ({ ...prev, [replyingTo.commentId]: true }));
+    setReplyText('');
+    setReplyingTo(null);
+  };
+
+  const loadReplies = async (commentId) => {
+    const data = await base44.entities.Comment.filter({ post_id: reel.id, parent_comment_id: commentId }, 'created_date', 20);
+    setRepliesMap(prev => ({ ...prev, [commentId]: data }));
+    setExpandedReplies(prev => ({ ...prev, [commentId]: true }));
+  };
+
   return (
     <div className="relative h-full w-full bg-black flex items-center justify-center">
       {/* Video */}
