@@ -83,9 +83,20 @@ export default function ReelCard({ reel, isActive }) {
     await base44.entities.Post.update(reel.id, { likes_count: newCount });
   };
 
-  const handleSave = () => {
-    setIsSaved(prev => !prev);
-    // Could persist to a Like/Bookmark entity here
+  const handleSave = async () => {
+    if (!user) { base44.auth.redirectToLogin(); return; }
+    const newSaved = !isSaved;
+    setIsSaved(newSaved);
+    if (newSaved) {
+      await base44.entities.Like.create({
+        user_id: user.id,
+        content_id: reel.id,
+        content_type: 'reel'
+      });
+    } else {
+      const existing = await base44.entities.Like.filter({ user_id: user.id, content_id: reel.id, content_type: 'reel' });
+      if (existing[0]) await base44.entities.Like.delete(existing[0].id);
+    }
   };
 
   const handleShare = () => {
