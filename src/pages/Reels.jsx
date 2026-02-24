@@ -8,6 +8,7 @@ import { Loader2 } from 'lucide-react';
 export default function Reels() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const containerRef = useRef(null);
+  const itemRefs = useRef([]);
   const queryClient = useQueryClient();
 
   const { data: reels, isLoading } = useQuery({
@@ -18,10 +19,7 @@ export default function Reels() {
         '-created_date',
         50
       );
-      
-      // Sort by positivity - promote positive content, demote fear-based
       return allReels.sort((a, b) => {
-        // Combine positivity score with engagement for ranking
         const scoreA = (a.positivity_score || 0.5) * 0.7 + (a.engagement_score || 0) * 0.3;
         const scoreB = (b.positivity_score || 0.5) * 0.7 + (b.engagement_score || 0) * 0.3;
         return scoreB - scoreA;
@@ -29,22 +27,24 @@ export default function Reels() {
     }
   });
 
+  // Use IntersectionObserver to detect which reel is fully visible
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    if (!reels?.length) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const idx = parseInt(entry.target.dataset.index, 10);
+            setCurrentIndex(idx);
+          }
+        });
+      },
+      { threshold: 0.6 }
+    );
 
-    const handleScroll = () => {
-      const scrollTop = container.scrollTop;
-      const itemHeight = container.clientHeight;
-      const newIndex = Math.round(scrollTop / itemHeight);
-      if (newIndex !== currentIndex) {
-        setCurrentIndex(newIndex);
-      }
-    };
-
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, [currentIndex]);
+    itemRefs.current.forEach((el) => { if (el) observer.observe(el); });
+    return () => observer.disconnect();
+  }, [reels]);
 
 
   if (isLoading) {
