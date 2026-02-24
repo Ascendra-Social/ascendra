@@ -53,6 +53,25 @@ export default function CommunityModerationSettings({ community }) {
 
   return (
     <div className="space-y-6">
+      {/* Community Guidelines */}
+      <Card className="rounded-2xl border-slate-100">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-cyan-500" />
+            Community Guidelines
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-xs text-slate-500 mb-2">Write detailed guidelines shown to all members when they join or post.</p>
+          <Textarea
+            placeholder="e.g. Be respectful. No spam. Stay on topic..."
+            value={guidelines}
+            onChange={(e) => setGuidelines(e.target.value)}
+            className="rounded-xl resize-none min-h-[120px]"
+          />
+        </CardContent>
+      </Card>
+
       {/* Community Rules */}
       <Card className="rounded-2xl border-slate-100">
         <CardHeader>
