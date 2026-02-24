@@ -292,6 +292,17 @@ export default function ReelCard({ reel, isActive }) {
         >
           <Bookmark className={`w-7 h-7 ${isSaved ? 'text-amber-400 fill-amber-400' : 'text-white'}`} />
         </Button>
+
+        {/* Tip */}
+        {user && user.id !== reel.author_id && (
+          <div onClick={e => e.stopPropagation()}>
+            <TipButton
+              post={reel}
+              currentUserId={user?.id}
+              className="rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 w-12 h-12 flex items-center justify-center text-amber-400"
+            />
+          </div>
+        )}
       </div>
 
       {/* Bottom info */}
