@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Lightbulb, Loader2, Coins } from 'lucide-react';
+import { Lightbulb, Bug, Loader2, Coins, Info } from 'lucide-react';
 import { toast } from 'sonner';
 
 const categories = [
@@ -20,51 +20,57 @@ const categories = [
   { value: 'other', label: 'Other' }
 ];
 
-export default function CreateFeatureRequestModal({ isOpen, onClose, user }) {
+export default function CreateFeatureRequestModal({ isOpen, onClose, user, defaultType = 'feature' }) {
+  const isBug = defaultType === 'bug';
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'feature',
+    steps_to_reproduce: '',
+    expected_behavior: '',
+    actual_behavior: '',
+    category: isBug ? 'bug_fix' : 'feature',
+    priority: 'medium',
     initial_pledge: ''
   });
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      const request = await base44.entities.FeatureRequest.create({
+      const payload = {
         title: formData.title,
         description: formData.description,
         category: formData.category,
+        priority: formData.priority,
+        request_type: defaultType,
         author_id: user.id,
         author_name: user.full_name
-      });
+      };
+      if (isBug) {
+        payload.steps_to_reproduce = formData.steps_to_reproduce;
+        payload.expected_behavior = formData.expected_behavior;
+        payload.actual_behavior = formData.actual_behavior;
+      }
 
-      // If user pledged tokens
+      const request = await base44.entities.FeatureRequest.create(payload);
+
       if (formData.initial_pledge && parseFloat(formData.initial_pledge) > 0) {
         const pledgeAmount = parseFloat(formData.initial_pledge);
-        
-        // Create pledge
         await base44.entities.FeatureRequestPledge.create({
           request_id: request.id,
           user_id: user.id,
           user_name: user.full_name,
           amount_asc: pledgeAmount
         });
-
-        // Update request total
         await base44.entities.FeatureRequest.update(request.id, {
           total_pledged_asc: pledgeAmount,
+          upvotes_count: 1,
           votes_count: 1
         });
-
-        // Deduct from wallet
         const wallets = await base44.entities.TokenWallet.filter({ user_id: user.id });
         if (wallets[0]) {
           await base44.entities.TokenWallet.update(wallets[0].id, {
             balance: (wallets[0].balance || 0) - pledgeAmount
           });
-
-          // Record transaction
           await base44.entities.TokenTransaction.create({
             user_id: user.id,
             type: 'spending',
@@ -73,17 +79,15 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user }) {
           });
         }
       }
-
       return request;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['feature-requests'] });
-      toast.success('Feature request created!');
+      toast.success(isBug ? 'Bug report submitted!' : 'Feature request created!');
       onClose();
-      setFormData({ title: '', description: '', category: 'feature', initial_pledge: '' });
     },
     onError: () => {
-      toast.error('Failed to create request');
+      toast.error('Failed to submit. Try again.');
     }
   });
 
@@ -98,52 +102,101 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg rounded-3xl">
+      <DialogContent className="sm:max-w-lg rounded-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Lightbulb className="w-5 h-5 text-cyan-500" />
-            Suggest a Feature
+            {isBug ? (
+              <><Bug className="w-5 h-5 text-red-500" /> Report a Bug</>
+            ) : (
+              <><Lightbulb className="w-5 h-5 text-cyan-500" /> Suggest a Feature</>
+            )}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label>Title</Label>
+            <Label>Title *</Label>
             <Input
               value={formData.title}
               onChange={(e) => setFormData({...formData, title: e.target.value})}
-              placeholder="Brief title for your suggestion"
+              placeholder={isBug ? "Brief summary of the bug" : "Brief title for your suggestion"}
               required
             />
           </div>
 
           <div>
-            <Label>Description</Label>
+            <Label>{isBug ? 'What happened?' : 'Description'} *</Label>
             <Textarea
               value={formData.description}
               onChange={(e) => setFormData({...formData, description: e.target.value})}
-              placeholder="Describe your suggestion in detail..."
-              rows={5}
+              placeholder={isBug ? "Describe the bug in detail..." : "Describe your suggestion in detail..."}
+              rows={3}
               required
             />
           </div>
 
-          <div>
-            <Label>Category</Label>
-            <Select value={formData.category} onValueChange={(val) => setFormData({...formData, category: val})}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map(cat => (
-                  <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {isBug && (
+            <>
+              <div>
+                <Label>Steps to Reproduce</Label>
+                <Textarea
+                  value={formData.steps_to_reproduce}
+                  onChange={(e) => setFormData({...formData, steps_to_reproduce: e.target.value})}
+                  placeholder={"1. Go to...\n2. Click on...\n3. See error"}
+                  rows={3}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Expected Behavior</Label>
+                  <Textarea
+                    value={formData.expected_behavior}
+                    onChange={(e) => setFormData({...formData, expected_behavior: e.target.value})}
+                    placeholder="What should happen?"
+                    rows={2}
+                  />
+                </div>
+                <div>
+                  <Label>Actual Behavior</Label>
+                  <Textarea
+                    value={formData.actual_behavior}
+                    onChange={(e) => setFormData({...formData, actual_behavior: e.target.value})}
+                    placeholder="What actually happens?"
+                    rows={2}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Category</Label>
+              <Select value={formData.category} onValueChange={(val) => setFormData({...formData, category: val})}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {categories.map(cat => (
+                    <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Priority</Label>
+              <Select value={formData.priority} onValueChange={(val) => setFormData({...formData, priority: val})}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="critical">Critical</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div>
-            <Label>Initial Pledge (Optional)</Label>
+            <Label>Pledge $ASC to Escrow (Optional)</Label>
             <div className="relative">
               <Input
                 type="number"
@@ -153,25 +206,27 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user }) {
                 placeholder="0"
                 className="pl-10"
               />
-              <Coins className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Coins className="w-4 h-4 text-amber-400 absolute left-3 top-1/2 -translate-y-1/2" />
             </div>
-            <p className="text-xs text-slate-500 mt-1">Pledge $ASC tokens to support this request</p>
+            <div className="flex items-start gap-1.5 mt-1.5 text-xs text-slate-400">
+              <Info className="w-3 h-3 mt-0.5 shrink-0 text-cyan-500" />
+              <span>Tokens are held in escrow and paid out to the developer who completes this request.</span>
+            </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button 
+          <div className="flex justify-end gap-3 pt-2">
+            <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
+            <Button
               type="submit"
               disabled={createMutation.isPending}
-              className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white"
+              className={isBug
+                ? "bg-gradient-to-r from-red-500 to-orange-500 text-white"
+                : "bg-gradient-to-r from-cyan-500 to-purple-500 text-white"
+              }
             >
               {createMutation.isPending ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                'Submit Request'
-              )}
+              ) : isBug ? 'Submit Bug Report' : 'Submit Request'}
             </Button>
           </div>
         </form>
