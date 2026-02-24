@@ -58,6 +58,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Wallet', icon: Wallet, page: 'Wallet' },
     { name: 'Smart Contracts', icon: TrendingUp, page: 'SmartContracts' },
     { name: 'Creator Dashboard', icon: TrendingUp, page: 'CreatorDashboard' },
+    { name: 'Dev Bounty Board', icon: Bug, page: 'FeatureRequests' },
   ];
 
   const businessNavItems = user ? [
