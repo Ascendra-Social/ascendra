@@ -181,5 +181,18 @@ export default function CreateModal({ isOpen, onClose, user }) {
         </div>
       )}
     </AnimatePresence>
+
+    {showListingModal && (
+      <CreateListingModal
+        isOpen={showListingModal}
+        onClose={() => setShowListingModal(false)}
+        user={user}
+        onCreated={() => {
+          setShowListingModal(false);
+          onClose();
+          navigate(createPageUrl('Marketplace'));
+        }}
+      />
+    )}
   );
 }
