@@ -224,6 +224,9 @@ export default function Home() {
         </TabsList>
       </Tabs>
 
+      {/* Trending Reels Strip */}
+      {(activeTab === 'foryou' || activeTab === 'trending') && <TrendingReelsStrip />}
+
       {/* Posts */}
       <div className="space-y-6">
         {isLoading ? (
