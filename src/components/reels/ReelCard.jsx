@@ -399,7 +399,8 @@ export default function ReelCard({ reel, isActive }) {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25 }}
-            className="absolute inset-x-0 bottom-0 h-2/3 bg-slate-900/95 backdrop-blur-md rounded-t-3xl z-50 flex flex-col"
+            className="absolute inset-x-0 bottom-0 bg-slate-900/95 backdrop-blur-md rounded-t-3xl z-50 flex flex-col"
+            style={{ height: '70%', paddingBottom: 'env(safe-area-inset-bottom)' }}
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-700">
