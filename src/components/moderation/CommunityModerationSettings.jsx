@@ -31,6 +31,7 @@ export default function CommunityModerationSettings({ community }) {
     mutationFn: async () => {
       await base44.entities.Community.update(community.id, {
         rules,
+        guidelines,
         ...settings
       });
     },
