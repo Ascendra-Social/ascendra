@@ -61,11 +61,14 @@ export default function CommunityDetail() {
 
   const { data: posts, isLoading: postsLoading } = useQuery({
     queryKey: ['community-posts', communityId],
-    queryFn: () => base44.entities.Post.filter(
-      { community_id: communityId },
-      '-created_date',
-      50
-    ),
+    queryFn: async () => {
+      const allPosts = await base44.entities.Post.filter({ community_id: communityId }, '-created_date', 50);
+      // Moderators/owners see all; regular members only see approved posts
+      if (isOwner || members?.some(m => m.user_id === user?.id && ['moderator', 'admin'].includes(m.role))) {
+        return allPosts;
+      }
+      return allPosts.filter(p => !p.approval_status || p.approval_status === 'approved');
+    },
     enabled: !!communityId
   });
 
