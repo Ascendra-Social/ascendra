@@ -99,7 +99,8 @@ export default function ReelCard({ reel, isActive }) {
     }
   };
 
-  const handleShare = () => {
+  const handleShare = (e) => {
+    e.stopPropagation();
     setShowShare(true);
   };
 
