@@ -188,7 +188,7 @@ export default function Layout({ children, currentPageName }) {
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
-          <div className="absolute right-0 top-16 w-64 h-[calc(100vh-4rem)] glass-effect border-l border-cyan-500/20 p-4" onClick={e => e.stopPropagation()}>
+          <div className="absolute right-0 top-16 w-64 h-[calc(100vh-4rem)] glass-effect border-l border-cyan-500/20 p-4 overflow-y-auto" onClick={e => e.stopPropagation()}>
               <nav className="space-y-1">
                 {[...navItems, ...businessNavItems, ...adminNavItems].map((item) => (
                   <Link
