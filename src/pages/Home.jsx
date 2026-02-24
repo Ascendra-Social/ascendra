@@ -9,6 +9,7 @@ import PostCard from '@/components/feed/PostCard';
 import CreatePostModal from '@/components/feed/CreatePostModal';
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
 import AdCard from '@/components/ads/AdCard';
+import TrendingReelsStrip from '@/components/feed/TrendingReelsStrip';
 import { motion } from 'framer-motion';
 
 export default function Home() {
