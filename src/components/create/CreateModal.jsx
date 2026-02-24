@@ -70,8 +70,7 @@ export default function CreateModal({ isOpen, onClose, user }) {
         handleClose();
         if (mode === 'reel') navigate(createPageUrl('Reels'));
       } else if (mode === 'listing') {
-        handleClose();
-        navigate(createPageUrl('Marketplace'));
+        // handled by CreateListingModal directly
       }
     } finally {
       setSubmitting(false);
