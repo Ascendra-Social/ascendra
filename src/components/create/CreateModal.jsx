@@ -109,7 +109,13 @@ export default function CreateModal({ isOpen, onClose, user }) {
                 {MODES.map(m => (
                   <button
                     key={m.id}
-                    onClick={() => setMode(m.id)}
+                    onClick={() => {
+                      if (m.id === 'listing') {
+                        setShowListingModal(true);
+                      } else {
+                        setMode(m.id);
+                      }
+                    }}
                     className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-slate-800 hover:bg-slate-700 transition-colors"
                   >
                     <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${m.color} flex items-center justify-center`}>
