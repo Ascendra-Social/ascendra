@@ -20,6 +20,18 @@ export default function Messages() {
   const messagesEndRef = useRef(null);
   const queryClient = useQueryClient();
 
+  // Pre-fill message if navigated here from a reel share
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const shareReel = params.get('shareReel');
+    const shareTitle = params.get('shareTitle');
+    if (shareReel) {
+      const link = `${window.location.origin}${createPageUrl('Reels')}`;
+      setNewMessage(`Check out this reel: ${shareTitle ? decodeURIComponent(shareTitle) + ' - ' : ''}${link}`);
+      setShowNewConversationModal(true);
+    }
+  }, []);
+
   useEffect(() => {
     const loadUser = async () => {
       try {

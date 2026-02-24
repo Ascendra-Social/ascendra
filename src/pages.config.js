@@ -58,6 +58,7 @@ import CreatePost from './pages/CreatePost';
 import CreatorDashboard from './pages/CreatorDashboard';
 import Explore from './pages/Explore';
 import FeatureRequests from './pages/FeatureRequests';
+import FollowingFeed from './pages/FollowingFeed';
 import Home from './pages/Home';
 import ListingDetail from './pages/ListingDetail';
 import Marketplace from './pages/Marketplace';
@@ -68,7 +69,6 @@ import Reels from './pages/Reels';
 import SmartContracts from './pages/SmartContracts';
 import VerificationReview from './pages/VerificationReview';
 import Wallet from './pages/Wallet';
-import FollowingFeed from './pages/FollowingFeed';
 import __Layout from './Layout.jsx';
 
 
@@ -84,6 +84,7 @@ export const PAGES = {
     "CreatorDashboard": CreatorDashboard,
     "Explore": Explore,
     "FeatureRequests": FeatureRequests,
+    "FollowingFeed": FollowingFeed,
     "Home": Home,
     "ListingDetail": ListingDetail,
     "Marketplace": Marketplace,
@@ -94,7 +95,6 @@ export const PAGES = {
     "SmartContracts": SmartContracts,
     "VerificationReview": VerificationReview,
     "Wallet": Wallet,
-    "FollowingFeed": FollowingFeed,
 }
 
 export const pagesConfig = {
