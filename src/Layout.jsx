@@ -4,7 +4,7 @@ import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
 import { 
   Home, Search, PlusSquare, ShoppingBag, MessageCircle, 
-  User, Compass, Play, Wallet, Bell, Menu, X, Users, TrendingUp, Shield, Building2
+  User, Compass, Play, Wallet, Bell, Menu, X, Users, TrendingUp, Shield, Building2, Bug
 } from 'lucide-react';
 import CreateModal from '@/components/create/CreateModal';
 import AIFloatingButton from '@/components/ai/AIFloatingButton';
