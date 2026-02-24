@@ -78,6 +78,7 @@ export default function CreateModal({ isOpen, onClose, user }) {
   };
 
   return (
+    <>
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-end lg:items-center justify-center">
