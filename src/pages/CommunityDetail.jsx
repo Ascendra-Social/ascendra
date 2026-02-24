@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import ModerationDashboard from '@/components/moderation/ModerationDashboard';
 import CommunityModerationSettings from '@/components/moderation/CommunityModerationSettings';
+import PostApprovalQueue from '@/components/moderation/PostApprovalQueue';
+import MemberManager from '@/components/moderation/MemberManager';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
