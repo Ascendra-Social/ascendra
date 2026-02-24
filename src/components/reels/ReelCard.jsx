@@ -481,19 +481,20 @@ export default function ReelCard({ reel, isActive }) {
               )}
             </div>
 
-            <div className="px-4 py-3 border-t border-slate-700 flex gap-2">
+            <div className="px-4 py-3 border-t border-slate-700 flex gap-2 bg-slate-900">
               <input
                 value={commentText}
                 onChange={e => setCommentText(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && submitComment()}
                 placeholder="Add a comment..."
-                className="flex-1 bg-slate-800 rounded-full px-4 py-2 text-sm text-white placeholder-slate-400 outline-none"
+                className="flex-1 bg-slate-800 border border-slate-700 rounded-full px-4 py-2.5 text-sm text-white placeholder-slate-400 outline-none focus:border-cyan-500"
+                autoComplete="off"
               />
               <Button
                 size="icon"
                 onClick={submitComment}
                 disabled={!commentText.trim()}
-                className="rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 shrink-0"
+                className="rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 shrink-0 w-10 h-10"
               >
                 <Send className="w-4 h-4" />
               </Button>
