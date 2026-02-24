@@ -21,6 +21,7 @@ export default function CreateModal({ isOpen, onClose, user }) {
   const [mediaPreview, setMediaPreview] = useState(null);
   const [mediaType, setMediaType] = useState('none');
   const [submitting, setSubmitting] = useState(false);
+  const [showListingModal, setShowListingModal] = useState(false);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
