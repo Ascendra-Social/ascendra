@@ -42,26 +42,67 @@ export default function Home() {
   }, []);
 
   const { data: posts, isLoading } = useQuery({
-    queryKey: ['posts', activeTab],
+    queryKey: ['posts', activeTab, user?.id],
     queryFn: async () => {
-      const allPosts = await base44.entities.Post.list('-created_date', 50);
-      
-      // Sort by positivity, engagement, and vote score for "For You"
-      if (activeTab === 'foryou') {
+      const allPosts = await base44.entities.Post.filter({ is_reel: false }, '-created_date', 100);
+
+      if (activeTab === 'trending') {
+        // Trending: high engagement in recent time, weighted by recency
+        const now = Date.now();
+        return allPosts
+          .map(p => {
+            const ageHours = (now - new Date(p.created_date).getTime()) / 3600000;
+            const decayFactor = Math.exp(-ageHours / 48); // decay over 48h
+            const engScore = ((p.likes_count || 0) * 2 + (p.comments_count || 0) * 3 + (p.shares_count || 0) * 4 + (p.vote_score || 0));
+            return { ...p, _trendScore: engScore * decayFactor };
+          })
+          .sort((a, b) => b._trendScore - a._trendScore)
+          .slice(0, 30);
+      }
+
+      if (activeTab === 'following' && user) {
+        const follows = await base44.entities.Follow.filter({ follower_id: user.id });
+        const followedIds = new Set(follows.map(f => f.following_id));
+        if (followedIds.size === 0) return [];
+        return allPosts
+          .filter(p => followedIds.has(p.author_id))
+          .sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+      }
+
+      // "For You" - personalized
+      if (activeTab === 'foryou' && user) {
+        // Get followed user IDs for a boost
+        const [follows, likes, comments] = await Promise.all([
+          base44.entities.Follow.filter({ follower_id: user.id }),
+          base44.entities.Like.filter({ user_id: user.id }, '-created_date', 50),
+          base44.entities.Comment.filter({ author_id: user.id }, '-created_date', 50)
+        ]);
+        const followedIds = new Set(follows.map(f => f.following_id));
+        // Build interest signal from liked/commented posts' authors
+        const interactedAuthorIds = new Set([
+          ...likes.map(l => l.post_id),
+          ...comments.map(c => c.post_id)
+        ]);
+
         return allPosts.sort((a, b) => {
-          const voteScoreA = (a.vote_score || 0) / 10; // Normalize vote score
+          const followBoostA = followedIds.has(a.author_id) ? 0.3 : 0;
+          const followBoostB = followedIds.has(b.author_id) ? 0.3 : 0;
+          const interactionBoostA = interactedAuthorIds.has(a.id) ? 0.2 : 0;
+          const interactionBoostB = interactedAuthorIds.has(b.id) ? 0.2 : 0;
+          const voteScoreA = (a.vote_score || 0) / 10;
           const voteScoreB = (b.vote_score || 0) / 10;
-          
-          const scoreA = (a.positivity_score || 0.5) * 0.4 + 
-                        (a.engagement_score || 0) * 0.3 + 
-                        voteScoreA * 0.3;
-          const scoreB = (b.positivity_score || 0.5) * 0.4 + 
-                        (b.engagement_score || 0) * 0.3 + 
-                        voteScoreB * 0.3;
+          const scoreA = (a.positivity_score || 0.5) * 0.2 + (a.engagement_score || 0) * 0.2 + voteScoreA * 0.1 + followBoostA + interactionBoostA;
+          const scoreB = (b.positivity_score || 0.5) * 0.2 + (b.engagement_score || 0) * 0.2 + voteScoreB * 0.1 + followBoostB + interactionBoostB;
           return scoreB - scoreA;
         });
       }
-      return allPosts;
+
+      // Default "For You" without login
+      return allPosts.sort((a, b) => {
+        const scoreA = (a.positivity_score || 0.5) * 0.4 + (a.engagement_score || 0) * 0.3 + ((a.vote_score || 0) / 10) * 0.3;
+        const scoreB = (b.positivity_score || 0.5) * 0.4 + (b.engagement_score || 0) * 0.3 + ((b.vote_score || 0) / 10) * 0.3;
+        return scoreB - scoreA;
+      });
     }
   });
 
