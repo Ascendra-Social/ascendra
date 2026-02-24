@@ -95,6 +95,12 @@ export default function CreatePostModal({ isOpen, onClose, user, communities = [
 
       if (communityId && communityId !== '') {
         postData.community_id = communityId;
+        // Check if community requires post approval
+        const communityList = await base44.entities.Community.filter({ id: communityId });
+        const selectedCommunity = communityList[0];
+        if (selectedCommunity?.require_post_approval) {
+          postData.approval_status = 'pending';
+        }
       }
 
       const post = await base44.entities.Post.create(postData);
