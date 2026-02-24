@@ -78,6 +78,8 @@ export default function Reels() {
         {reels.map((reel, index) => (
           <div 
             key={reel.id}
+            ref={(el) => (itemRefs.current[index] = el)}
+            data-index={index}
             className="h-screen w-full snap-start"
             style={{ scrollSnapAlign: 'start' }}
           >
