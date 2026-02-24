@@ -279,7 +279,7 @@ export default function ReelCard({ reel, isActive }) {
           <Button
             variant="ghost"
             size="icon"
-            onClick={handleShare}
+            onClick={(e) => { e.stopPropagation(); handleShare(e); }}
             className="rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 w-12 h-12"
           >
             <Share2 className="w-7 h-7 text-white" />
@@ -290,7 +290,7 @@ export default function ReelCard({ reel, isActive }) {
         <Button
           variant="ghost"
           size="icon"
-          onClick={handleSave}
+          onClick={(e) => { e.stopPropagation(); handleSave(); }}
           className="rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 w-12 h-12"
         >
           <Bookmark className={`w-7 h-7 ${isSaved ? 'text-amber-400 fill-amber-400' : 'text-white'}`} />
