@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import TipButton from '@/components/creator/TipButton';
 
 export default function ReelCard({ reel, isActive }) {
+  const navigate = useNavigate();
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
