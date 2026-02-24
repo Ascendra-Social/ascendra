@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 export default function CommunityModerationSettings({ community }) {
   const [rules, setRules] = useState(community.rules || []);
   const [newRule, setNewRule] = useState('');
+  const [guidelines, setGuidelines] = useState(community.guidelines || '');
   const [settings, setSettings] = useState({
     moderation_enabled: community.moderation_enabled ?? true,
     auto_mod_hate_speech: community.auto_mod_hate_speech ?? true,
