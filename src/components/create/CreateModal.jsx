@@ -6,6 +6,7 @@ import { X, Image, Video, Upload, FileText, ShoppingBag, Play, Loader2, Sparkles
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { motion, AnimatePresence } from 'framer-motion';
+import CreateListingModal from '@/components/marketplace/CreateListingModal';
 
 const MODES = [
   { id: 'post', label: 'Post', icon: FileText, color: 'from-violet-500 to-pink-500', desc: 'Share to your feed' },
