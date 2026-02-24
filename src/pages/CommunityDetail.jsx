@@ -282,17 +282,31 @@ export default function CommunityDetail() {
             )}
           </>
         ) : activeTab === 'moderation' && canModerate ? (
-          <Tabs defaultValue="dashboard">
-            <TabsList className="bg-slate-100 p-1 rounded-xl mb-6">
-              <TabsTrigger value="dashboard" className="rounded-lg data-[state=active]:bg-white">
-                Dashboard
+          <Tabs defaultValue="approval">
+            <TabsList className="bg-slate-800/50 p-1 rounded-xl mb-6 border border-cyan-500/20 flex flex-wrap gap-1">
+              <TabsTrigger value="approval" className="rounded-lg data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400 text-slate-400 text-xs">
+                Post Approval
               </TabsTrigger>
-              <TabsTrigger value="settings" className="rounded-lg data-[state=active]:bg-white">
+              <TabsTrigger value="members" className="rounded-lg data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400 text-slate-400 text-xs">
+                Members
+              </TabsTrigger>
+              <TabsTrigger value="reports" className="rounded-lg data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400 text-slate-400 text-xs">
+                Reports
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="rounded-lg data-[state=active]:bg-slate-700 data-[state=active]:text-cyan-400 text-slate-400 text-xs">
                 Settings
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="dashboard">
+            <TabsContent value="approval">
+              <PostApprovalQueue community={community} user={user} />
+            </TabsContent>
+
+            <TabsContent value="members">
+              <MemberManager community={community} user={user} />
+            </TabsContent>
+
+            <TabsContent value="reports">
               <ModerationDashboard community={community} user={user} />
             </TabsContent>
 
