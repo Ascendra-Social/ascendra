@@ -58,7 +58,9 @@ export default function ReelCard({ reel, isActive }) {
     }
   }, [isMuted]);
 
-  const handleVideoClick = () => {
+  const handleVideoClick = (e) => {
+    // Don't toggle mute if a panel is open
+    if (showShare || showComments) return;
     const now = Date.now();
     const delta = now - lastTap.current;
     lastTap.current = now;
