@@ -119,9 +119,8 @@ export default function ReelCard({ reel, isActive }) {
   };
 
   const handleShareInMessages = () => {
-    const reelLink = `${window.location.origin}${createPageUrl('Reels')}`;
-    window.location.href = createPageUrl(`Messages?share=${reel.id}`);
     setShowShare(false);
+    navigate(createPageUrl(`Messages?shareReel=${reel.id}&shareTitle=${encodeURIComponent(reel.author_name + ': ' + (reel.content || 'Reel'))}`));
   };
 
   const handleCopyLink = () => {
