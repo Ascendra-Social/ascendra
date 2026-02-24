@@ -105,17 +105,19 @@ export default function ReelCard({ reel, isActive }) {
   };
 
   const handleRepost = async () => {
-    if (!user) return;
-    await base44.entities.Post.create({
-      content: `Reposted: ${reel.content || ''}`,
-      media_url: reel.media_url || '',
-      media_type: reel.media_type || 'none',
+    if (!user) { base44.auth.redirectToLogin(); return; }
+    const postData = {
+      content: reel.content || '',
       is_reel: true,
       author_id: user.id,
       author_name: user.full_name || 'User',
-      author_avatar: user.avatar || ''
-    });
+      author_avatar: user.avatar || '',
+      media_type: reel.media_type || 'none'
+    };
+    if (reel.media_url) postData.media_url = reel.media_url;
+    await base44.entities.Post.create(postData);
     setShowShare(false);
+    alert('Reposted to your reels!');
   };
 
   const handleShareInMessages = () => {
