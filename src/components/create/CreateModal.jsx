@@ -194,5 +194,6 @@ export default function CreateModal({ isOpen, onClose, user }) {
         }}
       />
     )}
+  </>
   );
 }
