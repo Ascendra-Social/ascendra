@@ -249,7 +249,7 @@ export default function ReelCard({ reel, isActive }) {
           <Button
             variant="ghost"
             size="icon"
-            onClick={handleLike}
+            onClick={(e) => { e.stopPropagation(); handleLike(); }}
             className="rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 w-12 h-12"
           >
             <Heart className={`w-7 h-7 ${isLiked ? 'text-rose-500 fill-rose-500' : 'text-white'}`} />
@@ -262,7 +262,7 @@ export default function ReelCard({ reel, isActive }) {
           <Button
             variant="ghost"
             size="icon"
-            onClick={openComments}
+            onClick={(e) => { e.stopPropagation(); openComments(); }}
             className="rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 w-12 h-12"
           >
             <MessageCircle className="w-7 h-7 text-white" />
