@@ -88,13 +88,9 @@ export default function ReelCard({ reel, isActive }) {
     const newSaved = !isSaved;
     setIsSaved(newSaved);
     if (newSaved) {
-      await base44.entities.Like.create({
-        user_id: user.id,
-        content_id: reel.id,
-        content_type: 'reel'
-      });
+      await base44.entities.Like.create({ user_id: user.id, post_id: reel.id });
     } else {
-      const existing = await base44.entities.Like.filter({ user_id: user.id, content_id: reel.id, content_type: 'reel' });
+      const existing = await base44.entities.Like.filter({ user_id: user.id, post_id: reel.id });
       if (existing[0]) await base44.entities.Like.delete(existing[0].id);
     }
   };
