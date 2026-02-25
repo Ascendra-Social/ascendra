@@ -28,11 +28,27 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
     steps_to_reproduce: '',
     expected_behavior: '',
     actual_behavior: '',
-    category: isBug ? 'bug_fix' : 'feature',
+    category: defaultType === 'bug' ? 'bug_fix' : 'feature',
     priority: 'medium',
     initial_pledge: ''
   });
   const queryClient = useQueryClient();
+
+  // Reset form when modal opens with a different type
+  React.useEffect(() => {
+    if (isOpen) {
+      setFormData({
+        title: '',
+        description: '',
+        steps_to_reproduce: '',
+        expected_behavior: '',
+        actual_behavior: '',
+        category: defaultType === 'bug' ? 'bug_fix' : 'feature',
+        priority: 'medium',
+        initial_pledge: ''
+      });
+    }
+  }, [isOpen, defaultType]);
 
   const createMutation = useMutation({
     mutationFn: async () => {
