@@ -186,14 +186,12 @@ export default function FeatureRequests() {
         )}
       </div>
 
-      {showCreateModal && (
-        <CreateFeatureRequestModal
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-          user={user}
-          defaultType={createType}
-        />
-      )}
+      <CreateFeatureRequestModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        user={user}
+        defaultType={createType}
+      />
     </div>
   );
 }
