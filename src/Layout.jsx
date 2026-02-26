@@ -95,7 +95,7 @@ export default function Layout({ children, currentPageName }) {
       `}</style>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-72 flex-col glass-effect border-r border-cyan-500/20 z-50" style={{minHeight: 0}}>
+      <aside className="hidden lg:flex fixed left-0 top-0 w-72 glass-effect border-r border-cyan-500/20 z-50 flex-col" style={{height: '100vh', overflow: 'hidden'}}>
         <div className="p-6 shrink-0">
           <Link to={createPageUrl('Home')} className="flex items-center gap-3">
             <img 
