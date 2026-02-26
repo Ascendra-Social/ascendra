@@ -236,7 +236,8 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
             <Button
-              type="submit"
+              type="button"
+              onClick={handleSubmit}
               disabled={createMutation.isPending}
               className={isBug
                 ? "bg-gradient-to-r from-red-500 to-orange-500 text-white"
