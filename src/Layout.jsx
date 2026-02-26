@@ -38,13 +38,13 @@ export default function Layout({ children, currentPageName }) {
 
     // Update last active periodically
     const interval = setInterval(() => {
-      if (user) {
-        base44.auth.updateMe({ last_active: new Date().toISOString() });
-      }
-    }, 60000); // Every minute
+      base44.auth.me().then(u => {
+        if (u) base44.auth.updateMe({ last_active: new Date().toISOString() });
+      }).catch(() => {});
+    }, 60000);
 
     return () => clearInterval(interval);
-  }, [user]);
+  }, []);
 
   const navItems = [
     { name: 'Home', icon: Home, page: 'Home' },
