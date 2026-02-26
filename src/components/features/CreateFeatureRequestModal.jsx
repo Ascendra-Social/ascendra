@@ -38,6 +38,7 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
   // Reset form when modal opens with a different type
   React.useEffect(() => {
     if (isOpen) {
+      setCurrentType(defaultType);
       setFormData({
         title: '',
         description: '',
