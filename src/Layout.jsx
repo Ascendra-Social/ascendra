@@ -95,8 +95,8 @@ export default function Layout({ children, currentPageName }) {
       `}</style>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-72 flex-col glass-effect border-r border-cyan-500/20 z-50">
-        <div className="p-6">
+      <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-72 flex-col glass-effect border-r border-cyan-500/20 z-50" style={{minHeight: 0}}>
+        <div className="p-6 shrink-0">
           <Link to={createPageUrl('Home')} className="flex items-center gap-3">
             <img 
               src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/693b77daae7d72630553bc76/b38dd71b7_ChatGPTImageJan26202603_42_22PM.png" 
@@ -106,7 +106,7 @@ export default function Layout({ children, currentPageName }) {
           </Link>
         </div>
 
-        <nav className="flex-1 min-h-0 px-4 space-y-1 overflow-y-auto pb-4">
+        <nav className="flex-1 min-h-0 px-4 space-y-1 overflow-y-auto pb-2">
           {[...navItems, ...businessNavItems, ...adminNavItems].map((item) => (
             <Link
               key={item.page}
