@@ -53,26 +53,27 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
   }, [isOpen, defaultType]);
 
   const createMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async ({ data, type }) => {
+      const bugMode = type === 'bug';
       const payload = {
-        title: formData.title,
-        description: formData.description,
-        category: formData.category,
-        priority: formData.priority,
-        request_type: currentType,
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        priority: data.priority,
+        request_type: type,
         author_id: user.id,
         author_name: user.full_name
       };
-      if (isBug) {
-        payload.steps_to_reproduce = formData.steps_to_reproduce;
-        payload.expected_behavior = formData.expected_behavior;
-        payload.actual_behavior = formData.actual_behavior;
+      if (bugMode) {
+        payload.steps_to_reproduce = data.steps_to_reproduce;
+        payload.expected_behavior = data.expected_behavior;
+        payload.actual_behavior = data.actual_behavior;
       }
 
       const request = await base44.entities.FeatureRequest.create(payload);
 
-      if (formData.initial_pledge && parseFloat(formData.initial_pledge) > 0) {
-        const pledgeAmount = parseFloat(formData.initial_pledge);
+      if (data.initial_pledge && parseFloat(data.initial_pledge) > 0) {
+        const pledgeAmount = parseFloat(data.initial_pledge);
         await base44.entities.FeatureRequestPledge.create({
           request_id: request.id,
           user_id: user.id,
@@ -93,19 +94,19 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
             user_id: user.id,
             type: 'spending',
             amount: -pledgeAmount,
-            description: `Pledged to: ${formData.title}`
+            description: `Pledged to: ${data.title}`
           });
         }
       }
       return request;
     },
-    onSuccess: () => {
+    onSuccess: (_, { type }) => {
       queryClient.invalidateQueries({ queryKey: ['feature-requests'] });
-      toast.success(isBug ? 'Bug report submitted!' : 'Feature request created!');
+      toast.success(type === 'bug' ? 'Bug report submitted!' : 'Feature request created!');
       onClose();
     },
-    onError: () => {
-      toast.error('Failed to submit. Try again.');
+    onError: (err) => {
+      toast.error('Failed to submit: ' + (err?.message || 'Try again.'));
     }
   });
 
@@ -115,7 +116,7 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
       toast.error('Title and description are required');
       return;
     }
-    createMutation.mutate();
+    createMutation.mutate({ data: formData, type: currentType });
   };
 
   return (
