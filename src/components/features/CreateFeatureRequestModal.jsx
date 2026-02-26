@@ -59,7 +59,7 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
         description: formData.description,
         category: formData.category,
         priority: formData.priority,
-        request_type: defaultType,
+        request_type: currentType,
         author_id: user.id,
         author_name: user.full_name
       };
