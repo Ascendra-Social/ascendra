@@ -21,7 +21,8 @@ const categories = [
 ];
 
 export default function CreateFeatureRequestModal({ isOpen, onClose, user, defaultType = 'feature' }) {
-  const isBug = defaultType === 'bug';
+  const [currentType, setCurrentType] = useState(defaultType);
+  const isBug = currentType === 'bug';
   const [formData, setFormData] = useState({
     title: '',
     description: '',
