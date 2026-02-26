@@ -106,7 +106,7 @@ export default function Layout({ children, currentPageName }) {
           </Link>
         </div>
 
-        <nav className="flex-1 min-h-0 px-4 space-y-1 overflow-y-auto pb-2">
+        <nav className="px-4 space-y-1 pb-2" style={{overflowY: 'auto', flex: '1 1 0', minHeight: 0}}>
           {[...navItems, ...businessNavItems, ...adminNavItems].map((item) => (
             <Link
               key={item.page}
