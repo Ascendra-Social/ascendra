@@ -110,8 +110,7 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
     }
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     if (!formData.title.trim() || !formData.description.trim()) {
       toast.error('Title and description are required');
       return;
