@@ -95,7 +95,7 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
             balance: (wallets[0].balance || 0) - pledgeAmount
           });
           await base44.entities.TokenTransaction.create({
-            user_id: user.id,
+            user_id: currentUser.id,
             type: 'spending',
             amount: -pledgeAmount,
             description: `Pledged to: ${data.title}`
