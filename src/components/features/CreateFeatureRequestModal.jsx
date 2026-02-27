@@ -54,6 +54,10 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
 
   const createMutation = useMutation({
     mutationFn: async ({ data, type }) => {
+      // Always fetch fresh user to ensure correct author_id for RLS
+      const currentUser = await base44.auth.me();
+      if (!currentUser) throw new Error('You must be logged in to submit');
+      
       const bugMode = type === 'bug';
       const payload = {
         title: data.title,
@@ -61,8 +65,8 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
         category: data.category,
         priority: data.priority,
         request_type: type,
-        author_id: user.id,
-        author_name: user.full_name
+        author_id: currentUser.id,
+        author_name: currentUser.full_name
       };
       if (bugMode) {
         payload.steps_to_reproduce = data.steps_to_reproduce;
