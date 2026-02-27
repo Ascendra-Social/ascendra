@@ -20,7 +20,7 @@ const categories = [
   { value: 'other', label: 'Other' }
 ];
 
-export default function CreateFeatureRequestModal({ isOpen, onClose, user, defaultType = 'feature' }) {
+export default function CreateFeatureRequestModal({ isOpen, onClose, defaultType = 'feature' }) {
   const [currentType, setCurrentType] = useState(defaultType);
   const isBug = currentType === 'bug';
   const [formData, setFormData] = useState({
@@ -35,7 +35,6 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
   });
   const queryClient = useQueryClient();
 
-  // Reset form when modal opens with a different type
   React.useEffect(() => {
     if (isOpen) {
       setCurrentType(defaultType);
@@ -54,25 +53,28 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
 
   const createMutation = useMutation({
     mutationFn: async ({ data, type }) => {
-      // Always fetch fresh user to ensure correct author_id for RLS
-      const currentUser = await base44.auth.me();
-      if (!currentUser) throw new Error('You must be logged in to submit');
-      
+      // Always get fresh user from auth to ensure RLS compliance
+      const me = await base44.auth.me();
+      if (!me || !me.id) {
+        base44.auth.redirectToLogin();
+        throw new Error('Not logged in');
+      }
+
       const bugMode = type === 'bug';
       const payload = {
-        title: data.title,
-        description: data.description,
+        title: data.title.trim(),
+        description: data.description.trim(),
         category: data.category,
         priority: data.priority,
         request_type: type,
-        author_id: currentUser.id,
-        author_name: currentUser.full_name || currentUser.email || 'Anonymous'
+        author_id: me.id,
+        author_name: me.full_name || me.email || 'Anonymous'
       };
 
       if (bugMode) {
-        payload.steps_to_reproduce = data.steps_to_reproduce;
-        payload.expected_behavior = data.expected_behavior;
-        payload.actual_behavior = data.actual_behavior;
+        if (data.steps_to_reproduce) payload.steps_to_reproduce = data.steps_to_reproduce;
+        if (data.expected_behavior) payload.expected_behavior = data.expected_behavior;
+        if (data.actual_behavior) payload.actual_behavior = data.actual_behavior;
       }
 
       const request = await base44.entities.FeatureRequest.create(payload);
@@ -81,8 +83,8 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
         const pledgeAmount = parseFloat(data.initial_pledge);
         await base44.entities.FeatureRequestPledge.create({
           request_id: request.id,
-          user_id: currentUser.id,
-          user_name: currentUser.full_name,
+          user_id: me.id,
+          user_name: me.full_name || me.email,
           amount_asc: pledgeAmount
         });
         await base44.entities.FeatureRequest.update(request.id, {
@@ -90,13 +92,13 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
           upvotes_count: 1,
           votes_count: 1
         });
-        const wallets = await base44.entities.TokenWallet.filter({ user_id: currentUser.id });
+        const wallets = await base44.entities.TokenWallet.filter({ user_id: me.id });
         if (wallets[0]) {
           await base44.entities.TokenWallet.update(wallets[0].id, {
             balance: (wallets[0].balance || 0) - pledgeAmount
           });
           await base44.entities.TokenTransaction.create({
-            user_id: currentUser.id,
+            user_id: me.id,
             type: 'spending',
             amount: -pledgeAmount,
             description: `Pledged to: ${data.title}`
@@ -111,13 +113,17 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
       onClose();
     },
     onError: (err) => {
-      toast.error('Failed to submit: ' + (err?.message || 'Try again.'));
+      toast.error('Failed to submit: ' + (err?.message || 'Unknown error. Please try again.'));
     }
   });
 
   const handleSubmit = () => {
-    if (!formData.title.trim() || !formData.description.trim()) {
-      toast.error('Title and description are required');
+    if (!formData.title.trim()) {
+      toast.error('Title is required');
+      return;
+    }
+    if (!formData.description.trim()) {
+      toast.error('Description is required');
       return;
     }
     createMutation.mutate({ data: formData, type: currentType });
@@ -136,14 +142,13 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           <div>
             <Label>Title *</Label>
             <Input
               value={formData.title}
               onChange={(e) => setFormData({...formData, title: e.target.value})}
               placeholder={isBug ? "Brief summary of the bug" : "Brief title for your suggestion"}
-              required
             />
           </div>
 
@@ -154,7 +159,6 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
               onChange={(e) => setFormData({...formData, description: e.target.value})}
               placeholder={isBug ? "Describe the bug in detail..." : "Describe your suggestion in detail..."}
               rows={3}
-              required
             />
           </div>
 
@@ -238,7 +242,9 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
-            <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={onClose} disabled={createMutation.isPending}>
+              Cancel
+            </Button>
             <Button
               type="button"
               onClick={handleSubmit}
@@ -249,11 +255,11 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
               }
             >
               {createMutation.isPending ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Submitting...</>
               ) : isBug ? 'Submit Bug Report' : 'Submit Request'}
             </Button>
           </div>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );
