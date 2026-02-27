@@ -80,8 +80,8 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
         const pledgeAmount = parseFloat(data.initial_pledge);
         await base44.entities.FeatureRequestPledge.create({
           request_id: request.id,
-          user_id: user.id,
-          user_name: user.full_name,
+          user_id: currentUser.id,
+          user_name: currentUser.full_name,
           amount_asc: pledgeAmount
         });
         await base44.entities.FeatureRequest.update(request.id, {
@@ -89,7 +89,7 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
           upvotes_count: 1,
           votes_count: 1
         });
-        const wallets = await base44.entities.TokenWallet.filter({ user_id: user.id });
+        const wallets = await base44.entities.TokenWallet.filter({ user_id: currentUser.id });
         if (wallets[0]) {
           await base44.entities.TokenWallet.update(wallets[0].id, {
             balance: (wallets[0].balance || 0) - pledgeAmount
