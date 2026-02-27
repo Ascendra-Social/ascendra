@@ -66,8 +66,9 @@ export default function CreateFeatureRequestModal({ isOpen, onClose, user, defau
         priority: data.priority,
         request_type: type,
         author_id: currentUser.id,
-        author_name: currentUser.full_name
+        author_name: currentUser.full_name || currentUser.email || 'Anonymous'
       };
+      console.log('Submitting with author_id:', currentUser.id, 'user:', currentUser);
       if (bugMode) {
         payload.steps_to_reproduce = data.steps_to_reproduce;
         payload.expected_behavior = data.expected_behavior;
