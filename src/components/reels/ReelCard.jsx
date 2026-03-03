@@ -241,14 +241,23 @@ export default function ReelCard({ reel, isActive }) {
       <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60 pointer-events-none" />
 
       {/* Top bar */}
-      <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none">
-        <h2 className="text-white font-bold text-lg flex items-center gap-2">
+      <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+        <h2 className="text-white font-bold text-lg flex items-center gap-2 pointer-events-none">
           <Sparkles className="w-5 h-5 text-amber-400" />
           Reels
         </h2>
-        {/* Mute indicator (tap anywhere to toggle) */}
-        <div className="rounded-full bg-white/10 backdrop-blur-sm p-2">
-          {isMuted ? <VolumeX className="w-5 h-5 text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
+        <div className="flex items-center gap-2">
+          {user && user.id === reel.author_id && (
+            <button
+              onClick={(e) => { e.stopPropagation(); handleDelete(); }}
+              className="rounded-full bg-red-500/80 backdrop-blur-sm p-2 hover:bg-red-600/90 transition-colors"
+            >
+              <Trash2 className="w-5 h-5 text-white" />
+            </button>
+          )}
+          <div className="rounded-full bg-white/10 backdrop-blur-sm p-2 pointer-events-none">
+            {isMuted ? <VolumeX className="w-5 h-5 text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
+          </div>
         </div>
       </div>
 
