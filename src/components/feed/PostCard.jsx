@@ -296,10 +296,16 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="rounded-xl">
             {user && post.author_id === user.id && (
-              <DropdownMenuItem onClick={() => setShowBoost(true)}>
-                <TrendingUp className="w-4 h-4 mr-2 text-cyan-500" />
-                Boost Post
-              </DropdownMenuItem>
+              <>
+                <DropdownMenuItem onClick={() => setShowBoost(true)}>
+                  <TrendingUp className="w-4 h-4 mr-2 text-cyan-500" />
+                  Boost Post
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleDelete} className="text-red-500 focus:text-red-500">
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete Post
+                </DropdownMenuItem>
+              </>
             )}
             <DropdownMenuItem onClick={() => setShowAIRepost(true)}>
               <Wand2 className="w-4 h-4 mr-2 text-violet-500" />
