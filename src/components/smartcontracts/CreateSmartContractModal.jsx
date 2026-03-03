@@ -158,6 +158,20 @@ export default function CreateSmartContractModal({ isOpen, onClose, user }) {
               />
             </div>
 
+            <div>
+              <Label className="text-slate-300 flex items-center gap-2">
+                <Link2 className="w-4 h-4 text-cyan-400" />
+                Link to Content (Optional)
+              </Label>
+              <Input
+                placeholder="Paste a Post or Reel ID to tie this contract to specific content"
+                value={linkedContentId}
+                onChange={(e) => setLinkedContentId(e.target.value)}
+                className="bg-slate-900/50 border-cyan-500/20 text-white mt-1"
+              />
+              <p className="text-xs text-slate-500 mt-1">Find the Post/Reel ID in the URL or share menu.</p>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="text-slate-300">Max Payout per User ($ASC)</Label>
