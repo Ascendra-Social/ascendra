@@ -191,6 +191,8 @@ export default function ReelCard({ reel, isActive }) {
     setExpandedReplies(prev => ({ ...prev, [commentId]: true }));
   };
 
+  if (isDeleted) return null;
+
   return (
     <div className="relative h-full w-full bg-black flex items-center justify-center">
       {/* Video */}
