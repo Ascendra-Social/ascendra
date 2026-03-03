@@ -255,6 +255,8 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
     }
   };
 
+  if (isDeleted) return null;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
