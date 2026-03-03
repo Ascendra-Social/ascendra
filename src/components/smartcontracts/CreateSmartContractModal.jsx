@@ -21,6 +21,7 @@ export default function CreateSmartContractModal({ isOpen, onClose, user }) {
   const [totalBudget, setTotalBudget] = useState('');
   const [maxPayoutPerUser, setMaxPayoutPerUser] = useState('');
   const [cooldownHours, setCooldownHours] = useState('24');
+  const [linkedContentId, setLinkedContentId] = useState('');
 
   const queryClient = useQueryClient();
 
