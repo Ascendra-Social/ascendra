@@ -40,7 +40,7 @@ export default function CreateSmartContractModal({ isOpen, onClose, user }) {
     mutationFn: async () => {
       const budget = parseFloat(totalBudget);
       
-      if (budget <= 0) {
+      if (!budget || budget <= 0) {
         throw new Error('Budget must be greater than 0');
       }
 
