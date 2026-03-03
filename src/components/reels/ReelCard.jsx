@@ -130,6 +130,12 @@ export default function ReelCard({ reel, isActive }) {
     setShowShare(false);
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm('Delete this reel? This cannot be undone.')) return;
+    await base44.entities.Post.delete(reel.id);
+    setIsDeleted(true);
+  };
+
   const loadComments = async () => {
     const data = await base44.entities.Comment.filter({ post_id: reel.id }, '-created_date', 20);
     setComments(data);
