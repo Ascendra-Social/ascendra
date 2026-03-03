@@ -158,6 +158,13 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
     }
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm('Delete this post? This cannot be undone.')) return;
+    await base44.entities.Post.delete(post.id);
+    setIsDeleted(true);
+    toast.success('Post deleted');
+  };
+
   const handleVote = async (voteType) => {
     if (!user) {
       toast.error('Please log in to vote');
