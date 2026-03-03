@@ -99,6 +99,7 @@ export default function CreateSmartContractModal({ isOpen, onClose, user }) {
     setTotalBudget('');
     setMaxPayoutPerUser('');
     setCooldownHours('24');
+    setLinkedContentId('');
   };
 
   return (
