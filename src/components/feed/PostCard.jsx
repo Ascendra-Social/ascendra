@@ -37,6 +37,7 @@ export default function PostCard({ post, currentUserId, communityId, onLike, onC
   const [userVote, setUserVote] = useState(null);
   const [upvotesCount, setUpvotesCount] = useState(post.upvotes_count || 0);
   const [downvotesCount, setDownvotesCount] = useState(post.downvotes_count || 0);
+  const [isDeleted, setIsDeleted] = useState(false);
 
   React.useEffect(() => {
     const loadUser = async () => {
