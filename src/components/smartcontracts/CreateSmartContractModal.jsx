@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ContractTemplateSelector from './ContractTemplateSelector';
 import AIContractBuilder from './AIContractBuilder';
-import { FileCode, ArrowLeft, Zap, Loader2 } from 'lucide-react';
+import { FileCode, ArrowLeft, Zap, Loader2, Link2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function CreateSmartContractModal({ isOpen, onClose, user }) {
