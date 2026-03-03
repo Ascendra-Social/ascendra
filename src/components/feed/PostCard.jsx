@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { 
   Heart, MessageCircle, Share2, Bookmark, MoreHorizontal,
-  Coins, Sparkles, Wand2, RefreshCw, Flag, TrendingUp, Check, ArrowUp, ArrowDown
+  Coins, Sparkles, Wand2, RefreshCw, Flag, TrendingUp, Check, ArrowUp, ArrowDown, Trash2
 } from 'lucide-react';
 import AIAssistantModal from '@/components/ai/AIAssistantModal';
 import ReportContentModal from '@/components/moderation/ReportContentModal';
