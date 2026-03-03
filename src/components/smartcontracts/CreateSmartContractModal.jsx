@@ -67,6 +67,7 @@ export default function CreateSmartContractModal({ isOpen, onClose, user }) {
         description: contractData.description,
         contract_type: contractType,
         total_budget: budget,
+        linked_content_id: linkedContentId || undefined,
         ...contractData.config,
         security_features: {
           max_payout_per_user: parseFloat(maxPayoutPerUser) || undefined,
