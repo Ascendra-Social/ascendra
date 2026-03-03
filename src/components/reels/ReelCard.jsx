@@ -31,6 +31,7 @@ export default function ReelCard({ reel, isActive }) {
   const [expandedReplies, setExpandedReplies] = useState({});
   const [repliesMap, setRepliesMap] = useState({});
   const [user, setUser] = useState(null);
+  const [isDeleted, setIsDeleted] = useState(false);
   const lastTap = useRef(0);
 
   useEffect(() => {
