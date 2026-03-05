@@ -104,15 +104,21 @@ export default function FeatureRequestCard({ request, user, wallet }) {
     mutationFn: async () => {
       const amount = parseFloat(pledgeAmount);
       if (!amount || amount <= 0) throw new Error('Enter a valid amount');
-      if (amount > (wallet?.balance || 0)) throw new Error('Insufficient $ASC balance');
+
+      // Fetch fresh wallet to avoid stale/missing wallet prop
+      const wallets = await base44.entities.TokenWallet.filter({ user_id: user.id });
+      const freshWallet = wallets[0];
+      if (!freshWallet) throw new Error('No wallet found. Please set up your wallet first.');
+      if (amount > (freshWallet.balance || 0)) throw new Error(`Insufficient $ASC balance. You have ${freshWallet.balance || 0} $ASC.`);
+
       await base44.entities.FeatureRequestPledge.create({
         request_id: request.id, user_id: user.id, user_name: user.full_name, amount_asc: amount
       });
       await base44.entities.FeatureRequest.update(request.id, {
         total_pledged_asc: (request.total_pledged_asc || 0) + amount
       });
-      await base44.entities.TokenWallet.update(wallet.id, {
-        balance: (wallet.balance || 0) - amount
+      await base44.entities.TokenWallet.update(freshWallet.id, {
+        balance: (freshWallet.balance || 0) - amount
       });
       await base44.entities.TokenTransaction.create({
         user_id: user.id, type: 'spending', amount: -amount,
