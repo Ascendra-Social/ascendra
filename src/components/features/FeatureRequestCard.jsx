@@ -133,7 +133,10 @@ export default function FeatureRequestCard({ request, user, wallet }) {
       setPledgeAmount('');
       setShowPledgeInput(false);
     },
-    onError: (e) => toast.error(e.message || 'Failed to pledge')
+    onError: (e) => {
+      console.error('Pledge error:', e);
+      toast.error(e.message || 'Failed to pledge');
+    }
   });
 
   const claimMutation = useMutation({
