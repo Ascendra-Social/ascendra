@@ -350,13 +350,19 @@ export default function FeatureRequestCard({ request, user, wallet }) {
                     onChange={(e) => setPledgeAmount(e.target.value)}
                     className="flex-1 h-8 text-sm bg-slate-700 border-slate-600"
                   />
-                  <Button size="sm" onClick={() => { console.log('Pledge clicked, amount:', pledgeAmount, 'isPending:', pledgeMutation.isPending); pledgeMutation.mutate(); }} disabled={pledgeMutation.isPending || !pledgeAmount} className="bg-amber-500 hover:bg-amber-600 text-black h-8">
+                  <Button
+                    size="sm"
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); pledgeMutation.mutate(); }}
+                    disabled={pledgeMutation.isPending || !pledgeAmount || parseFloat(pledgeAmount) <= 0}
+                    className="bg-amber-500 hover:bg-amber-600 text-black h-8"
+                  >
                     {pledgeMutation.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Pledge'}
                   </Button>
-                  <Button variant="ghost" size="sm" className="h-8" onClick={() => { setShowPledgeInput(false); setPledgeAmount(''); }}>✕</Button>
+                  <Button type="button" variant="ghost" size="sm" className="h-8" onClick={() => { setShowPledgeInput(false); setPledgeAmount(''); }}>✕</Button>
                 </div>
               ) : (
-                <Button variant="outline" size="sm" onClick={() => setShowPledgeInput(true)} className="border-amber-500/40 text-amber-400 hover:bg-amber-500/10 h-8 text-xs">
+                <Button type="button" variant="outline" size="sm" onClick={() => setShowPledgeInput(true)} className="border-amber-500/40 text-amber-400 hover:bg-amber-500/10 h-8 text-xs">
                   <Coins className="w-3 h-3 mr-1" /> Add to Escrow
                 </Button>
               )
