@@ -32,7 +32,7 @@ export default function FeatureRequests() {
 
   const { data: requests, isLoading } = useQuery({
     queryKey: ['feature-requests'],
-    queryFn: () => base44.entities.FeatureRequest.list('-total_pledged_asc', 200),
+    queryFn: () => base44.entities.FeatureRequest.list('-created_date', 200),
     enabled: !!user
   });
 
