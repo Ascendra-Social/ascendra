@@ -337,7 +337,7 @@ export default function FeatureRequestCard({ request, user, wallet }) {
           {/* Actions */}
           <div className="flex flex-wrap gap-2">
             {/* Pledge */}
-            {request.status === 'open' && !userPledge && !isMine && (
+            {request.status === 'open' && !userPledge && (
               showPledgeInput ? (
                 <div className="flex gap-2 flex-1">
                   <Input
