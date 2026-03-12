@@ -167,10 +167,10 @@ export default function TipButton({ post, currentUserId, className }) {
             <div className="flex gap-2">
               <Button
                 onClick={() => tipMutation.mutate()}
-                disabled={tipMutation.isPending || !amount}
+                disabled={tipMutation.isPending || !amount || walletLoading || !wallet}
                 className="flex-1 bg-gradient-to-r from-cyan-500 to-purple-500"
               >
-                {tipMutation.isPending ? (
+                {tipMutation.isPending || walletLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <>
