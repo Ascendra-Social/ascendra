@@ -14,13 +14,15 @@ export default function TipButton({ post, currentUserId, className }) {
   const [message, setMessage] = useState('');
   const queryClient = useQueryClient();
 
-  const { data: wallet } = useQuery({
+  const { data: wallet, isLoading: walletLoading } = useQuery({
     queryKey: ['wallet', currentUserId],
     queryFn: async () => {
-      const wallets = await base44.entities.TokenWallet.filter({ user_id: currentUserId });
-      return wallets[0];
+      const currentUser = await base44.auth.me();
+      const wallets = await base44.entities.TokenWallet.filter({ user_id: currentUser.id });
+      return wallets[0] || null;
     },
-    enabled: !!currentUserId && isOpen
+    enabled: !!currentUserId && isOpen,
+    retry: false
   });
 
   const tipMutation = useMutation({
