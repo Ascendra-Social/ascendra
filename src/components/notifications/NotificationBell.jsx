@@ -27,8 +27,8 @@ export default function NotificationBell({ user }) {
     if (!user?.id) return;
     fetchNotifications();
 
-    // Poll every 2 minutes to avoid rate limits
-    const interval = setInterval(fetchNotifications, 120000);
+    // Poll every 5 minutes to avoid rate limits
+    const interval = setInterval(fetchNotifications, 300000);
     return () => clearInterval(interval);
   }, [user?.id]);
 
