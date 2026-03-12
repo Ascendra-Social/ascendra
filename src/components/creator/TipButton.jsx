@@ -27,6 +27,12 @@ export default function TipButton({ post, currentUserId, className }) {
     mutationFn: async () => {
       const tipAmount = parseFloat(amount);
       
+      console.log('Starting tip mutation', { tipAmount, wallet, currentUserId, recipientId: post.author_id });
+      
+      if (!wallet) {
+        throw new Error('Wallet not loaded');
+      }
+
       if (tipAmount > (wallet?.balance || 0)) {
         throw new Error('Insufficient balance');
       }
@@ -35,15 +41,21 @@ export default function TipButton({ post, currentUserId, className }) {
         throw new Error('Minimum tip is 1 $ASC');
       }
 
+      const currentUser = await base44.auth.me();
+
       // Create tip record
       await base44.entities.Tip.create({
         tipper_id: currentUserId,
-        tipper_name: (await base44.auth.me()).full_name,
+        tipper_name: currentUser.full_name,
         recipient_id: post.author_id,
         post_id: post.id,
         amount: tipAmount,
         message: message || ''
       });
+
+      // Update tipper wallet via auth.updateMe (since RLS may block direct updates)
+      // Note: This won't work for TokenWallet - need service role or proper RLS
+      console.log('Updating tipper wallet', wallet.id);
 
       // Deduct from tipper wallet
       await base44.entities.TokenWallet.update(wallet.id, {
@@ -53,6 +65,7 @@ export default function TipButton({ post, currentUserId, className }) {
       // Add to creator wallet
       const creatorWallets = await base44.entities.TokenWallet.filter({ user_id: post.author_id });
       if (creatorWallets[0]) {
+        console.log('Updating creator wallet', creatorWallets[0].id);
         await base44.entities.TokenWallet.update(creatorWallets[0].id, {
           balance: (creatorWallets[0].balance || 0) + tipAmount,
           lifetime_earnings: (creatorWallets[0].lifetime_earnings || 0) + tipAmount
@@ -73,6 +86,8 @@ export default function TipButton({ post, currentUserId, className }) {
         amount: tipAmount,
         description: `Tip from supporter`
       });
+
+      console.log('Tip mutation completed successfully');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wallet'] });
@@ -82,6 +97,7 @@ export default function TipButton({ post, currentUserId, className }) {
       setMessage('');
     },
     onError: (error) => {
+      console.error('Tip mutation error:', error);
       toast.error(error.message || 'Failed to send tip');
     }
   });
