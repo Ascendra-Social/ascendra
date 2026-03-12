@@ -145,9 +145,23 @@ export default function TipButton({ post, currentUserId, className }) {
               />
               {wallet && (
                 <p className="text-xs text-slate-400 mt-1">
-                  Available: {wallet.balance} $ASC
+                  Available: {wallet.balance.toLocaleString()} $ASC
                 </p>
               )}
+              <div className="flex gap-2 mt-2">
+                {[10, 50, 100, 500].map((preset) => (
+                  <Button
+                    key={preset}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setAmount(preset.toString())}
+                    disabled={wallet && preset > wallet.balance}
+                    className="border-cyan-500/20 hover:bg-cyan-500/10 text-xs"
+                  >
+                    {preset}
+                  </Button>
+                ))}
+              </div>
             </div>
 
             <div>
