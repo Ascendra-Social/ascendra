@@ -36,12 +36,12 @@ export default function Layout({ children, currentPageName }) {
     };
     loadUser();
 
-    // Update last active periodically
+    // Update last active periodically (every 5 minutes to avoid rate limits)
     const interval = setInterval(() => {
       base44.auth.me().then(u => {
         if (u) base44.auth.updateMe({ last_active: new Date().toISOString() });
       }).catch(() => {});
-    }, 60000);
+    }, 300000);
 
     return () => clearInterval(interval);
   }, []);
