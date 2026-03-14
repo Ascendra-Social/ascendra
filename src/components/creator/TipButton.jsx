@@ -20,7 +20,7 @@ export default function TipButton({ post, currentUserId, className }) {
       // Filter for Ascendra Social token wallets only
       const wallets = await base44.entities.TokenWallet.filter({ 
         user_id: currentUserId,
-        token_contract_address: 'ASC_MAINNET_V1'
+        token_contract_address: 'ATF7deyT7FdS7GHip1Btv8t6Mj9vhsfzffoMZhE2vvwR'
       });
       // Return the wallet with the highest balance
       if (wallets.length === 0) return null;
