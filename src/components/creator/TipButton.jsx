@@ -18,7 +18,9 @@ export default function TipButton({ post, currentUserId, className }) {
     queryKey: ['wallet', currentUserId],
     queryFn: async () => {
       const wallets = await base44.entities.TokenWallet.filter({ user_id: currentUserId });
-      return wallets[0] || null;
+      // Return the wallet with the highest balance
+      if (wallets.length === 0) return null;
+      return wallets.reduce((max, w) => (w.balance > max.balance ? w : max), wallets[0]);
     },
     enabled: !!currentUserId && isOpen,
     retry: false
