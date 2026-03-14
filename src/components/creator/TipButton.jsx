@@ -17,7 +17,11 @@ export default function TipButton({ post, currentUserId, className }) {
   const { data: wallet, isLoading: walletLoading } = useQuery({
     queryKey: ['wallet', currentUserId],
     queryFn: async () => {
-      const wallets = await base44.entities.TokenWallet.filter({ user_id: currentUserId });
+      // Filter for Ascendra Social token wallets only
+      const wallets = await base44.entities.TokenWallet.filter({ 
+        user_id: currentUserId,
+        token_contract_address: 'ASC_MAINNET_V1'
+      });
       // Return the wallet with the highest balance
       if (wallets.length === 0) return null;
       return wallets.reduce((max, w) => (w.balance > max.balance ? w : max), wallets[0]);
