@@ -179,7 +179,10 @@ export default function TipButton({ post, currentUserId, className }) {
 
             <div className="flex gap-2">
               <Button
-                onClick={() => tipMutation.mutate()}
+                onClick={() => {
+                  console.log('Send tip clicked', { amount, wallet, walletLoading, isPending: tipMutation.isPending });
+                  tipMutation.mutate();
+                }}
                 disabled={tipMutation.isPending || !amount || walletLoading || !wallet || parseFloat(amount) > (wallet?.balance || 0)}
                 className="flex-1 bg-gradient-to-r from-cyan-500 to-purple-500"
               >
