@@ -17,7 +17,7 @@ export default function TipButton({ post, currentUserId, className }) {
   const { data: wallet, isLoading: walletLoading } = useQuery({
     queryKey: ['wallet', currentUserId],
     queryFn: async () => {
-      const wallets = await base44.entities.TokenWallet.list();
+      const wallets = await base44.entities.TokenWallet.filter({ user_id: currentUserId });
       return wallets[0] || null;
     },
     enabled: !!currentUserId && isOpen,
