@@ -17,6 +17,7 @@ import WalletConnectionModal from '@/components/wallet/WalletConnectionModal';
 import { formatDistanceToNow, isAfter, isBefore } from 'date-fns';
 import { motion } from 'framer-motion';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { PublicKey } from '@solana/web3.js';
 
 const ASCENDRA_TOKEN_MINT = 'ATF7deyT7FdS7GHip1Btv8t6Mj9vhsfzffoMZhE2vvwR';
@@ -195,21 +196,16 @@ function WalletContent() {
             </div>
             <div>
               <h3 className="font-semibold text-white">
-                {connectedWallet ? connectedWallet.wallet : 'Connect Wallet'}
+                {connected && publicKey ? 'Wallet Connected' : 'Connect Wallet'}
               </h3>
               <p className="text-sm text-slate-400">
-                {connectedWallet
-                  ? `${connectedWallet.address.slice(0, 6)}...${connectedWallet.address.slice(-4)}`
-                  : 'MetaMask, Phantom, Coinbase & more'}
+                {connected && publicKey
+                  ? `${publicKey.toString().slice(0, 6)}...${publicKey.toString().slice(-4)}`
+                  : 'Connect your Phantom wallet to see balance'}
               </p>
             </div>
           </div>
-          <Button
-            onClick={() => setShowConnectModal(true)}
-            className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-xl h-10 px-4"
-          >
-            {connectedWallet ? 'Switch' : 'Connect'}
-          </Button>
+          <WalletMultiButton className="!bg-gradient-to-r !from-cyan-500 !to-purple-500 !text-white !rounded-xl !h-10 !px-4" />
         </div>
       </motion.div>
 
