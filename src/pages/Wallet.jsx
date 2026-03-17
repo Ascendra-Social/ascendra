@@ -69,11 +69,15 @@ function WalletContent() {
   const { data: wallet, isLoading: walletLoading } = useQuery({
     queryKey: ['wallet', user?.id],
     queryFn: async () => {
-      const wallets = await base44.entities.TokenWallet.filter({ user_id: user?.id });
+      const wallets = await base44.entities.TokenWallet.filter({ 
+        user_id: user?.id,
+        token_contract_address: 'ATF7deyT7FdS7GHip1Btv8t6Mj9vhsfzffoMZhE2vvwR'
+      });
       if (wallets.length === 0) {
         // Create wallet if doesn't exist
         const newWallet = await base44.entities.TokenWallet.create({
           user_id: user.id,
+          token_contract_address: 'ATF7deyT7FdS7GHip1Btv8t6Mj9vhsfzffoMZhE2vvwR',
           balance: 100, // Starting bonus
           lifetime_earnings: 100,
           pending_earnings: 0,
