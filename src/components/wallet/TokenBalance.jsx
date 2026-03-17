@@ -27,7 +27,7 @@ export default function TokenBalance({ wallet, onDeposit, onWithdraw }) {
           <div className="mb-8">
             <p className="text-5xl font-bold mb-2">
               {wallet?.balance?.toLocaleString() || '0'}
-              <span className="text-2xl ml-2 text-white/70">ASCENDRA</span>
+              <span className="text-2xl ml-2 text-white/70">$ASC</span>
             </p>
             <p className="text-white/60 text-sm flex items-center gap-1">
               <TrendingUp className="w-4 h-4" />
