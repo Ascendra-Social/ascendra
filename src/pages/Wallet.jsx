@@ -66,29 +66,66 @@ function WalletContent() {
     loadUser();
   }, []);
 
+  // Fetch on-chain token balance
+  const { data: tokenBalance, isLoading: balanceLoading } = useQuery({
+    queryKey: ['solana-balance', publicKey?.toString()],
+    queryFn: async () => {
+      if (!publicKey || !connected) return 0;
+      
+      try {
+        const mintPubkey = new PublicKey(ASCENDRA_TOKEN_MINT);
+        
+        // Get all token accounts for this wallet
+        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
+          programId: TOKEN_PROGRAM_ID
+        });
+        
+        // Find the Ascendra token account
+        const ascendraAccount = tokenAccounts.value.find(
+          account => account.account.data.parsed.info.mint === ASCENDRA_TOKEN_MINT
+        );
+        
+        if (!ascendraAccount) return 0;
+        
+        const balance = ascendraAccount.account.data.parsed.info.tokenAmount.uiAmount;
+        return balance || 0;
+      } catch (error) {
+        console.error('Error fetching token balance:', error);
+        return 0;
+      }
+    },
+    enabled: !!publicKey && connected,
+    refetchInterval: 10000 // Refresh every 10 seconds
+  });
+
   const { data: wallet, isLoading: walletLoading } = useQuery({
     queryKey: ['wallet', user?.id],
     queryFn: async () => {
       const wallets = await base44.entities.TokenWallet.filter({ 
         user_id: user?.id,
-        token_contract_address: 'ATF7deyT7FdS7GHip1Btv8t6Mj9vhsfzffoMZhE2vvwR'
+        token_contract_address: ASCENDRA_TOKEN_MINT
       });
       if (wallets.length === 0) {
-        // Create wallet if doesn't exist
+        // Create wallet record
         const newWallet = await base44.entities.TokenWallet.create({
           user_id: user.id,
-          token_contract_address: 'ATF7deyT7FdS7GHip1Btv8t6Mj9vhsfzffoMZhE2vvwR',
-          balance: 100, // Starting bonus
-          lifetime_earnings: 100,
+          token_contract_address: ASCENDRA_TOKEN_MINT,
+          balance: tokenBalance || 0,
+          lifetime_earnings: 0,
           pending_earnings: 0,
-          wallet_address: `0x${Math.random().toString(16).slice(2, 42)}`
+          wallet_address: publicKey?.toString() || ''
         });
         return newWallet;
       }
-      // Return the wallet with the highest balance
-      return wallets.reduce((max, w) => (w.balance > max.balance ? w : max), wallets[0]);
+      // Return wallet with live balance
+      const dbWallet = wallets.reduce((max, w) => (w.balance > max.balance ? w : max), wallets[0]);
+      return {
+        ...dbWallet,
+        balance: tokenBalance || dbWallet.balance,
+        wallet_address: publicKey?.toString() || dbWallet.wallet_address
+      };
     },
-    enabled: !!user
+    enabled: !!user && !balanceLoading
   });
 
   const { data: allTransactions, isLoading: transactionsLoading } = useQuery({
