@@ -16,6 +16,10 @@ import RecurringPaymentsModal from '@/components/wallet/RecurringPaymentsModal';
 import WalletConnectionModal from '@/components/wallet/WalletConnectionModal';
 import { formatDistanceToNow, isAfter, isBefore } from 'date-fns';
 import { motion } from 'framer-motion';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { PublicKey } from '@solana/web3.js';
+
+const ASCENDRA_TOKEN_MINT = 'ATF7deyT7FdS7GHip1Btv8t6Mj9vhsfzffoMZhE2vvwR';
 
 const transactionIcons = {
   earning: Sparkles,
@@ -53,6 +57,9 @@ function WalletContent() {
     minAmount: '',
     maxAmount: ''
   });
+  
+  const { publicKey, connected } = useWallet();
+  const { connection } = useConnection();
 
   useEffect(() => {
     const loadUser = async () => {
@@ -76,6 +83,7 @@ function WalletContent() {
         const mintPubkey = new PublicKey(ASCENDRA_TOKEN_MINT);
         
         // Get all token accounts for this wallet
+        const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
           programId: TOKEN_PROGRAM_ID
         });
