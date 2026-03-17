@@ -85,7 +85,8 @@ function WalletContent() {
         });
         return newWallet;
       }
-      return wallets[0];
+      // Return the wallet with the highest balance
+      return wallets.reduce((max, w) => (w.balance > max.balance ? w : max), wallets[0]);
     },
     enabled: !!user
   });
