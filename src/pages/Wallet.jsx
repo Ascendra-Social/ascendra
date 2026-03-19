@@ -13,7 +13,6 @@ import TokenBalance from '@/components/wallet/TokenBalance';
 import TransactionFilters from '@/components/wallet/TransactionFilters';
 import SendTokensModal from '@/components/wallet/SendTokensModal';
 import RecurringPaymentsModal from '@/components/wallet/RecurringPaymentsModal';
-import WalletConnectionModal from '@/components/wallet/WalletConnectionModal';
 import { formatDistanceToNow, isAfter, isBefore } from 'date-fns';
 import { motion } from 'framer-motion';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
@@ -46,8 +45,6 @@ const transactionColors = {
 
 function WalletContent() {
   const [user, setUser] = useState(null);
-  const [connectedWallet, setConnectedWallet] = useState(null);
-  const [showConnectModal, setShowConnectModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showSendModal, setShowSendModal] = useState(false);
   const [showRecurringModal, setShowRecurringModal] = useState(false);
@@ -363,12 +360,6 @@ function WalletContent() {
       </motion.div>
 
       {/* Modals */}
-      <WalletConnectionModal
-        isOpen={showConnectModal}
-        onClose={() => setShowConnectModal(false)}
-        onConnected={(w) => setConnectedWallet(w)}
-      />
-
       <SendTokensModal
         isOpen={showSendModal}
         onClose={() => setShowSendModal(false)}
