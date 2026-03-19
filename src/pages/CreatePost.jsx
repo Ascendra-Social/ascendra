@@ -91,15 +91,22 @@ export default function CreatePost() {
 
   const handleSubmit = async () => {
     if (!content.trim() && !mediaFile) return;
+    if (!user?.id) return;
     
     setIsSubmitting(true);
     setModerationResult(null);
     
     try {
-      // Content Moderation
+      let mediaUrl = '';
+
+      if (mediaFile) {
+        const uploadResult = await base44.integrations.Core.UploadFile({ file: mediaFile });
+        mediaUrl = uploadResult.file_url;
+      }
+
       const moderation = await moderateContent(
         content,
-        mediaPreview,
+        mediaUrl || null,
         'post',
         user.id
       );
@@ -110,7 +117,6 @@ export default function CreatePost() {
           reason: moderation.explanation,
           violation: moderation.violation_type
         });
-        setIsSubmitting(false);
         return;
       }
 
@@ -120,12 +126,6 @@ export default function CreatePost() {
           flagged: true,
           reason: moderation.explanation
         });
-      }
-
-      let mediaUrl = '';
-      if (mediaFile) {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file: mediaFile });
-        mediaUrl = file_url;
       }
 
       let positivityScore = moderation.safety_score || 0.5;
@@ -148,13 +148,13 @@ Post: "${content}"`,
         }
       }
 
-      // Create smart contract if premium
       let contractId = null;
-      if (isPremium && parseFloat(accessPrice) > 0) {
+
+      if (isPremium) {
         const contract = await base44.entities.SmartContract.create({
           creator_id: user.id,
           creator_name: user.full_name,
-          contract_name: `Content: ${content.slice(0, 30)}...`,
+          contract_name: `Premium access for post by ${user.full_name}`,
           description: 'Pay-per-view content monetization',
           contract_type: 'pay_per_view',
           total_budget: 0,
@@ -166,6 +166,7 @@ Post: "${content}"`,
           status: 'active',
           start_date: new Date().toISOString()
         });
+
         contractId = contract.id;
       }
 
