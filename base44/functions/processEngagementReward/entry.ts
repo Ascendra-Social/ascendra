@@ -174,12 +174,19 @@ Deno.serve(async (req) => {
       const netReward = netInCents / 100;
       const grossAmount = rewardAmount;
 
-      // Get user wallet with version and validate token contract
-      const wallets = await base44.entities.TokenWallet.filter({ 
-        user_id: user.id,
-        token_contract_address: VALID_TOKEN_CONTRACT
-      });
-      let userWallet = wallets[0];
+      // Batch fetch wallets to reduce N+1 queries
+      const [userWallets, platformWallets] = await Promise.all([
+        base44.entities.TokenWallet.filter({ 
+          user_id: user.id,
+          token_contract_address: VALID_TOKEN_CONTRACT
+        }),
+        base44.asServiceRole.entities.TokenWallet.filter({ 
+          user_id: PLATFORM_WALLET_ID,
+          token_contract_address: VALID_TOKEN_CONTRACT
+        })
+      ]);
+
+      let userWallet = userWallets[0];
       let userVersion = 0;
       
       if (!userWallet) {
@@ -193,11 +200,6 @@ Deno.serve(async (req) => {
         userVersion = userWallet.version || 0;
       }
 
-      // Get platform wallet (only accessible via service role)
-      const platformWallets = await base44.asServiceRole.entities.TokenWallet.filter({ 
-        user_id: PLATFORM_WALLET_ID,
-        token_contract_address: VALID_TOKEN_CONTRACT
-      });
       let platformWallet = platformWallets[0];
       let platformVersion = 0;
       

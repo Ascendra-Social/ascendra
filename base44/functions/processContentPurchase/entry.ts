@@ -37,43 +37,34 @@ Deno.serve(async (req) => {
         return Response.json({ success: true, message: 'Already purchased' });
       }
 
-      // Get buyer wallet with version and validate token contract
-      const wallets = await base44.entities.TokenWallet.filter({ 
-        user_id: user.id,
-        token_contract_address: VALID_TOKEN_CONTRACT
-      });
-      if (wallets.length === 0 || wallets[0].balance < post.access_price) {
+      // Batch fetch all wallets to reduce N+1 queries
+      const [buyerWallets, creatorWallets, platformWallets] = await Promise.all([
+        base44.entities.TokenWallet.filter({ 
+          user_id: user.id,
+          token_contract_address: VALID_TOKEN_CONTRACT
+        }),
+        base44.entities.TokenWallet.filter({ 
+          user_id: post.author_id,
+          token_contract_address: VALID_TOKEN_CONTRACT
+        }),
+        base44.asServiceRole.entities.TokenWallet.filter({ 
+          user_id: PLATFORM_WALLET_ID,
+          token_contract_address: VALID_TOKEN_CONTRACT
+        })
+      ]);
+
+      if (buyerWallets.length === 0 || buyerWallets[0].balance < post.access_price) {
         return Response.json({ error: 'Insufficient balance or invalid token' }, { status: 400 });
       }
-      const buyerWallet = wallets[0];
+      const buyerWallet = buyerWallets[0];
       const buyerVersion = buyerWallet.version || 0;
 
-      // Process 1% platform fee using integer arithmetic to avoid rounding errors
-      // Convert to cents/smallest unit: multiply by 100, calculate fee, then divide back
-      const amountInCents = Math.round(post.access_price * 100);
-      const feeInCents = Math.floor(amountInCents * 1 / 100); // 1% fee
-      const netInCents = amountInCents - feeInCents;
-      
-      const feeAmount = feeInCents / 100;
-      const netAmount = netInCents / 100;
-      const grossAmount = post.access_price;
-
-      // Get creator wallet with version and validate token contract
-      const creatorWallets = await base44.entities.TokenWallet.filter({ 
-        user_id: post.author_id,
-        token_contract_address: VALID_TOKEN_CONTRACT
-      });
       if (creatorWallets.length === 0) {
         return Response.json({ error: 'Creator wallet not found' }, { status: 400 });
       }
       const creatorWallet = creatorWallets[0];
       const creatorVersion = creatorWallet.version || 0;
 
-      // Get platform wallet (only accessible via service role)
-      const platformWallets = await base44.asServiceRole.entities.TokenWallet.filter({ 
-        user_id: PLATFORM_WALLET_ID,
-        token_contract_address: VALID_TOKEN_CONTRACT
-      });
       let platformWallet = platformWallets[0];
       let platformVersion = 0;
       
@@ -87,6 +78,15 @@ Deno.serve(async (req) => {
       } else {
         platformVersion = platformWallet.version || 0;
       }
+
+      // Process 1% platform fee using integer arithmetic to avoid rounding errors
+      const amountInCents = Math.round(post.access_price * 100);
+      const feeInCents = Math.floor(amountInCents * 1 / 100);
+      const netInCents = amountInCents - feeInCents;
+      
+      const feeAmount = feeInCents / 100;
+      const netAmount = netInCents / 100;
+      const grossAmount = post.access_price;
 
       // Atomic updates with version checking
       // Deduct from buyer

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import { invalidateWalletQueries } from '@/lib/cacheInvalidation';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,8 +60,8 @@ export default function TipButton({ post, currentUserId, className }) {
         message: message || ''
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['wallet'] });
+    onSuccess: async () => {
+      await invalidateWalletQueries(queryClient, currentUserId);
       toast.success('Tip sent!');
       setIsOpen(false);
       setAmount('');

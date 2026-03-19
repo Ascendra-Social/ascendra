@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import { invalidateWalletQueries, invalidatePostQueries } from '@/lib/cacheInvalidation';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import {
   Dialog,
@@ -87,8 +88,8 @@ export default function BoostPostModal({ open, onClose, post, user }) {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['wallet'] });
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      await invalidateWalletQueries(queryClient, user.id);
+      await invalidatePostQueries(queryClient, post.id);
       toast.success('Post boosted successfully! 🚀');
       onClose();
     },
