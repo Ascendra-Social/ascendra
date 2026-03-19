@@ -45,6 +45,13 @@ Deno.serve(async (req) => {
         return Response.json({ error: 'Invalid milestone configuration' }, { status: 400 });
       }
 
+      // Validate milestone_index bounds
+      if (milestone_index >= milestoneConfig.milestones.length) {
+        return Response.json({ 
+          error: `Milestone index ${milestone_index} out of bounds (total milestones: ${milestoneConfig.milestones.length})` 
+        }, { status: 400 });
+      }
+
       const milestone = milestoneConfig.milestones[milestone_index];
       if (!milestone) {
         return Response.json({ error: 'Milestone not found' }, { status: 404 });

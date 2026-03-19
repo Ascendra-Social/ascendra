@@ -12,7 +12,24 @@ Deno.serve(async (req) => {
         return Response.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const { contract_id, engagement_type, content_id } = await req.json();
+      const body = await req.json();
+      const { contract_id, engagement_type, content_id } = body;
+
+      // Comprehensive input validation
+      if (!contract_id || typeof contract_id !== 'string' || contract_id.trim() === '') {
+        return Response.json({ error: 'Invalid contract_id: must be a non-empty string' }, { status: 400 });
+      }
+
+      if (!content_id || typeof content_id !== 'string' || content_id.trim() === '') {
+        return Response.json({ error: 'Invalid content_id: must be a non-empty string' }, { status: 400 });
+      }
+
+      const validEngagementTypes = ['like', 'share', 'comment', 'follow'];
+      if (!engagement_type || !validEngagementTypes.includes(engagement_type)) {
+        return Response.json({ 
+          error: `Invalid engagement_type: must be one of ${validEngagementTypes.join(', ')}` 
+        }, { status: 400 });
+      }
 
       // Get contract
       const contracts = await base44.entities.SmartContract.filter({ id: contract_id });
