@@ -1,4 +1,11 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useRef,
+  useCallback,
+} from 'react';
 import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
@@ -11,149 +18,157 @@ export const AuthProvider = ({ children }) => {
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(true);
   const [authError, setAuthError] = useState(null);
-  const [appPublicSettings, setAppPublicSettings] = useState(null); // Contains only { id, public_settings }
+  const [appPublicSettings, setAppPublicSettings] = useState(null);
+
+  const retryTimeoutRef = useRef(null);
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
+    isMountedRef.current = true;
     checkAppState();
+
+    return () => {
+      isMountedRef.current = false;
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+    };
   }, []);
 
-  const checkAppState = async () => {
-    try {
-      setIsLoadingPublicSettings(true);
-      setAuthError(null);
-      
-      // First, check app public settings (with token if available)
-      // This will tell us if auth is required, user not registered, etc.
-      const appClient = createAxiosClient({
-        baseURL: `${appParams.serverUrl}/api/apps/public`,
-        headers: {
-          'X-App-Id': appParams.appId
-        },
-        token: appParams.token, // Include token if available
-        interceptResponses: true
-      });
-      
-      try {
-        const publicSettings = await appClient.get(`/prod/public-settings/by-id/${appParams.appId}`);
-        setAppPublicSettings(publicSettings);
-        
-        // If we got the app public settings successfully, check if user is authenticated
-        if (appParams.token) {
-          await checkUserAuth();
-        } else {
-          setIsLoadingAuth(false);
-          setIsAuthenticated(false);
-        }
-        setIsLoadingPublicSettings(false);
-      } catch (appError) {
-        console.error('App state check failed:', appError);
-        
-        // Handle app-level errors
-        if (appError.status === 403 && appError.data?.extra_data?.reason) {
-          const reason = appError.data.extra_data.reason;
-          if (reason === 'auth_required') {
-            setAuthError({
-              type: 'auth_required',
-              message: 'Authentication required'
-            });
-          } else if (reason === 'user_not_registered') {
-            setAuthError({
-              type: 'user_not_registered',
-              message: 'User not registered for this app'
-            });
-          } else {
-            setAuthError({
-              type: reason,
-              message: appError.message
-            });
-          }
-        } else {
-          setAuthError({
-            type: 'unknown',
-            message: appError.message || 'Failed to load app'
-          });
-        }
-        setIsLoadingPublicSettings(false);
-        setIsLoadingAuth(false);
-      }
-    } catch (error) {
-      console.error('Unexpected error:', error);
-      
-      // Classify error type
-      const isNetworkError = !error.status && (
-        error.message?.includes('network') ||
-        error.message?.includes('fetch') ||
-        error.code === 'ECONNREFUSED' ||
-        error.code === 'ETIMEDOUT'
-      );
-      
-      if (isNetworkError) {
-        // Network errors - implement retry logic
-        setAuthError({
-          type: 'network',
-          message: 'Network connection failed. Retrying...',
-          retryable: true
-        });
-        
-        // Retry after 2 seconds
-        setTimeout(() => {
-          checkAppState();
-        }, 2000);
-      } else {
-        // Permanent errors - don't retry
-        setAuthError({
-          type: 'unknown',
-          message: error.message || 'An unexpected error occurred',
-          retryable: false
-        });
-        setIsLoadingPublicSettings(false);
-        setIsLoadingAuth(false);
-      }
-    }
+  const safeSetState = (setter) => {
+    if (isMountedRef.current) setter();
   };
 
-  const checkUserAuth = async () => {
+  const checkUserAuth = useCallback(async () => {
     try {
-      // Now check if the user is authenticated
-      setIsLoadingAuth(true);
+      safeSetState(() => {
+        setIsLoadingAuth(true);
+        setAuthError(null);
+      });
+
       const currentUser = await base44.auth.me();
-      setUser(currentUser);
-      setIsAuthenticated(true);
-      setIsLoadingAuth(false);
+
+      safeSetState(() => {
+        setUser(currentUser);
+        setIsAuthenticated(true);
+        setIsLoadingAuth(false);
+        setAuthError(null);
+      });
     } catch (error) {
-      console.error('User auth check failed:', error);
-      setIsLoadingAuth(false);
-      setIsAuthenticated(false);
-      
-      // Classify auth errors
-      if (error.status === 401) {
-        setAuthError({
-          type: 'auth_expired',
-          message: 'Session expired. Please log in again.',
-          retryable: false
-        });
-      } else if (error.status === 403) {
-        setAuthError({
-          type: 'auth_forbidden',
-          message: 'Access forbidden',
-          retryable: false
-        });
-      } else if (!error.status) {
-        // Network error during auth check
-        setAuthError({
-          type: 'network',
-          message: 'Network error during authentication',
-          retryable: true
-        });
+      safeSetState(() => {
+        setIsLoadingAuth(false);
+        setIsAuthenticated(false);
+        setUser(null);
+
+        if (error.status === 401) {
+          setAuthError({
+            type: 'auth_expired',
+            message: 'Session expired. Please log in again.',
+            retryable: false,
+          });
+        } else if (error.status === 403) {
+          setAuthError({
+            type: 'auth_forbidden',
+            message: 'Access forbidden',
+            retryable: false,
+          });
+        } else if (!error.status) {
+          setAuthError({
+            type: 'network',
+            message: 'Network error during authentication',
+            retryable: true,
+          });
+        } else {
+          setAuthError({
+            type: 'auth_unknown',
+            message: error.message || 'Authentication failed',
+            retryable: false,
+          });
+        }
+      });
+    }
+  }, []);
+
+  const checkAppState = useCallback(async () => {
+    try {
+      safeSetState(() => {
+        setIsLoadingPublicSettings(true);
+        setAuthError(null);
+      });
+
+      const appClient = createAxiosClient({
+        baseURL: `${appParams.serverUrl}/api/apps/public`,
+        headers: { 'X-App-Id': appParams.appId },
+        token: appParams.token,
+        interceptResponses: true,
+      });
+
+      const publicSettings = await appClient.get(`/prod/public-settings/by-id/${appParams.appId}`);
+
+      safeSetState(() => {
+        setAppPublicSettings(publicSettings);
+      });
+
+      if (appParams.token) {
+        await checkUserAuth();
       } else {
-        setAuthError({
-          type: 'auth_unknown',
-          message: error.message || 'Authentication failed',
-          retryable: false
+        safeSetState(() => {
+          setUser(null);
+          setIsAuthenticated(false);
+          setIsLoadingAuth(false);
         });
       }
+
+      safeSetState(() => {
+        setIsLoadingPublicSettings(false);
+        setAuthError(null);
+      });
+    } catch (appError) {
+      safeSetState(() => {
+        if (appError.status === 403 && appError.data?.extra_data?.reason) {
+          const reason = appError.data.extra_data.reason;
+
+          if (reason === 'auth_required') {
+            setAuthError({ type: 'auth_required', message: 'Authentication required' });
+          } else if (reason === 'user_not_registered') {
+            setAuthError({ type: 'user_not_registered', message: 'User not registered for this app' });
+          } else {
+            setAuthError({ type: reason, message: appError.message });
+          }
+        } else {
+          const isNetworkError =
+            !appError.status &&
+            (
+              appError.message?.includes('network') ||
+              appError.message?.includes('fetch') ||
+              appError.code === 'ECONNREFUSED' ||
+              appError.code === 'ETIMEDOUT'
+            );
+
+          if (isNetworkError) {
+            setAuthError({
+              type: 'network',
+              message: 'Network connection failed. Retrying...',
+              retryable: true,
+            });
+
+            retryTimeoutRef.current = setTimeout(() => {
+              if (isMountedRef.current) checkAppState();
+            }, 2000);
+          } else {
+            setAuthError({
+              type: 'unknown',
+              message: appError.message || 'Failed to load app',
+              retryable: false,
+            });
+          }
+        }
+
+        setIsLoadingPublicSettings(false);
+        setIsLoadingAuth(false);
+      });
     }
-  };
+  }, [checkUserAuth]);
 
   const logout = (shouldRedirect = true) => {
     setUser(null);
