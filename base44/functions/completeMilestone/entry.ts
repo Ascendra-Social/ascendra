@@ -124,18 +124,19 @@ Deno.serve(async (req) => {
         status: 'completed'
       });
 
-      // Mark milestone as completed
-      milestoneConfig.milestones[milestone_index].completed = true;
+      // Deep clone milestone config to avoid mutating cached objects
+      const updatedMilestoneConfig = JSON.parse(JSON.stringify(milestoneConfig));
+      updatedMilestoneConfig.milestones[milestone_index].completed = true;
 
       // Update contract
       await base44.entities.SmartContract.update(contract_id, {
-        milestone_config: milestoneConfig,
+        milestone_config: updatedMilestoneConfig,
         spent_amount: (contract.spent_amount || 0) + milestone.payout_amount,
         total_payouts: (contract.total_payouts || 0) + 1
       });
 
       // Check if all milestones completed
-      const allCompleted = milestoneConfig.milestones.every(m => m.completed);
+      const allCompleted = updatedMilestoneConfig.milestones.every(m => m.completed);
       if (allCompleted) {
         await base44.entities.SmartContract.update(contract_id, {
           status: 'completed'
