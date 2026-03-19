@@ -99,9 +99,14 @@ Deno.serve(async (req) => {
         }
       }
 
-      // Calculate 1% platform fee
-      const feeAmount = (rewardAmount * 1) / 100;
-      const netReward = rewardAmount - feeAmount;
+      // Calculate 1% platform fee using integer arithmetic to avoid rounding errors
+      const amountInCents = Math.round(rewardAmount * 100);
+      const feeInCents = Math.floor(amountInCents * 1 / 100); // 1% fee
+      const netInCents = amountInCents - feeInCents;
+      
+      const feeAmount = feeInCents / 100;
+      const netReward = netInCents / 100;
+      const grossAmount = rewardAmount;
 
       // Get user wallet with version
       const wallets = await base44.entities.TokenWallet.filter({ user_id: user.id });
@@ -166,11 +171,13 @@ Deno.serve(async (req) => {
         version: platformVersion + 1
       });
 
-      // Create transaction
+      // Create transaction with gross and fee tracking
       await base44.entities.TokenTransaction.create({
         user_id: user.id,
         type: 'earning',
         amount: netReward,
+        gross_amount: grossAmount,
+        fee_amount: feeAmount,
         description: `${engagement_type} reward from ${contract.contract_name}`
       });
 
@@ -178,6 +185,8 @@ Deno.serve(async (req) => {
         user_id: 'platform',
         type: 'earning',
         amount: feeAmount,
+        gross_amount: grossAmount,
+        fee_amount: feeAmount,
         description: `Platform fee (1%): Engagement reward`
       });
 

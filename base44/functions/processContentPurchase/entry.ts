@@ -42,9 +42,15 @@ Deno.serve(async (req) => {
       const buyerWallet = wallets[0];
       const buyerVersion = buyerWallet.version || 0;
 
-      // Process 1% platform fee
-      const feeAmount = (post.access_price * 1) / 100;
-      const netAmount = post.access_price - feeAmount;
+      // Process 1% platform fee using integer arithmetic to avoid rounding errors
+      // Convert to cents/smallest unit: multiply by 100, calculate fee, then divide back
+      const amountInCents = Math.round(post.access_price * 100);
+      const feeInCents = Math.floor(amountInCents * 1 / 100); // 1% fee
+      const netInCents = amountInCents - feeInCents;
+      
+      const feeAmount = feeInCents / 100;
+      const netAmount = netInCents / 100;
+      const grossAmount = post.access_price;
 
       // Get creator wallet with version
       const creatorWallets = await base44.entities.TokenWallet.filter({ 
@@ -135,11 +141,13 @@ Deno.serve(async (req) => {
         purchase_count: (post.purchase_count || 0) + 1
       });
 
-      // Create transactions
+      // Create transactions with gross and fee tracking
       await base44.entities.TokenTransaction.create({
         user_id: user.id,
         type: 'spending',
-        amount: -post.access_price,
+        amount: -grossAmount,
+        gross_amount: grossAmount,
+        fee_amount: 0,
         description: `Purchased: ${post.content.slice(0, 50)}`
       });
 
@@ -147,6 +155,8 @@ Deno.serve(async (req) => {
         user_id: post.author_id,
         type: 'earning',
         amount: netAmount,
+        gross_amount: grossAmount,
+        fee_amount: feeAmount,
         description: `Content sale: ${post.content.slice(0, 50)}`
       });
 
@@ -154,6 +164,8 @@ Deno.serve(async (req) => {
         user_id: 'platform',
         type: 'earning',
         amount: feeAmount,
+        gross_amount: grossAmount,
+        fee_amount: feeAmount,
         description: `Platform fee (1%): Content purchase`
       });
 

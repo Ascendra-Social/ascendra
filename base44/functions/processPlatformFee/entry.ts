@@ -13,9 +13,14 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Invalid transaction amount' }, { status: 400 });
     }
 
-    // Calculate 1% fee
-    const feeAmount = (transaction_amount * PLATFORM_FEE_PERCENTAGE) / 100;
-    const netAmount = transaction_amount - feeAmount;
+    // Calculate 1% fee using integer arithmetic to avoid rounding errors
+    const amountInCents = Math.round(transaction_amount * 100);
+    const feeInCents = Math.floor(amountInCents * PLATFORM_FEE_PERCENTAGE / 100);
+    const netInCents = amountInCents - feeInCents;
+    
+    const feeAmount = feeInCents / 100;
+    const netAmount = netInCents / 100;
+    const grossAmount = transaction_amount;
 
     // Get or create platform wallet
     let platformWallets = await base44.asServiceRole.entities.TokenWallet.filter({ 
@@ -33,11 +38,13 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Record platform fee transaction
+    // Record platform fee transaction with gross and fee tracking
     await base44.asServiceRole.entities.TokenTransaction.create({
       user_id: PLATFORM_WALLET_ID,
       type: 'earning',
       amount: feeAmount,
+      gross_amount: grossAmount,
+      fee_amount: feeAmount,
       description: `Platform fee (1%): ${description || transaction_type}`
     });
 
@@ -47,6 +54,8 @@ Deno.serve(async (req) => {
         user_id: from_user_id,
         type: 'spending',
         amount: -feeAmount,
+        gross_amount: grossAmount,
+        fee_amount: feeAmount,
         description: `Platform fee (1%): ${description || transaction_type}`
       });
     }
