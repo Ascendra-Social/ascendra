@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { 
   Coins, TrendingUp, ArrowUpRight, ArrowDownLeft, 
-  Clock, Sparkles, Gift, ShoppingBag, Zap, Wallet as WalletIcon, Send, Repeat, Filter
+  Clock, Sparkles, Gift, ShoppingBag, Zap, Wallet as WalletIcon, Send, Repeat, Filter, Loader2
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";

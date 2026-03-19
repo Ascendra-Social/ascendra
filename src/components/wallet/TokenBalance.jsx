@@ -26,7 +26,7 @@ export default function TokenBalance({ wallet, onDeposit, onWithdraw }) {
 
           <div className="mb-8">
             <p className="text-5xl font-bold mb-2">
-              {wallet?.balance?.toLocaleString() || '0'}
+              {(wallet?.balance ?? 0).toLocaleString()}
               <span className="text-2xl ml-2 text-white/70">$ASC</span>
             </p>
             <p className="text-white/60 text-sm flex items-center gap-1">
@@ -64,7 +64,7 @@ export default function TokenBalance({ wallet, onDeposit, onWithdraw }) {
             <span className="text-sm text-slate-500">Lifetime Earnings</span>
           </div>
           <p className="text-2xl font-bold text-slate-800">
-            {wallet?.lifetime_earnings?.toLocaleString() || '0'}
+            {(wallet?.lifetime_earnings ?? 0).toLocaleString()}
           </p>
         </div>
 
@@ -76,7 +76,7 @@ export default function TokenBalance({ wallet, onDeposit, onWithdraw }) {
             <span className="text-sm text-slate-500">Pending</span>
           </div>
           <p className="text-2xl font-bold text-slate-800">
-            {wallet?.pending_earnings?.toLocaleString() || '0'}
+            {(wallet?.pending_earnings ?? 0).toLocaleString()}
           </p>
         </div>
       </div>
