@@ -57,82 +57,34 @@ export default function BoostPostModal({ open, onClose, post, user }) {
 
   const boostMutation = useMutation({
     mutationFn: async () => {
-      const MAX_RETRIES = 3;
-      
-      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-        try {
-          if (!wallet || wallet.balance < budget) {
-            throw new Error('Insufficient $ASC balance');
-          }
+      // Process transaction through backend
+      await base44.functions.invoke('processWalletTransaction', {
+        transaction_type: 'post_promotion',
+        amount: budget,
+        description: `Boosted post - ${objective}`,
+        reference_id: post.id
+      });
 
-          // Re-fetch wallet to get current version
-          const freshWallets = await base44.entities.TokenWallet.filter({ id: wallet.id });
-          if (freshWallets.length === 0) {
-            throw new Error('Wallet not found');
-          }
-          const currentWallet = freshWallets[0];
-          const currentVersion = currentWallet.version || 0;
-          
-          // Check balance again with fresh data
-          if (currentWallet.balance < budget) {
-            throw new Error('Insufficient $ASC balance');
-          }
+      // Create promoted post
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + duration);
 
-          // Verify wallet version hasn't changed
-          const versionCheck = await base44.entities.TokenWallet.filter({
-            id: currentWallet.id,
-            version: currentVersion
-          });
-          
-          if (versionCheck.length === 0) {
-            throw new Error('OPTIMISTIC_LOCK_FAILED');
-          }
-
-          // Deduct budget from wallet
-          await base44.entities.TokenWallet.update(currentWallet.id, {
-            balance: currentWallet.balance - budget,
-            version: currentVersion + 1
-          });
-
-          // Create transaction record
-          await base44.entities.TokenTransaction.create({
-            user_id: user.id,
-            type: 'spending',
-            amount: -budget,
-            description: `Boosted post - ${objective}`,
-            related_id: post.id
-          });
-
-          // Create promoted post
-          const endDate = new Date();
-          endDate.setDate(endDate.getDate() + duration);
-
-          return base44.entities.PromotedPost.create({
-            post_id: post.id,
-            user_id: user.id,
-            user_name: user.full_name,
-            budget_asc: budget,
-            campaign_objective: objective,
-            target_age_min: ageMin,
-            target_age_max: ageMax,
-            target_gender: gender,
-            target_locations: selectedLocations,
-            target_interests: selectedInterests,
-            duration_days: duration,
-            start_date: new Date().toISOString(),
-            end_date: endDate.toISOString(),
-            status: 'active'
-          });
-        } catch (error) {
-          if (error.message === 'OPTIMISTIC_LOCK_FAILED' && attempt < MAX_RETRIES - 1) {
-            await new Promise(resolve => setTimeout(resolve, 100 * (attempt + 1)));
-            continue;
-          }
-          throw error;
-        }
-      }
-      
-      throw new Error('Transaction failed after retries');
+      return base44.entities.PromotedPost.create({
+        post_id: post.id,
+        user_id: user.id,
+        user_name: user.full_name,
+        budget_asc: budget,
+        campaign_objective: objective,
+        target_age_min: ageMin,
+        target_age_max: ageMax,
+        target_gender: gender,
+        target_locations: selectedLocations,
+        target_interests: selectedInterests,
+        duration_days: duration,
+        start_date: new Date().toISOString(),
+        end_date: endDate.toISOString(),
+        status: 'active'
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wallet'] });
