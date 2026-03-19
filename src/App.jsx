@@ -11,6 +11,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import WalletProvider from '@/components/wallet/WalletProvider';
 import AuditLogs from '@/pages/AuditLogs';
+import { useEffect } from 'react';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -21,36 +22,70 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   : <>{children}</>;
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, isAuthenticated, navigateToLogin } = useAuth();
+  const {
+    isLoadingAuth,
+    isLoadingPublicSettings,
+    authError,
+    navigateToLogin,
+  } = useAuth();
 
-  // Show loading spinner while checking app public settings or auth
+  useEffect(() => {
+    if (!authError) return;
+
+    if (
+      authError.type === 'auth_required' ||
+      authError.type === 'auth_expired' ||
+      authError.type === 'auth_forbidden'
+    ) {
+      navigateToLogin();
+    }
+  }, [authError, navigateToLogin]);
+
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
       <div className="fixed inset-0 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin" />
       </div>
     );
   }
 
-  // Handle authentication errors
-  if (authError) {
-    if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
-      navigateToLogin();
-      return null;
-    }
+  if (authError?.type === 'user_not_registered') {
+    return <UserNotRegisteredError />;
   }
 
-  // Render the main app
+  if (
+    authError?.type === 'network' ||
+    authError?.type === 'auth_unknown' ||
+    authError?.type === 'unknown'
+  ) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center p-6">
+        <div className="max-w-md rounded-2xl border bg-white p-6 text-center shadow">
+          <h2 className="text-lg font-semibold mb-2">Unable to load the app</h2>
+          <p className="text-sm text-slate-600 mb-4">
+            {authError.message || 'Something went wrong while checking authentication.'}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="rounded-lg bg-slate-900 px-4 py-2 text-white"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Routes>
-      <Route path="/" element={
-        <LayoutWrapper currentPageName={mainPageKey}>
-          <MainPage />
-        </LayoutWrapper>
-      } />
+      <Route
+        path="/"
+        element={
+          <LayoutWrapper currentPageName={mainPageKey}>
+            <MainPage />
+          </LayoutWrapper>
+        }
+      />
       {Object.entries(Pages).map(([path, Page]) => (
         <Route
           key={path}
@@ -62,11 +97,14 @@ const AuthenticatedApp = () => {
           }
         />
       ))}
-      <Route path="/AuditLogs" element={
-        <LayoutWrapper currentPageName="AuditLogs">
-          <AuditLogs />
-        </LayoutWrapper>
-      } />
+      <Route
+        path="/AuditLogs"
+        element={
+          <LayoutWrapper currentPageName="AuditLogs">
+            <AuditLogs />
+          </LayoutWrapper>
+        }
+      />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
