@@ -55,6 +55,15 @@ export default function SubscriptionTiers({ creatorId, currentUserId }) {
         nextBilling.setFullYear(nextBilling.getFullYear() + 1);
       }
 
+      // Process wallet transaction via backend
+      await base44.functions.invoke('processWalletTransaction', {
+        transaction_type: 'subscription',
+        amount: price,
+        recipient_id: creatorId,
+        description: `Subscription: ${tier.name} (${billingCycle})`,
+        reference_id: tier.id
+      });
+
       // Create subscription
       await base44.entities.CreatorSubscription.create({
         subscriber_id: currentUserId,
@@ -71,35 +80,6 @@ export default function SubscriptionTiers({ creatorId, currentUserId }) {
       // Update tier subscriber count
       await base44.entities.CreatorTier.update(tier.id, {
         subscriber_count: (tier.subscriber_count || 0) + 1
-      });
-
-      // Deduct from subscriber wallet
-      await base44.entities.TokenWallet.update(wallet.id, {
-        balance: (wallet.balance || 0) - price
-      });
-
-      // Add to creator wallet
-      const creatorWallets = await base44.entities.TokenWallet.filter({ user_id: creatorId });
-      if (creatorWallets[0]) {
-        await base44.entities.TokenWallet.update(creatorWallets[0].id, {
-          balance: (creatorWallets[0].balance || 0) + price,
-          lifetime_earnings: (creatorWallets[0].lifetime_earnings || 0) + price
-        });
-      }
-
-      // Record transactions
-      await base44.entities.TokenTransaction.create({
-        user_id: currentUserId,
-        type: 'spending',
-        amount: -price,
-        description: `Subscription: ${tier.name} (${billingCycle})`
-      });
-
-      await base44.entities.TokenTransaction.create({
-        user_id: creatorId,
-        type: 'earning',
-        amount: price,
-        description: `New subscriber: ${tier.name}`
       });
     },
     onSuccess: () => {

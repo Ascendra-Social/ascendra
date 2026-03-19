@@ -78,16 +78,10 @@ export default function CreateAdModal({ isOpen, onClose, user, wallet, ad, onCre
         mediaUrl = file_url;
       }
 
-      // Deduct tokens from wallet
-      await base44.entities.TokenWallet.update(wallet.id, {
-        balance: (wallet.balance || 0) - budget
-      });
-
-      // Record transaction
-      await base44.entities.TokenTransaction.create({
-        user_id: user.id,
-        type: 'spending',
-        amount: -budget,
+      // Process wallet transaction via backend
+      await base44.functions.invoke('processWalletTransaction', {
+        transaction_type: 'ad_campaign',
+        amount: budget,
         description: `Ad campaign: ${formData.title}`,
         reference_id: ad?.id || 'pending'
       });

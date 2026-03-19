@@ -48,6 +48,15 @@ export default function DigitalProductsGrid({ creatorId, currentUserId }) {
         throw new Error('Insufficient balance');
       }
 
+      // Process wallet transaction via backend
+      await base44.functions.invoke('processWalletTransaction', {
+        transaction_type: 'digital_product',
+        amount: product.price,
+        recipient_id: product.creator_id,
+        description: `Purchased: ${product.title}`,
+        reference_id: product.id
+      });
+
       // Create purchase record
       const purchase = await base44.entities.ProductPurchase.create({
         buyer_id: currentUserId,
@@ -61,35 +70,6 @@ export default function DigitalProductsGrid({ creatorId, currentUserId }) {
       // Update product sales count
       await base44.entities.DigitalProduct.update(product.id, {
         sales_count: (product.sales_count || 0) + 1
-      });
-
-      // Deduct from buyer wallet
-      await base44.entities.TokenWallet.update(wallet.id, {
-        balance: (wallet.balance || 0) - product.price
-      });
-
-      // Add to creator wallet
-      const creatorWallets = await base44.entities.TokenWallet.filter({ user_id: product.creator_id });
-      if (creatorWallets[0]) {
-        await base44.entities.TokenWallet.update(creatorWallets[0].id, {
-          balance: (creatorWallets[0].balance || 0) + product.price,
-          lifetime_earnings: (creatorWallets[0].lifetime_earnings || 0) + product.price
-        });
-      }
-
-      // Record transactions
-      await base44.entities.TokenTransaction.create({
-        user_id: currentUserId,
-        type: 'purchase',
-        amount: -product.price,
-        description: `Purchased: ${product.title}`
-      });
-
-      await base44.entities.TokenTransaction.create({
-        user_id: product.creator_id,
-        type: 'sale',
-        amount: product.price,
-        description: `Sale: ${product.title}`
       });
 
       return purchase;

@@ -40,44 +40,14 @@ export default function AppDetailModal({ app, open, onClose, user }) {
     mutationFn: async () => {
       setIsPurchasing(true);
       
-      // Check wallet balance
-      const wallets = await base44.entities.TokenWallet.filter({ user_id: user.id });
-      const wallet = wallets[0];
-      
-      if (wallet.balance < app.price) {
-        throw new Error('Insufficient ASCENDRA tokens');
-      }
-
-      // Deduct from buyer
-        await base44.entities.TokenWallet.update(wallet.id, {
-          balance: wallet.balance - app.price
-        });
-
-        // Record buyer transaction
-        await base44.entities.TokenTransaction.create({
-          user_id: user.id,
-          type: 'purchase',
-          amount: -app.price,
-          description: `Purchased ${app.title}`,
-          reference_id: app.id
-        });
-
-        // Credit developer
-        const devWallets = await base44.entities.TokenWallet.filter({ user_id: app.developer_id });
-        if (devWallets.length > 0) {
-          await base44.entities.TokenWallet.update(devWallets[0].id, {
-            balance: devWallets[0].balance + app.price,
-            lifetime_earnings: devWallets[0].lifetime_earnings + app.price
-          });
-
-          await base44.entities.TokenTransaction.create({
-            user_id: app.developer_id,
-            type: 'sale',
-            amount: app.price,
-            description: `Sale of ${app.title}`,
-            reference_id: app.id
-          });
-        }
+      // Process wallet transaction via backend
+      await base44.functions.invoke('processWalletTransaction', {
+        transaction_type: 'app_purchase',
+        amount: app.price,
+        recipient_id: app.developer_id,
+        description: `Purchased ${app.title}`,
+        reference_id: app.id
+      });
 
       // Create purchase record
       await base44.entities.AppPurchase.create({
