@@ -31,6 +31,8 @@ export default function CreateBusinessPage() {
   });
   const [logoFile, setLogoFile] = useState(null);
   const [coverFile, setCoverFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState('');
+  const [coverPreview, setCoverPreview] = useState('');
   const [uploading, setUploading] = useState(false);
 
   const navigate = useNavigate();
@@ -47,40 +49,62 @@ export default function CreateBusinessPage() {
     loadUser();
   }, []);
 
+  useEffect(() => {
+    if (!logoFile) {
+      setLogoPreview('');
+      return;
+    }
+    const nextUrl = URL.createObjectURL(logoFile);
+    setLogoPreview(nextUrl);
+    return () => URL.revokeObjectURL(nextUrl);
+  }, [logoFile]);
+
+  useEffect(() => {
+    if (!coverFile) {
+      setCoverPreview('');
+      return;
+    }
+    const nextUrl = URL.createObjectURL(coverFile);
+    setCoverPreview(nextUrl);
+    return () => URL.revokeObjectURL(nextUrl);
+  }, [coverFile]);
+
   const createBusinessMutation = useMutation({
     mutationFn: async () => {
+      if (!user?.id) {
+        throw new Error('You must be logged in to create a business page.');
+      }
+
       setUploading(true);
+
       let logoUrl = '';
       let coverUrl = '';
 
-      // Upload logo
       if (logoFile) {
         const { file_url } = await base44.integrations.Core.UploadFile({ file: logoFile });
         logoUrl = file_url;
       }
 
-      // Upload cover
       if (coverFile) {
         const { file_url } = await base44.integrations.Core.UploadFile({ file: coverFile });
         coverUrl = file_url;
       }
 
-      setUploading(false);
-
       return base44.entities.BusinessPage.create({
         owner_id: user.id,
         ...formData,
         logo_url: logoUrl,
-        cover_image_url: coverUrl
+        cover_image_url: coverUrl,
       });
     },
     onSuccess: (business) => {
+      setUploading(false);
       toast.success('Business page created! Pending review.');
       navigate(createPageUrl(`BusinessPage?id=${business.id}`));
     },
     onError: (error) => {
       setUploading(false);
-      toast.error('Failed to create business page');
+      toast.error(error?.message || 'Failed to create business page');
     }
   });
 
@@ -123,9 +147,9 @@ export default function CreateBusinessPage() {
           <div>
             <Label>Business Logo</Label>
             <div className="mt-2 flex items-center gap-4">
-              {logoFile && (
+              {logoPreview && (
                 <img 
-                  src={URL.createObjectURL(logoFile)} 
+                  src={logoPreview} 
                   className="w-20 h-20 rounded-xl object-cover"
                   alt="Logo preview"
                 />
@@ -149,9 +173,9 @@ export default function CreateBusinessPage() {
           <div>
             <Label>Cover Image</Label>
             <div className="mt-2">
-              {coverFile && (
+              {coverPreview && (
                 <img 
-                  src={URL.createObjectURL(coverFile)} 
+                  src={coverPreview} 
                   className="w-full h-40 rounded-xl object-cover mb-2"
                   alt="Cover preview"
                 />
