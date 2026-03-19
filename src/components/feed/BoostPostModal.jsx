@@ -87,7 +87,7 @@ export default function BoostPostModal({ open, onClose, post, user }) {
         status: 'active'
       });
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       await invalidateWalletQueries(queryClient, user.id);
       await invalidatePostQueries(queryClient, post.id);
       toast.success('Post boosted successfully! 🚀');
