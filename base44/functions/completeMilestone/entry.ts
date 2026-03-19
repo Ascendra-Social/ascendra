@@ -74,6 +74,15 @@ Deno.serve(async (req) => {
         version: creatorVersion + 1
       });
 
+      // Audit log
+      console.log('[AUDIT] Milestone Completion:', {
+        timestamp: new Date().toISOString(),
+        user_id: user.id,
+        contract_id: contract_id,
+        milestone_index: milestone_index,
+        payout_amount: milestone.payout_amount
+      });
+
       // Create transaction
       await base44.entities.TokenTransaction.create({
         user_id: user.id,
