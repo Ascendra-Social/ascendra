@@ -140,7 +140,8 @@ Deno.serve(async (req) => {
         });
         
         const lastPayout = recentPayouts
-          .sort((a, b) => new Date(b.created_date) - new Date(a.created_date))[0];
+          .filter(p => p.created_date)
+          .sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime())[0];
         
         if (lastPayout) {
           const timeSince = Date.now() - new Date(lastPayout.created_date).getTime();
