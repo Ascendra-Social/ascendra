@@ -101,36 +101,30 @@ function WalletContent() {
     staleTime: 5000
   });
 
-  const { data: wallet, isLoading: walletLoading, error: walletError } = useQuery({
-    queryKey: ['wallet', user?.id, walletAddress, tokenBalance],
+  // Fetch wallet metadata (earnings, pending) without creating records
+  const { data: wallet, isLoading: walletLoading } = useQuery({
+    queryKey: ['wallet-metadata', user?.id, walletAddress],
     queryFn: async () => {
       if (!user?.id || !walletAddress) return null;
 
       const wallets = await base44.entities.TokenWallet.filter({
         user_id: user.id,
-        token_contract_address: ASCENDRA_TOKEN_MINT,
         wallet_address: walletAddress,
-      });
+      }, '-created_date', 1);
 
-      if (wallets.length === 0) {
-        return await base44.entities.TokenWallet.create({
-          user_id: user.id,
-          token_contract_address: ASCENDRA_TOKEN_MINT,
-          balance: tokenBalance ?? 0,
-          lifetime_earnings: 0,
-          pending_earnings: 0,
-          wallet_address: walletAddress,
-        });
+      if (wallets.length > 0) {
+        return wallets[0];
       }
 
-      const dbWallet = wallets[0];
+      // Return minimal wallet object if none exists
       return {
-        ...dbWallet,
-        balance: typeof tokenBalance === 'number' ? tokenBalance : (dbWallet.balance ?? 0),
+        balance: 0,
+        lifetime_earnings: 0,
+        pending_earnings: 0,
         wallet_address: walletAddress,
       };
     },
-    enabled: !!user?.id && !!walletAddress && connected,
+    enabled: !!user?.id && !!walletAddress,
   });
 
   const { data: allTransactions, isLoading: transactionsLoading } = useQuery({
@@ -216,9 +210,14 @@ function WalletContent() {
       </motion.div>
 
       {/* Token Balance */}
-      {connected ? (
+      {connected && publicKey ? (
         <TokenBalance 
-          wallet={wallet || { balance: tokenBalance ?? 0, lifetime_earnings: 0, pending_earnings: 0 }}
+          wallet={{
+            balance: tokenBalance ?? 0,
+            lifetime_earnings: wallet?.lifetime_earnings ?? 0,
+            pending_earnings: wallet?.pending_earnings ?? 0,
+            wallet_address: walletAddress,
+          }}
           onDeposit={() => {}}
           onWithdraw={() => {}}
         />
