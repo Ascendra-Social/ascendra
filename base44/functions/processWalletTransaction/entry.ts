@@ -1,5 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.21';
 
+const VALID_TOKEN_CONTRACT = 'ATF7deyT7FdS7GHip1Btv8t6Mj9vhsfzffoMZhE2vvwR'; // Ascendra Social token
+
 Deno.serve(async (req) => {
   const MAX_RETRIES = 3;
   
@@ -25,10 +27,13 @@ Deno.serve(async (req) => {
         return Response.json({ error: 'Invalid transaction parameters' }, { status: 400 });
       }
 
-      // Get sender wallet with version
-      const senderWallets = await base44.entities.TokenWallet.filter({ user_id: user.id });
+      // Get sender wallet with version and validate token contract
+      const senderWallets = await base44.entities.TokenWallet.filter({ 
+        user_id: user.id,
+        token_contract_address: VALID_TOKEN_CONTRACT
+      });
       if (senderWallets.length === 0) {
-        return Response.json({ error: 'Wallet not found' }, { status: 404 });
+        return Response.json({ error: 'Valid token wallet not found' }, { status: 404 });
       }
       const senderWallet = senderWallets[0];
       const senderVersion = senderWallet.version || 0;
@@ -77,7 +82,8 @@ Deno.serve(async (req) => {
       // If there's a recipient, credit them
       if (recipient_id) {
         const recipientWallets = await base44.entities.TokenWallet.filter({ 
-          user_id: recipient_id 
+          user_id: recipient_id,
+          token_contract_address: VALID_TOKEN_CONTRACT
         });
         
         if (recipientWallets.length > 0) {

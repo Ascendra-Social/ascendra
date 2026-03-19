@@ -1,6 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.21';
 
 const PLATFORM_WALLET_ID = Deno.env.get('PLATFORM_WALLET_ID') || 'platform_system_account';
+const VALID_TOKEN_CONTRACT = 'ATF7deyT7FdS7GHip1Btv8t6Mj9vhsfzffoMZhE2vvwR'; // Ascendra Social token
 
 Deno.serve(async (req) => {
   const MAX_RETRIES = 3;
@@ -36,10 +37,13 @@ Deno.serve(async (req) => {
         return Response.json({ success: true, message: 'Already purchased' });
       }
 
-      // Get buyer wallet with version
-      const wallets = await base44.entities.TokenWallet.filter({ user_id: user.id });
+      // Get buyer wallet with version and validate token contract
+      const wallets = await base44.entities.TokenWallet.filter({ 
+        user_id: user.id,
+        token_contract_address: VALID_TOKEN_CONTRACT
+      });
       if (wallets.length === 0 || wallets[0].balance < post.access_price) {
-        return Response.json({ error: 'Insufficient balance' }, { status: 400 });
+        return Response.json({ error: 'Insufficient balance or invalid token' }, { status: 400 });
       }
       const buyerWallet = wallets[0];
       const buyerVersion = buyerWallet.version || 0;
@@ -54,9 +58,10 @@ Deno.serve(async (req) => {
       const netAmount = netInCents / 100;
       const grossAmount = post.access_price;
 
-      // Get creator wallet with version
+      // Get creator wallet with version and validate token contract
       const creatorWallets = await base44.entities.TokenWallet.filter({ 
-        user_id: post.author_id 
+        user_id: post.author_id,
+        token_contract_address: VALID_TOKEN_CONTRACT
       });
       if (creatorWallets.length === 0) {
         return Response.json({ error: 'Creator wallet not found' }, { status: 400 });
@@ -66,7 +71,8 @@ Deno.serve(async (req) => {
 
       // Get platform wallet (only accessible via service role)
       const platformWallets = await base44.asServiceRole.entities.TokenWallet.filter({ 
-        user_id: PLATFORM_WALLET_ID
+        user_id: PLATFORM_WALLET_ID,
+        token_contract_address: VALID_TOKEN_CONTRACT
       });
       let platformWallet = platformWallets[0];
       let platformVersion = 0;
@@ -74,6 +80,7 @@ Deno.serve(async (req) => {
       if (!platformWallet) {
         platformWallet = await base44.asServiceRole.entities.TokenWallet.create({
           user_id: PLATFORM_WALLET_ID,
+          token_contract_address: VALID_TOKEN_CONTRACT,
           balance: 0,
           version: 0
         });

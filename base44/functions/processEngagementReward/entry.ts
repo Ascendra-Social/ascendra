@@ -1,6 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.21';
 
 const PLATFORM_WALLET_ID = Deno.env.get('PLATFORM_WALLET_ID') || 'platform_system_account';
+const VALID_TOKEN_CONTRACT = 'ATF7deyT7FdS7GHip1Btv8t6Mj9vhsfzffoMZhE2vvwR'; // Ascendra Social token
 const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
 const MAX_REQUESTS_PER_WINDOW = 10; // Max 10 engagement rewards per minute per user
 
@@ -190,7 +191,8 @@ Deno.serve(async (req) => {
 
       // Get platform wallet (only accessible via service role)
       const platformWallets = await base44.asServiceRole.entities.TokenWallet.filter({ 
-        user_id: PLATFORM_WALLET_ID
+        user_id: PLATFORM_WALLET_ID,
+        token_contract_address: VALID_TOKEN_CONTRACT
       });
       let platformWallet = platformWallets[0];
       let platformVersion = 0;
@@ -198,6 +200,7 @@ Deno.serve(async (req) => {
       if (!platformWallet) {
         platformWallet = await base44.asServiceRole.entities.TokenWallet.create({
           user_id: PLATFORM_WALLET_ID,
+          token_contract_address: VALID_TOKEN_CONTRACT,
           balance: 0,
           version: 0
         });
