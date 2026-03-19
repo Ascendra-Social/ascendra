@@ -71,6 +71,8 @@ function WalletContent() {
     loadUser();
   }, []);
 
+  const walletAddress = publicKey?.toString() ?? null;
+
   // Fetch on-chain token balance
   const { data: tokenBalance, isLoading: balanceLoading } = useQuery({
     queryKey: ['solana-balance', publicKey?.toString()],
@@ -78,8 +80,6 @@ function WalletContent() {
       if (!publicKey || !connected) return 0;
       
       try {
-        const mintPubkey = new PublicKey(ASCENDRA_TOKEN_MINT);
-        
         // Get all token accounts for this wallet
         const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
@@ -105,33 +105,39 @@ function WalletContent() {
   });
 
   const { data: wallet, isLoading: walletLoading } = useQuery({
-    queryKey: ['wallet', user?.id],
+    queryKey: ['wallet', user?.id, walletAddress],
     queryFn: async () => {
-      const wallets = await base44.entities.TokenWallet.filter({ 
-        user_id: user?.id,
-        token_contract_address: ASCENDRA_TOKEN_MINT
+      if (!user?.id || !walletAddress) return null;
+
+      const wallets = await base44.entities.TokenWallet.filter({
+        user_id: user.id,
+        token_contract_address: ASCENDRA_TOKEN_MINT,
+        wallet_address: walletAddress,
       });
+
       if (wallets.length === 0) {
-        // Create wallet record
-        const newWallet = await base44.entities.TokenWallet.create({
+        return await base44.entities.TokenWallet.create({
           user_id: user.id,
           token_contract_address: ASCENDRA_TOKEN_MINT,
           balance: tokenBalance || 0,
           lifetime_earnings: 0,
           pending_earnings: 0,
-          wallet_address: publicKey?.toString() || ''
+          wallet_address: walletAddress,
         });
-        return newWallet;
       }
-      // Return wallet with live balance
-      const dbWallet = wallets.reduce((max, w) => (w.balance > max.balance ? w : max), wallets[0]);
+
+      const dbWallet = wallets.reduce(
+        (max, w) => (w.balance > max.balance ? w : max),
+        wallets[0]
+      );
+
       return {
         ...dbWallet,
-        balance: tokenBalance || dbWallet.balance,
-        wallet_address: publicKey?.toString() || dbWallet.wallet_address
+        balance: tokenBalance ?? dbWallet.balance ?? 0,
+        wallet_address: walletAddress,
       };
     },
-    enabled: !!user && !balanceLoading
+    enabled: !!user?.id && !!walletAddress && connected && !balanceLoading,
   });
 
   const { data: allTransactions, isLoading: transactionsLoading } = useQuery({
