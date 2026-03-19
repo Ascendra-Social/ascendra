@@ -32,116 +32,32 @@ export default function TipButton({ post, currentUserId, className }) {
 
   const tipMutation = useMutation({
     mutationFn: async () => {
-      const MAX_RETRIES = 3;
+      const tipAmount = parseFloat(amount);
       
-      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-        try {
-          const tipAmount = parseFloat(amount);
-          
-          if (!wallet) {
-            throw new Error('Wallet not loaded');
-          }
-
-          if (tipAmount > (wallet?.balance || 0)) {
-            throw new Error('Insufficient balance');
-          }
-
-          if (tipAmount < 1) {
-            throw new Error('Minimum tip is 1 $ASC');
-          }
-
-          const currentUser = await base44.auth.me();
-          
-          // Re-fetch wallets to get current versions
-          const freshTipperWallets = await base44.entities.TokenWallet.filter({ id: wallet.id });
-          if (freshTipperWallets.length === 0) {
-            throw new Error('Wallet not found');
-          }
-          const tipperWallet = freshTipperWallets[0];
-          const tipperVersion = tipperWallet.version || 0;
-          
-          // Check balance again with fresh data
-          if (tipperWallet.balance < tipAmount) {
-            throw new Error('Insufficient balance');
-          }
-
-          // Get creator wallet with version
-          const creatorWallets = await base44.entities.TokenWallet.filter({ user_id: post.author_id });
-          if (creatorWallets.length === 0) {
-            throw new Error('Creator wallet not found');
-          }
-          const creatorWallet = creatorWallets[0];
-          const creatorVersion = creatorWallet.version || 0;
-
-          // Verify tipper wallet version hasn't changed
-          const tipperCheck = await base44.entities.TokenWallet.filter({
-            id: tipperWallet.id,
-            version: tipperVersion
-          });
-          
-          if (tipperCheck.length === 0) {
-            throw new Error('OPTIMISTIC_LOCK_FAILED');
-          }
-
-          // Deduct from tipper wallet
-          await base44.entities.TokenWallet.update(tipperWallet.id, {
-            balance: tipperWallet.balance - tipAmount,
-            version: tipperVersion + 1
-          });
-
-          // Verify creator wallet version
-          const creatorCheck = await base44.entities.TokenWallet.filter({
-            id: creatorWallet.id,
-            version: creatorVersion
-          });
-          
-          if (creatorCheck.length === 0) {
-            throw new Error('OPTIMISTIC_LOCK_FAILED');
-          }
-
-          // Add to creator wallet
-          await base44.entities.TokenWallet.update(creatorWallet.id, {
-            balance: creatorWallet.balance + tipAmount,
-            lifetime_earnings: (creatorWallet.lifetime_earnings || 0) + tipAmount,
-            version: creatorVersion + 1
-          });
-
-          // Create tip record
-          await base44.entities.Tip.create({
-            tipper_id: currentUserId,
-            tipper_name: currentUser.full_name,
-            recipient_id: post.author_id,
-            post_id: post.id,
-            amount: tipAmount,
-            message: message || ''
-          });
-
-          // Record transactions
-          await base44.entities.TokenTransaction.create({
-            user_id: currentUserId,
-            type: 'spending',
-            amount: -tipAmount,
-            description: `Tip to ${post.author_name}`
-          });
-
-          await base44.entities.TokenTransaction.create({
-            user_id: post.author_id,
-            type: 'earning',
-            amount: tipAmount,
-            description: `Tip from supporter`
-          });
-
-          return;
-        } catch (error) {
-          if (error.message === 'OPTIMISTIC_LOCK_FAILED' && attempt < MAX_RETRIES - 1) {
-            await new Promise(resolve => setTimeout(resolve, 100 * (attempt + 1)));
-            continue;
-          }
-          throw error;
-        }
+      if (tipAmount < 1) {
+        throw new Error('Minimum tip is 1 $ASC');
       }
-      
-      throw new Error('Transaction failed after retries');
+
+      const currentUser = await base44.auth.me();
+
+      // Process transaction through backend
+      await base44.functions.invoke('processWalletTransaction', {
+        transaction_type: 'tip',
+        amount: tipAmount,
+        recipient_id: post.author_id,
+        description: `Tip to ${post.author_name}`,
+        reference_id: post.id
+      });
+
+      // Create tip record
+      await base44.entities.Tip.create({
+        tipper_id: currentUserId,
+        tipper_name: currentUser.full_name,
+        recipient_id: post.author_id,
+        post_id: post.id,
+        amount: tipAmount,
+        message: message || ''
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wallet'] });
