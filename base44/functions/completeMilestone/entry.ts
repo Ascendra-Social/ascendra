@@ -69,10 +69,13 @@ Deno.serve(async (req) => {
         return Response.json({ error: 'Insufficient contract budget' }, { status: 400 });
       }
 
-      // Get creator wallet with version
-      const wallets = await base44.entities.TokenWallet.filter({ user_id: user.id });
+      // Get creator wallet with version and validate token contract
+      const wallets = await base44.asServiceRole.entities.TokenWallet.filter({ 
+        user_id: user.id,
+        token_contract_address: VALID_TOKEN_CONTRACT
+      });
       if (wallets.length === 0) {
-        return Response.json({ error: 'Wallet not found' }, { status: 400 });
+        return Response.json({ error: 'Valid token wallet not found' }, { status: 400 });
       }
       const creatorWallet = wallets[0];
       const creatorVersion = creatorWallet.version || 0;

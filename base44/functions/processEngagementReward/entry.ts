@@ -174,14 +174,18 @@ Deno.serve(async (req) => {
       const netReward = netInCents / 100;
       const grossAmount = rewardAmount;
 
-      // Get user wallet with version
-      const wallets = await base44.entities.TokenWallet.filter({ user_id: user.id });
+      // Get user wallet with version and validate token contract
+      const wallets = await base44.entities.TokenWallet.filter({ 
+        user_id: user.id,
+        token_contract_address: VALID_TOKEN_CONTRACT
+      });
       let userWallet = wallets[0];
       let userVersion = 0;
       
       if (!userWallet) {
         userWallet = await base44.entities.TokenWallet.create({
           user_id: user.id,
+          token_contract_address: VALID_TOKEN_CONTRACT,
           balance: 0,
           version: 0
         });
