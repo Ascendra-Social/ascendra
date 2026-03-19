@@ -63,38 +63,46 @@ function WalletContent() {
   const walletAddress = publicKey?.toString() ?? null;
 
   // Fetch on-chain token balance
-  const { data: tokenBalance, isLoading: balanceLoading } = useQuery({
-    queryKey: ['solana-balance', publicKey?.toString()],
+  const { data: tokenBalance, isLoading: balanceLoading, error: balanceError } = useQuery({
+    queryKey: ['solana-balance', publicKey?.toString(), connected],
     queryFn: async () => {
       if (!publicKey || !connected) return 0;
       
       try {
-        // Get all token accounts for this wallet
         const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
           programId: TOKEN_PROGRAM_ID
         });
         
-        // Find the Ascendra token account
-        const ascendraAccount = tokenAccounts.value.find(
-          account => account.account.data.parsed.info.mint === ASCENDRA_TOKEN_MINT
-        );
+        // Find the Ascendra token account by matching mint
+        const ascendraAccount = tokenAccounts.value.find(account => {
+          try {
+            const mint = account.account.data.parsed?.info?.mint;
+            return mint === ASCENDRA_TOKEN_MINT;
+          } catch (e) {
+            return false;
+          }
+        });
         
-        if (!ascendraAccount) return 0;
+        if (!ascendraAccount) {
+          console.log('No Ascendra token account found for wallet');
+          return 0;
+        }
         
-        const balance = ascendraAccount.account.data.parsed.info.tokenAmount.uiAmount;
-        return balance || 0;
+        const uiAmount = ascendraAccount.account.data.parsed?.info?.tokenAmount?.uiAmount;
+        return uiAmount || 0;
       } catch (error) {
         console.error('Error fetching token balance:', error);
         return 0;
       }
     },
     enabled: !!publicKey && connected,
-    refetchInterval: 10000 // Refresh every 10 seconds
+    refetchInterval: 10000,
+    staleTime: 5000
   });
 
-  const { data: wallet, isLoading: walletLoading } = useQuery({
-    queryKey: ['wallet', user?.id, walletAddress],
+  const { data: wallet, isLoading: walletLoading, error: walletError } = useQuery({
+    queryKey: ['wallet', user?.id, walletAddress, tokenBalance],
     queryFn: async () => {
       if (!user?.id || !walletAddress) return null;
 
@@ -108,25 +116,21 @@ function WalletContent() {
         return await base44.entities.TokenWallet.create({
           user_id: user.id,
           token_contract_address: ASCENDRA_TOKEN_MINT,
-          balance: tokenBalance || 0,
+          balance: tokenBalance ?? 0,
           lifetime_earnings: 0,
           pending_earnings: 0,
           wallet_address: walletAddress,
         });
       }
 
-      const dbWallet = wallets.reduce(
-        (max, w) => (w.balance > max.balance ? w : max),
-        wallets[0]
-      );
-
+      const dbWallet = wallets[0];
       return {
         ...dbWallet,
-        balance: tokenBalance ?? dbWallet.balance ?? 0,
+        balance: typeof tokenBalance === 'number' ? tokenBalance : (dbWallet.balance ?? 0),
         wallet_address: walletAddress,
       };
     },
-    enabled: !!user?.id && !!walletAddress && connected && !balanceLoading,
+    enabled: !!user?.id && !!walletAddress && connected,
   });
 
   const { data: allTransactions, isLoading: transactionsLoading } = useQuery({
@@ -163,7 +167,17 @@ function WalletContent() {
     { label: 'Marketplace Sales', amount: 320, icon: ShoppingBag, color: 'pink' },
   ];
 
-  if (!user || walletLoading) {
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />
+      </div>
+    );
+  }
+
+  const isLoading = walletLoading || balanceLoading;
+
+  if (isLoading) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         <Skeleton className="h-64 rounded-3xl" />
@@ -202,11 +216,24 @@ function WalletContent() {
       </motion.div>
 
       {/* Token Balance */}
-      <TokenBalance 
-        wallet={wallet}
-        onDeposit={() => {}}
-        onWithdraw={() => {}}
-      />
+      {connected ? (
+        <TokenBalance 
+          wallet={wallet || { balance: tokenBalance ?? 0, lifetime_earnings: 0, pending_earnings: 0 }}
+          onDeposit={() => {}}
+          onWithdraw={() => {}}
+        />
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-br from-cyan-500 via-blue-500 to-purple-600 rounded-3xl p-8 text-white text-center"
+        >
+          <Coins className="w-12 h-12 mx-auto mb-4 text-white/80" />
+          <h3 className="text-xl font-semibold mb-2">ASC Balance</h3>
+          <p className="text-white/60 mb-4">Connect your wallet to view your Ascendra token balance</p>
+          <WalletMultiButton className="!bg-white !text-cyan-600 !rounded-xl" />
+        </motion.div>
+      )}
 
       {/* Quick Actions */}
       <motion.div
