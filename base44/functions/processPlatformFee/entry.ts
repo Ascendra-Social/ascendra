@@ -1,7 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 
 const PLATFORM_FEE_PERCENTAGE = 1; // 1% platform fee
-const PLATFORM_WALLET_ID = 'platform'; // Special platform user ID
+const PLATFORM_WALLET_ID = Deno.env.get('PLATFORM_WALLET_ID') || 'platform_system_account';
 
 Deno.serve(async (req) => {
   try {
