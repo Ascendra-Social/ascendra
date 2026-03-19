@@ -1,5 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.21';
 
+const PLATFORM_WALLET_ID = Deno.env.get('PLATFORM_WALLET_ID') || 'platform_system_account';
+
 Deno.serve(async (req) => {
   const MAX_RETRIES = 3;
   
@@ -140,16 +142,16 @@ Deno.serve(async (req) => {
         userVersion = userWallet.version || 0;
       }
 
-      // Get platform wallet
+      // Get platform wallet (only accessible via service role)
       const platformWallets = await base44.asServiceRole.entities.TokenWallet.filter({ 
-        user_id: 'platform' 
+        user_id: PLATFORM_WALLET_ID
       });
       let platformWallet = platformWallets[0];
       let platformVersion = 0;
       
       if (!platformWallet) {
         platformWallet = await base44.asServiceRole.entities.TokenWallet.create({
-          user_id: 'platform',
+          user_id: PLATFORM_WALLET_ID,
           balance: 0,
           version: 0
         });
@@ -210,7 +212,7 @@ Deno.serve(async (req) => {
       });
 
       await base44.asServiceRole.entities.TokenTransaction.create({
-        user_id: 'platform',
+        user_id: PLATFORM_WALLET_ID,
         type: 'earning',
         amount: feeAmount,
         gross_amount: grossAmount,
