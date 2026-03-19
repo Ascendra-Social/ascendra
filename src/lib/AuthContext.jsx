@@ -78,12 +78,37 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Unexpected error:', error);
-      setAuthError({
-        type: 'unknown',
-        message: error.message || 'An unexpected error occurred'
-      });
-      setIsLoadingPublicSettings(false);
-      setIsLoadingAuth(false);
+      
+      // Classify error type
+      const isNetworkError = !error.status && (
+        error.message?.includes('network') ||
+        error.message?.includes('fetch') ||
+        error.code === 'ECONNREFUSED' ||
+        error.code === 'ETIMEDOUT'
+      );
+      
+      if (isNetworkError) {
+        // Network errors - implement retry logic
+        setAuthError({
+          type: 'network',
+          message: 'Network connection failed. Retrying...',
+          retryable: true
+        });
+        
+        // Retry after 2 seconds
+        setTimeout(() => {
+          checkAppState();
+        }, 2000);
+      } else {
+        // Permanent errors - don't retry
+        setAuthError({
+          type: 'unknown',
+          message: error.message || 'An unexpected error occurred',
+          retryable: false
+        });
+        setIsLoadingPublicSettings(false);
+        setIsLoadingAuth(false);
+      }
     }
   };
 
@@ -100,11 +125,31 @@ export const AuthProvider = ({ children }) => {
       setIsLoadingAuth(false);
       setIsAuthenticated(false);
       
-      // If user auth fails, it might be an expired token
-      if (error.status === 401 || error.status === 403) {
+      // Classify auth errors
+      if (error.status === 401) {
         setAuthError({
-          type: 'auth_required',
-          message: 'Authentication required'
+          type: 'auth_expired',
+          message: 'Session expired. Please log in again.',
+          retryable: false
+        });
+      } else if (error.status === 403) {
+        setAuthError({
+          type: 'auth_forbidden',
+          message: 'Access forbidden',
+          retryable: false
+        });
+      } else if (!error.status) {
+        // Network error during auth check
+        setAuthError({
+          type: 'network',
+          message: 'Network error during authentication',
+          retryable: true
+        });
+      } else {
+        setAuthError({
+          type: 'auth_unknown',
+          message: error.message || 'Authentication failed',
+          retryable: false
         });
       }
     }
