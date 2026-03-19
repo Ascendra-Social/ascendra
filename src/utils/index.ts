@@ -1,3 +1,5 @@
 export function createPageUrl(pageName: string) {
-    return '/' + pageName.replace(/ /g, '-');
+  const [pathPart, queryAndHash = ''] = pageName.split(/(?=[?#])/);
+  const normalizedPath = pathPart.trim().replace(/ /g, '-');
+  return `/${normalizedPath}${queryAndHash}`;
 }
