@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import CreateSmartContractModal from '@/components/smartcontracts/CreateSmartContractModal';
+import BlockchainStateMonitor from '@/components/smartcontracts/BlockchainStateMonitor';
 import { 
   FileCode, Plus, Zap, Users, TrendingUp, DollarSign, 
   Clock, CheckCircle, Pause, Play, XCircle 
@@ -269,6 +270,11 @@ export default function SmartContracts() {
           <TabsTrigger value="earnings" className="rounded-xl data-[state=active]:bg-cyan-500/20">
             My Earnings
           </TabsTrigger>
+          {user?.role === 'admin' && (
+            <TabsTrigger value="monitoring" className="rounded-xl data-[state=active]:bg-cyan-500/20">
+              Blockchain Monitor
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="my_contracts" className="space-y-4">
@@ -338,6 +344,12 @@ export default function SmartContracts() {
             </div>
           )}
         </TabsContent>
+
+        {user?.role === 'admin' && (
+          <TabsContent value="monitoring">
+            <BlockchainStateMonitor />
+          </TabsContent>
+        )}
       </Tabs>
 
       {/* Create Modal */}
