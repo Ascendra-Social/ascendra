@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useMutation } from '@tanstack/react-query';
+import { useAuth } from '@/lib/AuthContext';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,7 +20,7 @@ const categories = [
 ];
 
 export default function CreateBusinessPage() {
-  const [user, setUser] = useState(null);
+  const { user, isLoadingAuth } = useAuth();
   const [formData, setFormData] = useState({
     business_name: '',
     business_category: '',
@@ -36,18 +37,6 @@ export default function CreateBusinessPage() {
   const [uploading, setUploading] = useState(false);
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const currentUser = await base44.auth.me();
-        setUser(currentUser);
-      } catch (e) {
-        base44.auth.redirectToLogin();
-      }
-    };
-    loadUser();
-  }, []);
 
   useEffect(() => {
     if (!logoFile) {
@@ -117,7 +106,7 @@ export default function CreateBusinessPage() {
     createBusinessMutation.mutate();
   };
 
-  if (!user) {
+  if (isLoadingAuth || !user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />

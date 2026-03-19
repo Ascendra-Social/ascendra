@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/lib/AuthContext';
 import { 
   Coins, TrendingUp, ArrowUpRight, ArrowDownLeft, 
   Clock, Sparkles, Gift, ShoppingBag, Zap, Wallet as WalletIcon, Send, Repeat, Filter
@@ -44,7 +45,7 @@ const transactionColors = {
 };
 
 function WalletContent() {
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
   const [showFilters, setShowFilters] = useState(false);
   const [showSendModal, setShowSendModal] = useState(false);
   const [showRecurringModal, setShowRecurringModal] = useState(false);
@@ -58,18 +59,6 @@ function WalletContent() {
   
   const { publicKey, connected } = useWallet();
   const { connection } = useConnection();
-
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const currentUser = await base44.auth.me();
-        setUser(currentUser);
-      } catch (e) {
-        base44.auth.redirectToLogin();
-      }
-    };
-    loadUser();
-  }, []);
 
   const walletAddress = publicKey?.toString() ?? null;
 
