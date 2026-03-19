@@ -2,7 +2,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.21';
 
 Deno.serve(async (req) => {
   const MAX_RETRIES = 3;
-  
+
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
       const base44 = createClientFromRequest(req);
@@ -12,7 +12,17 @@ Deno.serve(async (req) => {
         return Response.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const { contract_id, milestone_index } = await req.json();
+      const body = await req.json();
+      const { contract_id, milestone_index } = body;
+
+      // Comprehensive input validation
+      if (!contract_id || typeof contract_id !== 'string' || contract_id.trim() === '') {
+        return Response.json({ error: 'Invalid contract_id: must be a non-empty string' }, { status: 400 });
+      }
+
+      if (typeof milestone_index !== 'number' || !Number.isInteger(milestone_index) || milestone_index < 0) {
+        return Response.json({ error: 'Invalid milestone_index: must be a non-negative integer' }, { status: 400 });
+      }
 
       // Get contract
       const contracts = await base44.entities.SmartContract.filter({ id: contract_id });
