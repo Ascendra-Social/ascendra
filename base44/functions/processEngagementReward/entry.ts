@@ -1,6 +1,35 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.21';
 
 const PLATFORM_WALLET_ID = Deno.env.get('PLATFORM_WALLET_ID') || 'platform_system_account';
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 10; // Max 10 engagement rewards per minute per user
+
+// In-memory rate limiting store (consider Redis for production multi-instance deployments)
+const rateLimitStore = new Map();
+
+function checkRateLimit(userId) {
+  const now = Date.now();
+  const userKey = `engagement:${userId}`;
+  const userLimit = rateLimitStore.get(userKey) || { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
+  
+  // Reset if window expired
+  if (now > userLimit.resetAt) {
+    userLimit.count = 0;
+    userLimit.resetAt = now + RATE_LIMIT_WINDOW_MS;
+  }
+  
+  // Check if limit exceeded
+  if (userLimit.count >= MAX_REQUESTS_PER_WINDOW) {
+    const waitSeconds = Math.ceil((userLimit.resetAt - now) / 1000);
+    return { allowed: false, waitSeconds };
+  }
+  
+  // Increment count
+  userLimit.count++;
+  rateLimitStore.set(userKey, userLimit);
+  
+  return { allowed: true };
+}
 
 Deno.serve(async (req) => {
   const MAX_RETRIES = 3;
@@ -12,6 +41,23 @@ Deno.serve(async (req) => {
 
       if (!user) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+
+      // Server-side rate limiting
+      const rateLimitCheck = checkRateLimit(user.id);
+      if (!rateLimitCheck.allowed) {
+        console.log('[SECURITY] Rate limit exceeded:', {
+          timestamp: new Date().toISOString(),
+          user_id: user.id,
+          wait_seconds: rateLimitCheck.waitSeconds
+        });
+        return Response.json({ 
+          error: 'Rate limit exceeded. Too many requests.',
+          retry_after_seconds: rateLimitCheck.waitSeconds
+        }, { 
+          status: 429,
+          headers: { 'Retry-After': rateLimitCheck.waitSeconds.toString() }
+        });
       }
 
       const body = await req.json();
