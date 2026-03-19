@@ -14,12 +14,19 @@ const WALLETS = [
     chains: ['ETH', 'BNB', 'MATIC'],
     popular: true,
     connect: async () => {
-      if (!window.ethereum || !window.ethereum.isMetaMask) {
-        window.open('https://metamask.io/download/', '_blank');
-        throw new Error('MetaMask not installed. Opening download page...');
+      try {
+        if (typeof window === 'undefined' || !window.ethereum?.isMetaMask) {
+          window.open('https://metamask.io/download/', '_blank');
+          throw new Error('MetaMask not installed. Opening download page...');
+        }
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        return { address: accounts[0], wallet: 'MetaMask' };
+      } catch (err) {
+        if (err.code === 4001) {
+          throw new Error('Connection request rejected');
+        }
+        throw err;
       }
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      return { address: accounts[0], wallet: 'MetaMask' };
     }
   },
   {
@@ -30,12 +37,19 @@ const WALLETS = [
     chains: ['SOL', 'ETH', 'MATIC'],
     popular: true,
     connect: async () => {
-      if (!window.solana || !window.solana.isPhantom) {
-        window.open('https://phantom.app/', '_blank');
-        throw new Error('Phantom not installed. Opening download page...');
+      try {
+        if (typeof window === 'undefined' || !window.solana?.isPhantom) {
+          window.open('https://phantom.app/', '_blank');
+          throw new Error('Phantom not installed. Opening download page...');
+        }
+        const resp = await window.solana.connect();
+        return { address: resp.publicKey.toString(), wallet: 'Phantom' };
+      } catch (err) {
+        if (err.message?.includes('User rejected')) {
+          throw new Error('Connection request rejected');
+        }
+        throw err;
       }
-      const resp = await window.solana.connect();
-      return { address: resp.publicKey.toString(), wallet: 'Phantom' };
     }
   },
   {
@@ -46,12 +60,19 @@ const WALLETS = [
     chains: ['ETH', 'SOL', 'BTC'],
     popular: false,
     connect: async () => {
-      if (!window.ethereum?.isCoinbaseWallet) {
-        window.open('https://www.coinbase.com/wallet', '_blank');
-        throw new Error('Coinbase Wallet not installed. Opening download page...');
+      try {
+        if (typeof window === 'undefined' || !window.ethereum?.isCoinbaseWallet) {
+          window.open('https://www.coinbase.com/wallet', '_blank');
+          throw new Error('Coinbase Wallet not installed. Opening download page...');
+        }
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        return { address: accounts[0], wallet: 'Coinbase Wallet' };
+      } catch (err) {
+        if (err.code === 4001) {
+          throw new Error('Connection request rejected');
+        }
+        throw err;
       }
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      return { address: accounts[0], wallet: 'Coinbase Wallet' };
     }
   },
   {
@@ -62,12 +83,19 @@ const WALLETS = [
     chains: ['BNB', 'ETH', 'SOL'],
     popular: false,
     connect: async () => {
-      if (!window.ethereum?.isTrust) {
-        window.open('https://trustwallet.com/', '_blank');
-        throw new Error('Trust Wallet not installed. Opening download page...');
+      try {
+        if (typeof window === 'undefined' || !window.ethereum?.isTrust) {
+          window.open('https://trustwallet.com/', '_blank');
+          throw new Error('Trust Wallet not installed. Opening download page...');
+        }
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        return { address: accounts[0], wallet: 'Trust Wallet' };
+      } catch (err) {
+        if (err.code === 4001) {
+          throw new Error('Connection request rejected');
+        }
+        throw err;
       }
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      return { address: accounts[0], wallet: 'Trust Wallet' };
     }
   },
   {
