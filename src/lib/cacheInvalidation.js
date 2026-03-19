@@ -5,10 +5,13 @@
 
 export const invalidateWalletQueries = (queryClient, userId) => {
   return Promise.all([
+    // Invalidate all wallet queries (with or without userId)
     queryClient.invalidateQueries({ queryKey: ['wallet', userId] }),
     queryClient.invalidateQueries({ queryKey: ['wallet'] }),
-    queryClient.invalidateQueries({ queryKey: ['transactions', userId] }),
-    queryClient.invalidateQueries({ queryKey: ['transactions'] })
+    // Invalidate all transaction queries (matches all limit variations)
+    queryClient.invalidateQueries({ 
+      predicate: (query) => query.queryKey[0] === 'transactions' && (!userId || query.queryKey[1] === userId)
+    })
   ]);
 };
 
