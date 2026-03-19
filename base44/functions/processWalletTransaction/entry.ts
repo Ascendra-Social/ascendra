@@ -54,12 +54,23 @@ Deno.serve(async (req) => {
         version: senderVersion + 1
       });
 
-      // Record sender transaction
-      await base44.entities.TokenTransaction.create({
+      // Record sender transaction with audit logging
+      const senderTx = await base44.entities.TokenTransaction.create({
         user_id: user.id,
         type: 'spending',
         amount: -amount,
         description: description || `${transaction_type} payment`,
+        reference_id: reference_id
+      });
+
+      // Audit log
+      console.log('[AUDIT] Wallet Transaction:', {
+        timestamp: new Date().toISOString(),
+        transaction_id: senderTx.id,
+        user_id: user.id,
+        type: transaction_type,
+        amount: amount,
+        recipient_id: recipient_id,
         reference_id: reference_id
       });
 

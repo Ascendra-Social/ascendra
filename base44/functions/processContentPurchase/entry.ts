@@ -141,6 +141,17 @@ Deno.serve(async (req) => {
         purchase_count: (post.purchase_count || 0) + 1
       });
 
+      // Audit log
+      console.log('[AUDIT] Content Purchase:', {
+        timestamp: new Date().toISOString(),
+        buyer_id: user.id,
+        creator_id: post.author_id,
+        post_id: post.id,
+        gross_amount: grossAmount,
+        fee_amount: feeAmount,
+        net_amount: netAmount
+      });
+
       // Create transactions with gross and fee tracking
       await base44.entities.TokenTransaction.create({
         user_id: user.id,

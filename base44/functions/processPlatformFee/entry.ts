@@ -38,6 +38,17 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Audit log
+    console.log('[AUDIT] Platform Fee:', {
+      timestamp: new Date().toISOString(),
+      transaction_type: transaction_type,
+      from_user_id: from_user_id,
+      to_user_id: to_user_id,
+      gross_amount: grossAmount,
+      fee_amount: feeAmount,
+      net_amount: netAmount
+    });
+
     // Record platform fee transaction with gross and fee tracking
     await base44.asServiceRole.entities.TokenTransaction.create({
       user_id: PLATFORM_WALLET_ID,

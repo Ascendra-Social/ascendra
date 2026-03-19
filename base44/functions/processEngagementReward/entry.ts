@@ -171,6 +171,17 @@ Deno.serve(async (req) => {
         version: platformVersion + 1
       });
 
+      // Audit log
+      console.log('[AUDIT] Engagement Reward:', {
+        timestamp: new Date().toISOString(),
+        user_id: user.id,
+        contract_id: smartContract.id,
+        engagement_type: engagement_type,
+        gross_amount: grossAmount,
+        fee_amount: feeAmount,
+        net_reward: netReward
+      });
+
       // Create transaction with gross and fee tracking
       await base44.entities.TokenTransaction.create({
         user_id: user.id,
