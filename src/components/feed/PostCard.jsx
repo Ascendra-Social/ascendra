@@ -25,45 +25,32 @@ import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 
-export default function PostCard({ post, currentUserId, communityId, onLike, onComment }) {
+export default function PostCard({ post, currentUserId, currentUser, communityId, onLike, onComment }) {
+  // Use passed currentUser prop to avoid per-card auth.me() calls
+  const user = currentUser || null;
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likes_count || 0);
   const [showComments, setShowComments] = useState(false);
   const [showAIRepost, setShowAIRepost] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const [user, setUser] = useState(null);
+  const [isBookmarked, setIsBookmarked] = useState(() => (currentUser?.bookmarked_posts || []).includes(post.id));
   const [userVote, setUserVote] = useState(null);
   const [upvotesCount, setUpvotesCount] = useState(post.upvotes_count || 0);
   const [downvotesCount, setDownvotesCount] = useState(post.downvotes_count || 0);
   const [isDeleted, setIsDeleted] = useState(false);
 
   React.useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const currentUser = await base44.auth.me();
-        setUser(currentUser);
-        
-        // Check if bookmarked
-        const bookmarks = currentUser.bookmarked_posts || [];
-        setIsBookmarked(bookmarks.includes(post.id));
-        
-        // Load user's existing vote
-        const votes = await base44.entities.Vote.filter({
-          user_id: currentUser.id,
-          content_id: post.id,
-          content_type: 'post'
-        });
-        if (votes.length > 0) {
-          setUserVote(votes[0].vote_type);
-        }
-      } catch (e) {
-        console.log('Not logged in');
-      }
-    };
-    loadUser();
-  }, [post.id]);
+    if (!user) return;
+    // Load user's existing vote
+    base44.entities.Vote.filter({
+      user_id: user.id,
+      content_id: post.id,
+      content_type: 'post'
+    }).then(votes => {
+      if (votes.length > 0) setUserVote(votes[0].vote_type);
+    }).catch(() => {});
+  }, [post.id, user?.id]);
 
   const handleLike = async () => {
     const newLiked = !isLiked;

@@ -266,6 +266,7 @@ export default function Home() {
                   <PostCard 
                     post={post} 
                     currentUserId={user?.id}
+                    currentUser={user}
                   />
                 </motion.div>
               </React.Fragment>
