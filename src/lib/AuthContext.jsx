@@ -9,9 +9,15 @@ import React, {
 import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 
+const BASE44_API_URL = 'https://api.base44.app';
+
 /** Fetch public app settings without relying on internal SDK dist paths. */
 async function fetchPublicSettings(appId, serverUrl) {
-  const url = `${serverUrl}/api/apps/public/prod/public-settings/by-id/${appId}`;
+  // If serverUrl is the app's own origin (preview sandbox), it can't serve the API —
+  // fall back to the real Base44 API server.
+  const isSameOrigin = !serverUrl || serverUrl === window.location.origin || serverUrl.startsWith(window.location.origin + '/');
+  const apiBase = isSameOrigin ? BASE44_API_URL : serverUrl;
+  const url = `${apiBase}/api/apps/public/prod/public-settings/by-id/${appId}`;
   const res = await fetch(url, {
     headers: { 'X-App-Id': appId },
   });
