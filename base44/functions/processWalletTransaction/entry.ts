@@ -1,4 +1,5 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.21';
+// @base44/sdk@0.8.25 — pinned to match the latest stable backend-supported version (frontend uses 0.8.26)
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const VALID_TOKEN_CONTRACT = 'ATF7deyT7FdS7GHip1Btv8t6Mj9vhsfzffoMZhE2vvwR'; // Ascendra Social token
 
