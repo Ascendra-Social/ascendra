@@ -52,8 +52,12 @@ const getAppParams = () => {
 		storage.removeItem('base44_access_token');
 		storage.removeItem('token');
 	}
-	// Also clear any cached bad server_url from localStorage
+	// Clear any cached bad server_url or login-looping from_url from localStorage
 	storage.removeItem('base44_server_url');
+	const cachedFromUrl = storage.getItem('base44_from_url');
+	if (cachedFromUrl && cachedFromUrl.includes('/login')) {
+		storage.removeItem('base44_from_url');
+	}
 	return {
 		appId: getAppParamValue("app_id", { defaultValue: import.meta.env.VITE_BASE44_APP_ID }),
 		serverUrl: getServerUrl(),
