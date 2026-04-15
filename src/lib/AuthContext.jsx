@@ -8,7 +8,22 @@ import React, {
 } from 'react';
 import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
-import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
+
+/** Fetch public app settings without relying on internal SDK dist paths. */
+async function fetchPublicSettings(appId, serverUrl) {
+  const url = `${serverUrl}/api/apps/public/prod/public-settings/by-id/${appId}`;
+  const res = await fetch(url, {
+    headers: { 'X-App-Id': appId },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const err = new Error(data?.message || `HTTP ${res.status}`);
+    err.status = res.status;
+    err.data = data;
+    throw err;
+  }
+  return data;
+}
 
 const AuthContext = createContext();
 
@@ -96,14 +111,7 @@ export const AuthProvider = ({ children }) => {
         setAuthError(null);
       });
 
-      const appClient = createAxiosClient({
-        baseURL: `${appParams.serverUrl}/api/apps/public`,
-        headers: { 'X-App-Id': appParams.appId },
-        token: appParams.token,
-        interceptResponses: true,
-      });
-
-      const publicSettings = await appClient.get(`/prod/public-settings/by-id/${appParams.appId}`);
+      const publicSettings = await fetchPublicSettings(appParams.appId, appParams.serverUrl);
 
       safeSetState(() => {
         setAppPublicSettings(publicSettings);
