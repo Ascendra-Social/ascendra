@@ -34,14 +34,29 @@ const getAppParamValue = (paramName, { defaultValue = undefined, removeFromUrl =
 	return null;
 }
 
+const getServerUrl = () => {
+	// Never read server_url from localStorage — it may have been poisoned by a preview session.
+	// Only read from URL param or env var. Never cache it.
+	if (isNode) return import.meta.env.VITE_BASE44_BACKEND_URL;
+	const urlParams = new URLSearchParams(window.location.search);
+	const fromUrl = urlParams.get('server_url');
+	// Ignore if it's the app's own origin (preview sandbox injects this)
+	if (fromUrl && fromUrl !== window.location.origin && !fromUrl.startsWith(window.location.origin + '/')) {
+		return fromUrl;
+	}
+	return import.meta.env.VITE_BASE44_BACKEND_URL || 'https://api.base44.app';
+};
+
 const getAppParams = () => {
 	if (getAppParamValue("clear_access_token") === 'true') {
 		storage.removeItem('base44_access_token');
 		storage.removeItem('token');
 	}
+	// Also clear any cached bad server_url from localStorage
+	storage.removeItem('base44_server_url');
 	return {
 		appId: getAppParamValue("app_id", { defaultValue: import.meta.env.VITE_BASE44_APP_ID }),
-		serverUrl: getAppParamValue("server_url", { defaultValue: import.meta.env.VITE_BASE44_BACKEND_URL }),
+		serverUrl: getServerUrl(),
 		token: getAppParamValue("access_token", { removeFromUrl: true }),
 		fromUrl: getAppParamValue("from_url", { defaultValue: isNode ? '' : window.location.href }),
 		functionsVersion: getAppParamValue("functions_version", { defaultValue: import.meta.env.VITE_BASE44_FUNCTIONS_VERSION }),
