@@ -37,6 +37,7 @@ export default function CreatePost() {
   const [isPremium, setIsPremium] = useState(false);
   const [accessPrice, setAccessPrice] = useState('');
   const [previewDuration, setPreviewDuration] = useState('10');
+  const [premiumError, setPremiumError] = useState('');
   const navigate = useNavigate();
 
   // Check for repost draft
@@ -92,6 +93,21 @@ export default function CreatePost() {
   const handleSubmit = async () => {
     if (!content.trim() && !mediaFile) return;
     if (!user?.id) return;
+
+    // Validate premium fields before proceeding
+    if (isPremium) {
+      const parsedPrice = parseFloat(accessPrice);
+      const parsedDuration = parseFloat(previewDuration);
+      if (!accessPrice || isNaN(parsedPrice) || parsedPrice <= 0) {
+        setPremiumError('Please enter a valid access price greater than 0.');
+        return;
+      }
+      if (!previewDuration || isNaN(parsedDuration) || parsedDuration <= 0) {
+        setPremiumError('Please enter a valid preview duration greater than 0.');
+        return;
+      }
+    }
+    setPremiumError('');
     
     setIsSubmitting(true);
     setModerationResult(null);
@@ -150,6 +166,9 @@ Post: "${content}"`,
 
       let contractId = null;
 
+      const safePrice = isPremium ? parseFloat(accessPrice) : 0;
+      const safeDuration = parseFloat(previewDuration) || 10;
+
       if (isPremium) {
         const contract = await base44.entities.SmartContract.create({
           creator_id: user.id,
@@ -159,9 +178,9 @@ Post: "${content}"`,
           contract_type: 'pay_per_view',
           total_budget: 0,
           pay_per_view_config: {
-            price_per_view: parseFloat(accessPrice),
+            price_per_view: safePrice,
             content_id: null,
-            preview_duration: parseFloat(previewDuration)
+            preview_duration: safeDuration
           },
           status: 'active',
           start_date: new Date().toISOString()
@@ -181,8 +200,8 @@ Post: "${content}"`,
         community_id: communityId || null,
         positivity_score: positivityScore,
         is_premium: isPremium,
-        access_price: isPremium ? parseFloat(accessPrice) : 0,
-        preview_duration: parseFloat(previewDuration),
+        access_price: safePrice,
+        preview_duration: safeDuration,
         smart_contract_id: contractId
       });
 
@@ -327,6 +346,14 @@ Post: "${content}"`,
                 onCheckedChange={setIsReel}
               />
             </div>
+          )}
+
+          {/* Premium Validation Error */}
+          {premiumError && (
+            <Alert variant="destructive" className="rounded-xl">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{premiumError}</AlertDescription>
+            </Alert>
           )}
 
           {/* Monetization Settings */}
