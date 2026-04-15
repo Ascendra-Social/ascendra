@@ -247,30 +247,3 @@ export class AuditLogger {
 export function createAuditLogger(base44, user, request = null) {
   return new AuditLogger(base44, user, request);
 }
-
-/**
- * Middleware to automatically log all backend function calls
- */
-export async function auditLogMiddleware(req, handler) {
-  const base44 = createClientFromRequest(req);
-  const user = await base44.auth.me().catch(() => null);
-  const logger = new AuditLogger(base44, user, req);
-
-  try {
-    const result = await handler(base44, user, logger);
-    return result;
-  } catch (error) {
-    // Log the error
-    await logger.log({
-      event_type: 'security_alert',
-      target_type: 'system',
-      action: 'Function execution failed',
-      status: 'failed',
-      error_message: error.message,
-      metadata: {
-        stack: error.stack
-      }
-    });
-    throw error;
-  }
-}

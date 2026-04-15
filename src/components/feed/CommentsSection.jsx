@@ -18,54 +18,58 @@ export default function CommentsSection({ postId, currentUserId }) {
   });
 
   const createCommentMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (trimmedContent) => {
       const currentUser = await base44.auth.me();
+      if (!currentUser) throw new Error('Not authenticated');
       const result = await base44.entities.Comment.create({
         post_id: postId,
-        author_id: currentUserId,
+        author_id: currentUser.id,
         author_name: currentUser.full_name,
         author_avatar: currentUser.avatar,
-        content: newComment
+        content: trimmedContent
       });
-      return { result, currentUser };
+      return { result, currentUser, trimmedContent };
     },
-    onSuccess: async ({ result, currentUser }) => {
+    onSuccess: async ({ currentUser, trimmedContent }) => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId] });
-      
+
       // Update post comments count and notify post author
       const posts = await base44.entities.Post.filter({ id: postId });
       if (posts[0]) {
         await base44.entities.Post.update(postId, {
           comments_count: (posts[0].comments_count || 0) + 1
         });
-        // Notify post author
-        if (posts[0].author_id && posts[0].author_id !== currentUserId) {
+        if (posts[0].author_id && posts[0].author_id !== currentUser.id) {
           base44.entities.Notification.create({
             recipient_id: posts[0].author_id,
-            sender_id: currentUserId,
+            sender_id: currentUser.id,
             sender_name: currentUser.full_name,
             sender_avatar: currentUser.avatar,
             type: 'comment',
             content_id: postId,
-            content_preview: newComment.slice(0, 80)
+            content_preview: trimmedContent.slice(0, 80)
           }).catch(() => {});
         }
       }
-      
+
       setNewComment('');
       toast.success('Comment posted!');
     },
     onError: (error) => {
       console.error('=== COMMENT ERROR ===', error);
-      toast.error('Failed to post comment: ' + (error.message || JSON.stringify(error)));
+      if (error.message === 'Not authenticated') {
+        toast.error('You must be logged in to comment.');
+      } else {
+        toast.error('Failed to post comment: ' + (error.message || 'Unknown error'));
+      }
     }
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (newComment.trim()) {
-      createCommentMutation.mutate();
-    }
+    const trimmed = newComment.trim();
+    if (!trimmed) return;
+    createCommentMutation.mutate(trimmed);
   };
 
   return (
