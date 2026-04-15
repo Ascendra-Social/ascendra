@@ -21,8 +21,9 @@ export default function Messages() {
   const messagesEndRef = useRef(null);
   const queryClient = useQueryClient();
 
-  // Pre-fill message if navigated here from a reel share
+  // Pre-fill message if navigated here from a reel share — defer until user is loaded
   useEffect(() => {
+    if (!user) return; // wait for auth before opening modal that needs currentUser
     const params = new URLSearchParams(window.location.search);
     const shareReel = params.get('shareReel');
     const shareTitle = params.get('shareTitle');
@@ -30,8 +31,10 @@ export default function Messages() {
       const link = `${window.location.origin}${createPageUrl('Reels')}`;
       setNewMessage(`Check out this reel: ${shareTitle ? decodeURIComponent(shareTitle) + ' - ' : ''}${link}`);
       setShowNewConversationModal(true);
+      // Clear params so re-renders don't re-open the modal
+      window.history.replaceState({}, '', window.location.pathname);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const loadUser = async () => {
