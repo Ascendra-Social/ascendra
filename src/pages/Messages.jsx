@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import ConversationItem from '@/components/messages/ConversationItem';
 import NewConversationModal from '@/components/messages/NewConversationModal';
 import { formatDistanceToNow } from 'date-fns';
+import { createPageUrl } from '@/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Messages() {
