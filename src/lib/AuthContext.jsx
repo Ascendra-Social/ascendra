@@ -145,11 +145,9 @@ export const AuthProvider = ({ children }) => {
           const reason = appError.data.extra_data.reason;
 
           if (reason === 'auth_required') {
-            // Redirect to login directly — do NOT set authError to avoid loops in App.jsx
-            const isLoginPage = window.location.pathname.includes('/login');
-            if (!isLoginPage) {
-              base44.auth.redirectToLogin(window.location.href);
-            }
+            // Set the error type so App.jsx can decide whether to redirect
+            // App.jsx will NOT redirect if already on login page
+            setAuthError({ type: 'auth_required', message: 'Authentication required' });
             setIsLoadingPublicSettings(false);
             setIsLoadingAuth(false);
             return;
@@ -207,11 +205,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const navigateToLogin = () => {
-    // Only pass from_url if we're NOT already on the login page, to prevent infinite redirect loops
-    const currentPath = window.location.pathname;
-    const isLoginPage = currentPath.includes('/login') || window.location.href.includes('/login');
-    const fromUrl = isLoginPage ? undefined : window.location.href;
-    base44.auth.redirectToLogin(fromUrl);
+    const isLoginPage = window.location.pathname.includes('/login') || window.location.href.includes('/login');
+    if (isLoginPage) return; // Safety guard — never redirect if already on login
+    // Pass only the clean origin+path as from_url, never any query string that could nest from_url
+    const cleanFromUrl = window.location.origin + window.location.pathname;
+    base44.auth.redirectToLogin(cleanFromUrl);
   };
 
   return (

@@ -22,5 +22,5 @@ export const base44 = createClient({
   serverUrl: resolvedServerUrl,
   token,
   functionsVersion,
-  requiresAuth: true
+  requiresAuth: false
 });
