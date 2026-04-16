@@ -145,7 +145,14 @@ export const AuthProvider = ({ children }) => {
           const reason = appError.data.extra_data.reason;
 
           if (reason === 'auth_required') {
-            setAuthError({ type: 'auth_required', message: 'Authentication required' });
+            // Redirect to login directly — do NOT set authError to avoid loops in App.jsx
+            const isLoginPage = window.location.pathname.includes('/login');
+            if (!isLoginPage) {
+              base44.auth.redirectToLogin(window.location.href);
+            }
+            setIsLoadingPublicSettings(false);
+            setIsLoadingAuth(false);
+            return;
           } else if (reason === 'user_not_registered') {
             setAuthError({ type: 'user_not_registered', message: 'User not registered for this app' });
           } else {

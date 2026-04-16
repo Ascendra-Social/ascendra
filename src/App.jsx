@@ -32,8 +32,9 @@ const AuthenticatedApp = () => {
   useEffect(() => {
     if (!authError) return;
 
+    // Only force redirect for expired/forbidden sessions, NOT for auth_required
+    // (auth_required just means user is not logged in on a public app — that's fine)
     if (
-      authError.type === 'auth_required' ||
       authError.type === 'auth_expired' ||
       authError.type === 'auth_forbidden'
     ) {
